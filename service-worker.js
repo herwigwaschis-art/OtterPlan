@@ -1,4 +1,4 @@
-const CACHE="otterplan-v22";
+const CACHE="milo-v23";
 const STATIC=["./","./index.html","./manifest.webmanifest","./icon.svg"];
 
 self.addEventListener("install",event=>{
