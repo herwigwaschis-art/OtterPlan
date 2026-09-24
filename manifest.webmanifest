@@ -5,7 +5,7 @@
   "start_url":"./",
   "scope":"./",
   "display":"standalone",
-  "background_color":"#f4f7f4",
-  "theme_color":"#2f6f65",
-  "icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+  "background_color":"#f8fbfb",
+  "theme_color":"#0EA5A0",
+  "icons":[{"src":"./milo-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
 }
