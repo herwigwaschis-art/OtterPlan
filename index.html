@@ -556,7 +556,7 @@ function leaveAdmin(){showTeacherArea("class")}
 async function openGradeOverview(grade){
  modal("classChooserModal",false);
  S.gradeLevel=Number(grade);
- S.gradeActivePlan=null;S.gradeStudentData=null;S.student=null;
+ S.gradeActivePlan=null;S.gradeStudentData=null;S.student=null;S.gradeQuickMode=false;S.gradeFilter="all";S.gradeClassFilter="all";
  el("gradeOverviewContent").style.display="block";el("gradeStudentDetail").style.display="none";
  showTeacherArea("grade");
  await loadGradeOverview()
@@ -564,26 +564,47 @@ async function openGradeOverview(grade){
 async function loadGradeOverview(){
  var link=S.gradeLinks.find(function(x){return Number(x.grade_level)===Number(S.gradeLevel)});
  if(!link){toast("Keine Berechtigung für diese Stufe");showTeacherArea("class");return}
- var r=await sb.rpc("list_grade_plan_students",{p_school_id:link.school_id,p_grade_level:Number(S.gradeLevel),p_week_start:week()});
+ var day=isCurrentWeek()?new Date().getDay():0;
+ var r=await sb.rpc("list_grade_plan_students_v2",{p_school_id:link.school_id,p_grade_level:Number(S.gradeLevel),p_week_start:week(),p_weekday:Number(day>=1&&day<=5?day:0)});
  if(r.error){toast("Stufenüberblick konnte nicht geladen werden");return}
  S.gradeRows=r.data||[];
  renderGradeOverview()
 }
+function gradeFilteredRows(){
+ var rows=(S.gradeRows||[]).slice();
+ if(S.gradeClassFilter&&S.gradeClassFilter!=="all")rows=rows.filter(function(x){return x.class_name===S.gradeClassFilter});
+ if(S.gradeFilter==="checkin")rows=rows.filter(function(x){return !x.checkin_completed});
+ if(S.gradeFilter==="checkout")rows=rows.filter(function(x){return !x.checkout_self});
+ if(S.gradeFilter==="today")rows=rows.filter(function(x){return isCurrentWeek()&&Number(x.today_enabled_count||0)>0&&Number(x.today_rated_count||0)===0});
+ return rows
+}
+function setGradeFilter(v){S.gradeFilter=v||"all";S.gradeQuickMode=false;renderGradeOverview()}
+function setGradeClassFilter(v){S.gradeClassFilter=v||"all";S.gradeQuickMode=false;renderGradeOverview()}
 function renderGradeOverview(){
  el("gradeTitle").textContent="Stufe "+S.gradeLevel+" · Überblick";updateDateUI();
  var rows=S.gradeRows||[];
+ var filtered=gradeFilteredRows();
  var ci=rows.filter(function(x){return x.checkin_completed}).length;
  var co=rows.filter(function(x){return !!x.checkout_self}).length;
- el("gradeSummary").innerHTML='<div class="dash-card"><div class="dash-value">'+rows.length+'</div><div class="dash-label">Kinder mit Plan</div></div><div class="dash-card"><div class="dash-value">'+ci+'</div><div class="dash-label">Check-in erledigt</div></div><div class="dash-card"><div class="dash-value">'+co+'</div><div class="dash-label">Check-out erledigt</div></div>';
- var groups={};rows.forEach(function(x){if(!groups[x.class_name])groups[x.class_name]=[];groups[x.class_name].push(x)});
+ var todayDone=rows.filter(function(x){return Number(x.today_rated_count||0)>0}).length;
+ el("gradeSummary").innerHTML='<div class="dash-card"><div class="dash-value">'+rows.length+'</div><div class="dash-label">Kinder mit Plan</div></div><div class="dash-card"><div class="dash-value">'+ci+'/'+rows.length+'</div><div class="dash-label">Check-in erledigt</div></div><div class="dash-card"><div class="dash-value">'+co+'/'+rows.length+'</div><div class="dash-label">Check-out erledigt</div></div>';
+ ["all","checkin","checkout","today"].forEach(function(v){var x=el("gradeFilter"+(v==="all"?"All":v==="checkin"?"Checkin":v==="checkout"?"Checkout":"Today"));if(x)x.classList.toggle("active",S.gradeFilter===v)});
+ var todayFilter=el("gradeFilterToday");if(todayFilter)todayFilter.style.display=isCurrentWeek()?"inline-block":"none";
+ var classes=[...new Set(rows.map(function(x){return x.class_name}))].sort();
+ var cls=el("gradeClassFilter");if(cls){cls.innerHTML='<option value="all">Alle Klassen</option>'+classes.map(function(n){return '<option value="'+esc(n)+'">'+esc(n)+'</option>'}).join("");cls.value=classes.indexOf(S.gradeClassFilter)>=0?S.gradeClassFilter:"all";if(cls.value==="all")S.gradeClassFilter="all"}
+ var groups={};filtered.forEach(function(x){if(!groups[x.class_name])groups[x.class_name]=[];groups[x.class_name].push(x)});
  el("gradePlanGroups").innerHTML=Object.keys(groups).map(function(name){
    return '<section><h3 class="grade-plan-title">'+esc(name)+'</h3><div class="grade-plan-grid">'+groups[name].map(function(x){
      var ciText=x.checkin_completed?"🎯 Check-in":"○ Check-in offen";
      var coText=x.checkout_self?"✅ Check-out":"○ Check-out offen";
+     var todayText=isCurrentWeek()&&new Date().getDay()>=1&&new Date().getDay()<=5?(Number(x.today_rated_count||0)>0?"😊 heute "+Number(x.today_rated_count||0):"○ heute offen"):"";
      var idx=rows.indexOf(x);
-     return '<div class="grade-plan-card"><h3>'+esc(x.avatar_emoji||"🦦")+' '+esc(x.display_name)+'</h3><div class="goal">'+esc(x.goal||"Noch kein Ziel")+'</div><div class="student-status"><span class="status-chip">'+ciText+'</span><span class="status-chip">'+coText+'</span></div><div class="grade-plan-actions" style="margin-top:12px"><button class="btn small grade-plan-open" onclick="APP.gradeOpenStudent('+idx+')">Plan öffnen →</button><button class="btn secondary small" onclick="APP.gradeCheckin('+idx+')">Check-in</button><button class="btn secondary small" onclick="APP.gradeCheckout('+idx+')">Check-out</button></div></div>';
+     return '<div class="grade-plan-card"><h3>'+esc(x.avatar_emoji||"🦦")+' '+esc(x.display_name)+'</h3><div class="goal">'+esc(x.goal||"Noch kein Ziel")+'</div><div class="student-status"><span class="status-chip">'+ciText+'</span><span class="status-chip">'+coText+'</span>'+(todayText?'<span class="status-chip">'+todayText+'</span>':'')+'</div><div class="grade-plan-actions" style="margin-top:12px"><button class="btn small grade-plan-open" onclick="APP.gradeOpenStudent('+idx+')">Plan öffnen →</button><button class="btn secondary small" onclick="APP.gradeCheckin('+idx+')">Check-in</button><button class="btn secondary small" onclick="APP.gradeCheckout('+idx+')">Check-out</button></div></div>';
    }).join("")+'</div></section>';
- }).join("")||'<div class="card" style="text-align:center"><h3 style="margin:0 0 5px">Noch keine Wochenpläne</h3><p class="muted" style="margin:0">Sobald Kinder in Stufe '+S.gradeLevel+' einen Plan haben, erscheinen sie hier.</p></div>'
+ }).join("")||'<div class="card" style="text-align:center"><h3 style="margin:0 0 5px">'+(rows.length?"Keine Treffer":"Noch keine Wochenpläne")+'</h3><p class="muted" style="margin:0">'+(rows.length?"Passe den Filter an.":"Sobald Kinder in Stufe "+S.gradeLevel+" einen Plan haben, erscheinen sie hier.")+'</p></div>';
+ if(isCurrentWeek()&&new Date().getDay()>=1&&new Date().getDay()<=5&&S.gradeFilter==="all"&&todayDone<rows.length){
+   var t=el("gradeDate");if(t)t.textContent="📅 "+todayLong()+" · "+todayDone+"/"+rows.length+" Kinder heute bewertet"
+ }
 }
 async function loadGradeStudent(studentId){
  var r=await sb.rpc("grade_get_student_week",{p_student_id:studentId,p_week_start:week()});
@@ -595,22 +616,50 @@ async function loadGradeStudent(studentId){
  S.scheduleSlots=(d.schedule_slots||[]).map(function(x){x.student_id=S.student.id;return x});
  renderGradeStudent();return true
 }
+async function openGradeStudentById(studentId){
+ el("gradeOverviewContent").style.display="none";el("gradeStudentDetail").style.display="block";
+ var ok=await loadGradeStudent(studentId);
+ if(!ok){el("gradeOverviewContent").style.display="block";el("gradeStudentDetail").style.display="none"}
+}
 async function gradeOpenStudent(i){
  var x=S.gradeRows[Number(i)];if(!x)return;
- el("gradeOverviewContent").style.display="none";el("gradeStudentDetail").style.display="block";
- var ok=await loadGradeStudent(x.student_id);
- if(!ok){el("gradeOverviewContent").style.display="block";el("gradeStudentDetail").style.display="none"}
+ S.gradeQuickMode=false;
+ await openGradeStudentById(x.student_id)
+}
+async function startGradeQuickMode(){
+ var rows=gradeFilteredRows();
+ if(!rows.length){toast("Für diesen Filter gibt es keine Kinder");return}
+ S.gradeQuickMode=true;S.gradeQuickIndex=0;
+ await openGradeStudentById(rows[0].student_id)
 }
 function renderGradeStudent(){
  if(!S.gradeStudentData||!S.student)return;
  var d=S.gradeStudentData,p=S.gradeActivePlan;
  el("gradeStudentName").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name;
- el("gradeStudentMeta").textContent=(d.student.class_name||"")+" · Stufe "+(d.student.grade_level||S.gradeLevel);
+ el("gradeStudentMeta").textContent=(d.student.class_name||"")+" · Stufe "+(d.student.grade_level||S.gradeLevel)+" · "+weekRangeLabel();
  el("gradeStudentGoal").innerHTML=p?'<strong>'+esc(p.goal)+'</strong>'+(p.help_text?'<div class="muted" style="margin-top:6px">💡 '+esc(p.help_text)+'</div>':''):"Noch kein Ziel";
+ var nav=el("gradeQuickNav");
+ if(nav){
+   nav.style.display=S.gradeQuickMode?"flex":"none";
+   if(S.gradeQuickMode){
+     var rows=gradeFilteredRows(),idx=rows.findIndex(function(x){return x.student_id===S.student.id});if(idx<0)idx=0;S.gradeQuickIndex=idx;
+     el("gradeQuickCount").textContent=(idx+1)+" von "+rows.length
+   }
+ }
  updateDateUI();renderWeek("gradeStudentWeek",true)
 }
+async function gradeQuickNext(delta){
+ var rows=gradeFilteredRows();if(!rows.length)return;
+ var idx=rows.findIndex(function(x){return S.student&&x.student_id===S.student.id});if(idx<0)idx=S.gradeQuickIndex||0;
+ var next=idx+Number(delta||0);
+ if(next<0){toast("Das ist das erste Kind");return}
+ if(next>=rows.length){toast("Alle Kinder in diesem Filter geschafft");return}
+ S.gradeQuickMode=true;S.gradeQuickIndex=next;await openGradeStudentById(rows[next].student_id)
+}
+function gradeDetailCheckin(){if(S.student)checkin()}
+function gradeDetailCheckout(){if(S.student)checkout()}
 function gradeBackToOverview(){
- S.gradeStudentData=null;S.gradeActivePlan=null;S.student=null;S.ratings=[];S.scheduleSlots=[];
+ S.gradeQuickMode=false;S.gradeStudentData=null;S.gradeActivePlan=null;S.student=null;S.ratings=[];S.scheduleSlots=[];
  el("gradeStudentDetail").style.display="none";el("gradeOverviewContent").style.display="block";renderGradeOverview()
 }
 function gradeCheckin(i){
@@ -625,7 +674,7 @@ function gradeCheckout(i){
  S.student={id:x.student_id,display_name:x.display_name,avatar_emoji:x.avatar_emoji};
  checkout()
 }
-function backFromGrade(){S.gradeActivePlan=null;S.gradeStudentData=null;S.student=null;S.gradeRows=[];S.ratings=[];S.scheduleSlots=[];showTeacherArea("class");if(!S.classRow&&S.gradeLinks.length)setTimeout(openClassChooser,80)}
+function backFromGrade(){S.gradeQuickMode=false;S.gradeActivePlan=null;S.gradeStudentData=null;S.student=null;S.gradeRows=[];S.ratings=[];S.scheduleSlots=[];showTeacherArea("class");if(!S.classRow&&S.gradeLinks.length)setTimeout(openClassChooser,80)}
 
 function renderHome(){
  el("teacherHome").style.display="block";el("teacherDetail").style.display="none";updateDateUI();
