@@ -97,7 +97,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
 </section>
 
 <section id="teacher" class="screen">
-  <div class="view-tabs"><button id="tabClass" class="view-tab active" onclick="APP.showTeacherArea('class')">Klassen</button><button id="tabSchool" class="view-tab" onclick="APP.showTeacherArea('school')">Schule</button><button id="tabAdmin" class="view-tab" style="display:none" onclick="APP.showTeacherArea('admin')">Admin</button></div>
+  <div id="teacherTabs" class="view-tabs"><button id="tabClass" class="view-tab active" onclick="APP.showTeacherArea('class')">Klassen</button><button id="tabAdmin" class="view-tab" style="display:none" onclick="APP.showTeacherArea('admin')">Admin</button></div>
 
   <div id="classArea">
     <div id="teacherHome">
@@ -130,15 +130,8 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
     </div>
   </div>
 
-  <div id="schoolArea" style="display:none">
-    <div class="section-center"><h2 style="margin:0">Schule</h2><p class="muted" style="margin:6px 0 0">Klassen nach Stufen</p><button id="schoolAdminShortcut" class="btn ghost" style="margin-top:14px" onclick="APP.showTeacherArea('admin')">⚙︎ Admin</button></div>
-    <div class="school-toolbar"><select id="schoolSelect" onchange="APP.switchSchool(this.value)"></select></div>
-    <div id="schoolOverview"></div>
-  </div>
-
   <div id="adminArea" style="display:none">
-    <div class="section-center"><h2 style="margin:0">Admin</h2><p class="muted" style="margin:6px 0 0">Schule, Lehrkräfte und Grundeinstellungen</p></div>
-    <div class="school-toolbar"><select id="adminSchoolSelect" onchange="APP.switchAdminSchool(this.value)"></select></div>
+    <div class="section-center"><h2 style="margin:0">Admin</h2><p class="muted" style="margin:6px 0 0">Schule, Klassen, Lehrkräfte und Grundeinstellungen</p></div>
     <div id="adminContent"></div>
   </div>
 </section>
@@ -345,7 +338,7 @@ async function load(){
      ids.length?sb.from("student_schedule_slots").select("*").in("student_id",ids):Promise.resolve({data:[]})
    ]);
    S.timetable=[];S.plans=q[0].data||[];S.ratings=q[1].data||[];S.rewards=q[2].data||[];S.progress=q[3].data||[];S.scheduleSlots=q[4].data||[];
-   renderTeacherShell();renderHome();if(S.teacherArea==="school")await loadSchoolOverview();show("teacher");
+   renderTeacherShell();renderHome();show("teacher");
  }else if(S.role==="student"){
    var link=await sb.from("student_device_links").select("student_id").eq("user_id",S.user.id).maybeSingle();var sid=link.data&&link.data.student_id;
    if(!sid){var legacy=await sb.from("students").select("id").eq("child_user_id",S.user.id).maybeSingle();sid=legacy.data&&legacy.data.id}
@@ -380,9 +373,10 @@ function renderTeacherShell(){
    switchName.textContent=S.classRow?S.classRow.name:"Klasse wählen";
    el("classMeta").textContent=S.classRow?(S.classRow.grade_level?"Stufe "+S.classRow.grade_level+" · ":"")+(S.classRow.school_year||""):"";
  }
- var ss=el("schoolSelect");ss.innerHTML=S.schools.length?S.schools.map(function(s){return '<option value="'+s.id+'" '+(S.schoolRow&&S.schoolRow.id===s.id?'selected':'')+'>'+esc(s.name)+'</option>'}).join(""):'<option value="">Noch keine Schule</option>';
- var admins=adminSchools(),as=el("adminSchoolSelect");as.innerHTML=admins.length?admins.map(function(s){return '<option value="'+s.id+'" '+(S.schoolRow&&S.schoolRow.id===s.id?'selected':'')+'>'+esc(s.name)+'</option>'}).join(""):'<option value="">Neue Schule anlegen</option>';
- var showAdmin=admins.length>0||S.schools.length===0;el("tabSchool").style.display=S.schools.length?"inline-block":"none";el("tabAdmin").style.display=showAdmin?"inline-block":"none";el("schoolAdminShortcut").style.display=(S.schoolRow&&isSchoolAdmin(S.schoolRow.id))?"inline-block":"none";
+ var admins=adminSchools();
+ var showAdmin=admins.length>0||S.schools.length===0;
+ el("tabAdmin").style.display=showAdmin?"inline-block":"none";
+ el("teacherTabs").style.display=showAdmin?"flex":"none";
 }
 function openClassChooser(){
  if(!S.classes.length){toast("Noch keine Klasse zugeordnet");return}
@@ -411,13 +405,10 @@ async function switchClass(id){return chooseClass(id)}
 function showTeacherArea(area){
  if(area==="admin"&&adminSchools().length===0&&S.schools.length>0){toast("Dafür brauchst du Admin-Rechte");return}
  S.teacherArea=area;
- el("tabClass").classList.toggle("active",area==="class");el("tabSchool").classList.toggle("active",area==="school");el("tabAdmin").classList.toggle("active",area==="admin");
- el("classArea").style.display=area==="class"?"block":"none";el("schoolArea").style.display=area==="school"?"block":"none";el("adminArea").style.display=area==="admin"?"block":"none";
- if(area==="school")loadSchoolOverview();
+ el("tabClass").classList.toggle("active",area==="class");el("tabAdmin").classList.toggle("active",area==="admin");
+ el("classArea").style.display=area==="class"?"block":"none";el("adminArea").style.display=area==="admin"?"block":"none";
  if(area==="admin")renderAdminArea();
 }
-async function switchSchool(id){S.schoolRow=S.schools.find(function(s){return s.id===id})||null;renderTeacherShell();await loadSchoolOverview()}
-async function switchAdminSchool(id){S.schoolRow=S.schools.find(function(s){return s.id===id})||null;renderTeacherShell();await renderAdminArea()}
 
 function renderHome(){
  el("teacherHome").style.display="block";el("teacherDetail").style.display="none";
@@ -668,17 +659,9 @@ async function removeSchoolMember(uid){if(!confirm("Lehrkraft aus dieser Schule 
 function resetTeacherPasswordIndex(i){var m=S.schoolMembers[Number(i)];if(m)resetTeacherPassword(m.user_id,m.email)}
 function removeSchoolMemberIndex(i){var m=S.schoolMembers[Number(i)];if(m)removeSchoolMember(m.user_id)}
 
-async function loadSchoolOverview(){
- if(!S.schoolRow){el("schoolOverview").innerHTML='<div class="card"><h3>Noch keine Schule</h3><p class="muted">Die Schule wird im Admin-Bereich eingerichtet.</p><button class="btn" onclick="APP.showTeacherArea(\'admin\')">Admin öffnen</button></div>';return}
- var r=await sb.rpc("list_school_structure",{p_school_id:S.schoolRow.id});S.schoolStructure=r.data||[];
- var groups={};S.schoolStructure.forEach(function(c){var g=c.grade_level?String(c.grade_level):"Weitere";if(!groups[g])groups[g]=[];groups[g].push(c)});
- var keys=Object.keys(groups).sort(function(a,b){return a==="Weitere"?1:b==="Weitere"?-1:Number(a)-Number(b)});
- el("schoolOverview").innerHTML=keys.map(function(g){return '<div class="grade-block"><h3 class="grade-title">'+(g==="Weitere"?"Weitere Klassen":"Stufe "+g)+'</h3><div class="school-grid">'+groups[g].map(function(c){return '<div class="school-card"><h3>'+esc(c.class_name)+'</h3><div class="meta">'+esc(c.school_year||"")+" · "+c.student_count+" Kinder</div>"+(c.has_access?'<button class="btn small" onclick="APP.openSchoolClass(\''+c.class_id+'\')">Öffnen</button>':'<span class="pill">Nur Übersicht</span>')+'</div>'}).join("")+'</div></div>'}).join("")||'<div class="card muted">Noch keine Klassen in dieser Schule.</div>';
-}
-async function openSchoolClass(id){var c=S.classes.find(function(x){return x.id===id});if(!c){await load();c=S.classes.find(function(x){return x.id===id})}if(!c){toast("Keine Klassenberechtigung");return}S.classRow=c;S.teacherArea="class";await load();showTeacherArea("class")}
 function gradeOptions(blank){var a=blank?['<option value="">Keine</option>']:[];for(var i=1;i<=13;i++)a.push('<option value="'+i+'">Stufe '+i+'</option>');return a.join("")}
-async function attachClass(){var cid=el("attachClass").value,g=Number(el("attachGrade").value);if(!cid||!g)return;var r=await sb.rpc("attach_class_to_school",{p_class_id:cid,p_school_id:S.schoolRow.id,p_grade_level:g});if(r.error){toast("Zuordnung nicht möglich");return}await load();await renderSchoolAdmin();await loadSchoolOverview();toast("Klasse zugeordnet")}
-async function createSchoolClass(){var n=el("schoolClassName").value.trim(),g=Number(el("schoolClassGrade").value),y=el("schoolClassYear").value.trim()||"2026/27";if(!n||!g)return;var r=await sb.rpc("create_class_for_school",{p_school_id:S.schoolRow.id,p_name:n,p_grade_level:g,p_school_year:y});if(r.error){toast("Klasse konnte nicht angelegt werden");return}await load();await renderSchoolAdmin();await loadSchoolOverview();toast("Klasse angelegt")}
+async function attachClass(){var cid=el("attachClass").value,g=Number(el("attachGrade").value);if(!cid||!g)return;var r=await sb.rpc("attach_class_to_school",{p_class_id:cid,p_school_id:S.schoolRow.id,p_grade_level:g});if(r.error){toast("Zuordnung nicht möglich");return}await load();S.teacherArea="admin";showTeacherArea("admin");toast("Klasse zugeordnet")}
+async function createSchoolClass(){var n=el("schoolClassName").value.trim(),g=Number(el("schoolClassGrade").value),y=el("schoolClassYear").value.trim()||"2026/27";if(!n||!g)return;var r=await sb.rpc("create_class_for_school",{p_school_id:S.schoolRow.id,p_name:n,p_grade_level:g,p_school_year:y});if(r.error){toast("Klasse konnte nicht angelegt werden");return}await load();S.teacherArea="admin";showTeacherArea("admin");toast("Klasse angelegt")}
 
 function renderChild(){
  var s=S.student,p=plan(s.id),sh=shells(s.id),x=stats(s.id),rewards=rs(s.id),next=rewards.find(function(r){return r.shells_required>sh});
@@ -700,7 +683,7 @@ window.addEventListener("online",updateNet);window.addEventListener("offline",up
 
 window.APP={
  login:login,logout:logout,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,help:help,account:account,saveOwnPassword:saveOwnPassword,copyCredentials:copyCredentials,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,
- showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,switchSchool:switchSchool,switchAdminSchool:switchAdminSchool,openSchoolClass:openSchoolClass,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
+ showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
  openStudent:openStudent,back:back,openRating:openRating,saveRating:saveRating,clearRating:clearRating,
  checkin:checkin,fillCheckinTemplate:fillCheckinTemplate,pickCheckin:pickCheckin,saveCheckin:saveCheckin,
