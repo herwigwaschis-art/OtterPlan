@@ -75,7 +75,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
     </div>
   </div>
 </header>
-<div class="banner">🧪 Testbetrieb · noch keine echten Schülerdaten verwenden</div>
+<div id="pilotBanner" class="banner">🧪 Pilotmodus · noch keine echten Schülerdaten verwenden</div>
 
 <main>
 <section id="login" class="screen active">
@@ -103,7 +103,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
             </div>
           </details>
         </div>
-        <div class="test-note">🧪 Testbetrieb · noch keine echten Schülerdaten verwenden</div>
+        <div id="startPilotNote" class="test-note">🧪 Pilotmodus · noch keine echten Schülerdaten verwenden</div>
       </div>
     </div>
   </div>
@@ -475,6 +475,13 @@ async function loadStudent(withRatings){
 function isSchoolAdmin(id){return S.schoolMemberships.some(function(m){return m.school_id===id&&m.role==="admin"})}
 function adminSchools(){return S.schools.filter(function(s){return isSchoolAdmin(s.id)})}
 function canManageCurrentClass(){return !!(S.classRow&&(S.classRow.teacher_id===S.user.id||(S.classRow.school_id&&isSchoolAdmin(S.classRow.school_id))))}
+function renderPilotMode(){
+ var settings=S.schoolRow&&S.schoolSettings.find(function(x){return x.school_id===S.schoolRow.id});
+ var pilot=!settings||settings.pilot_mode!==false;
+ var b=el("pilotBanner"),s=el("startPilotNote");
+ if(b){b.style.display="block";b.textContent=pilot?"🧪 Pilotmodus · nur Test- und Fantasiedaten verwenden":"MILO Schulmodus · schulische Freigaben bitte weiterhin eigenständig prüfen";b.style.background=pilot?"rgba(255,248,225,.84)":"rgba(238,246,244,.88)";b.style.color=pilot?"#7a5b14":"#48635d"}
+ if(s){s.textContent=pilot?"🧪 Pilotmodus · nur Test- und Fantasiedaten verwenden":"Schulmodus · Freigaben bitte weiterhin eigenständig prüfen"}
+}
 function renderTeacherShell(){
  var switchName=el("classSwitchName"),switchBtn=el("classSwitchBtn");
  if(!S.classes.length){
@@ -495,7 +502,7 @@ function renderTeacherShell(){
  var admins=adminSchools();
  var showAdmin=admins.length>0||S.schools.length===0;
  el("topAdminItem").style.display=showAdmin?"block":"none";
- updateDateUI();
+ updateDateUI();renderPilotMode();
 }
 function openClassChooser(){
  if(!S.classes.length&&!S.gradeLinks.length){toast("Noch keine Klasse oder Stufe zugeordnet");return}
@@ -803,7 +810,43 @@ async function clearRating(){
 function toggleTopMenu(){el("topMenu").classList.toggle("show")}
 function closeTopMenu(){var m=el("topMenu");if(m)m.classList.remove("show")}
 document.addEventListener("click",closeTopMenu);
-function help(){modal("helpModal",true)}
+function help(){
+ var title="MILO Hilfe",cards=[];
+ if(S.role==="student"){
+   title="MILO für Kinder";
+   cards=[
+    ["🎯 Mein Ziel","Oben siehst du dein Wochenziel und was dir dabei helfen kann."],
+    ["📅 Heute","Unter „Heute“ siehst du deine Stunden und die bisherigen Smileys."],
+    ["🐚 Muscheln","Deine Muscheln zeigen, wie du deinem nächsten Ziel näherkommst."]
+   ];
+ }else if(S.teacherArea==="grade"){
+   title="MILO · Stufenüberblick";
+   cards=[
+    ["🔎 Filtern","Zeige nur offene Check-ins, offene Check-outs, eine Klasse oder Kinder ohne heutige Bewertung."],
+    ["👤 Plan öffnen","Öffne ein Kind und tippe im Wochenplan direkt die Stunde an, um einen Smiley zu vergeben."],
+    ["⚡ Schnellmodus","Arbeite Kind für Kind durch. Unten wechselst du direkt zum nächsten Kind."],
+    ["📅 Woche wechseln","Mit den Pfeilen oben kannst du vergangene Wochen ansehen und bearbeiten."]
+   ];
+ }else if(S.teacherArea==="admin"){
+   title="MILO · Admin";
+   cards=[
+    ["👨‍🏫 Lehrkräfte","Lehrkräfte einladen und ihre Klassen- oder Stufenrechte später über „Bearbeiten“ ändern."],
+    ["🏫 Klassen","Klassen, Stufen und Schuljahr zentral verwalten."],
+    ["🧪 Pilotmodus","Im Pilotmodus bleibt der Testhinweis sichtbar. Das Abschalten ersetzt keine schulische oder datenschutzrechtliche Freigabe."]
+   ];
+ }else{
+   title="MILO · Klassenalltag";
+   cards=[
+    ["😊 Heute bewerten","Die wichtigste Alltagsfunktion. MILO zeigt dir, wie viele Kinder heute bereits bewertet wurden."],
+    ["📅 Woche wechseln","Mit den Pfeilen oben kannst du zurückblättern. Ein Klick auf die Wochenanzeige bringt dich zurück zur aktuellen Woche."],
+    ["✅ Wochenabschluss","Die Kachel „Wochenabschluss“ zeigt offene Kinder und führt direkt zum Abschluss."],
+    ["••• Weitere Funktionen","Dort findest du Kind hinzufügen, QR-Karten, Export und Klassenverwaltung."]
+   ];
+ }
+ el("helpTitle").textContent=title;
+ el("helpContent").innerHTML=cards.map(function(x){return '<div class="help-card"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join("");
+ modal("helpModal",true)
+}
 function openClassMore(){el("moreClassSettingsBtn").style.display=canManageCurrentClass()?"block":"none";modal("classMoreModal",true)}
 function openStudentMore(){if(!S.student)return;el("studentMoreName").textContent=S.student.display_name+" · Mehr";modal("studentMoreModal",true)}
 function moreCarryGoals(){modal("classMoreModal",false);carryGoals()}
@@ -980,11 +1023,11 @@ async function renderAdminArea(){
  S.schoolMembers=members.data||[];
  var structure=await sb.rpc("list_school_structure",{p_school_id:S.schoolRow.id});
  var classes=structure.data||[];S.adminClasses=classes;
- var settings=S.schoolSettings.find(function(x){return x.school_id===S.schoolRow.id})||{default_school_year:"2026/27",default_retention_days:90,teachers_can_create_classes:false};
+ var settings=S.schoolSettings.find(function(x){return x.school_id===S.schoolRow.id})||{default_school_year:"2026/27",default_retention_days:90,teachers_can_create_classes:false,pilot_mode:true};
 
  var memberRows=S.schoolMembers.map(function(m,i){
    var own=m.user_id===S.user.id;
-   var actions=own?'<span class="pill">Du</span>':'<button class="btn secondary small" onclick="APP.resetTeacherPasswordIndex('+i+')">Passwort-Link senden</button><button class="btn secondary small" onclick="APP.removeSchoolMemberIndex('+i+')">Entfernen</button>';
+   var actions=own?'<span class="pill">Du</span>':'<button class="btn secondary small" onclick="APP.openTeacherEditIndex('+i+')">Bearbeiten</button><button class="btn secondary small" onclick="APP.resetTeacherPasswordIndex('+i+')">Passwort-Link</button><button class="btn secondary small" onclick="APP.removeSchoolMemberIndex('+i+')">Entfernen</button>';
    return '<div class="list-row"><div class="list-main"><b>'+esc(m.display_name)+'</b><span>'+esc(m.email)+' · '+(m.role==="admin"?"Admin":"Lehrkraft")+'</span></div><div class="toolbar">'+actions+'</div></div>';
  }).join("");
 
@@ -1001,7 +1044,7 @@ async function renderAdminArea(){
    return '<div class="list-row"><div class="list-main"><b>'+esc(x.class_name)+'</b><span>'+esc(meta)+'</span></div><div class="toolbar"><span class="pill">'+(x.has_access?"Zugriff":"Übersicht")+'</span><button class="btn secondary small" onclick="APP.openAdminClassEditIndex('+i+')">Bearbeiten</button></div></div>';
  }).join("");
 
- var schoolCard='<div class="card s12"><div class="eyebrow">Schule</div><h2 style="margin:6px 0 12px">'+esc(S.schoolRow.name)+'</h2><div class="inline-grid"><div><label>Name</label><input id="adminSchoolName" value="'+esc(S.schoolRow.name)+'"></div><div><label>Standard-Schuljahr</label><input id="adminDefaultYear" value="'+esc(settings.default_school_year||"2026/27")+'"></div></div><label>Archivierte Daten löschen nach Tagen</label><input id="adminRetention" type="number" min="7" max="1095" value="'+Number(settings.default_retention_days||90)+'"><label class="check-item" style="margin-top:12px"><input id="adminTeacherCreateClass" type="checkbox" '+(settings.teachers_can_create_classes?"checked":"")+'><span>Lehrkräfte dürfen selbst neue Klassen anlegen</span></label><button class="btn" style="margin-top:12px" onclick="APP.saveAdminSettings()">Einstellungen speichern</button></div>';
+ var schoolCard='<div class="card s12"><div class="eyebrow">Schule</div><h2 style="margin:6px 0 12px">'+esc(S.schoolRow.name)+'</h2><div class="inline-grid"><div><label>Name</label><input id="adminSchoolName" value="'+esc(S.schoolRow.name)+'"></div><div><label>Standard-Schuljahr</label><input id="adminDefaultYear" value="'+esc(settings.default_school_year||"2026/27")+'"></div></div><label>Archivierte Daten löschen nach Tagen</label><input id="adminRetention" type="number" min="7" max="1095" value="'+Number(settings.default_retention_days||90)+'"><label class="check-item" style="margin-top:12px"><input id="adminTeacherCreateClass" type="checkbox" '+(settings.teachers_can_create_classes?"checked":"")+'><span>Lehrkräfte dürfen selbst neue Klassen anlegen</span></label><div class="pilot-box"><label class="check-item" style="margin:0"><input id="adminPilotMode" type="checkbox" '+(settings.pilot_mode!==false?"checked":"")+'><span><b>Pilotmodus aktiv</b>Testhinweise bleiben in MILO sichtbar.</span></label><p>Das Abschalten des Hinweises bedeutet nicht automatisch, dass alle schulischen oder datenschutzrechtlichen Voraussetzungen erfüllt sind.</p></div><button class="btn" style="margin-top:12px" onclick="APP.saveAdminSettings()">Einstellungen speichern</button></div>';
 
  var classCard='<div class="card s12"><div class="eyebrow">Klassen & Stufen</div><h2 style="margin:6px 0 12px">Klassen verwalten</h2><div class="compact-grid"><input id="schoolClassName" placeholder="z. B. 2a"><select id="schoolClassGrade">'+gradeOptions(false)+'</select><input id="schoolClassYear" value="'+esc(settings.default_school_year||"2026/27")+'"></div><button class="btn" style="margin-top:9px" onclick="APP.createSchoolClass()">Klasse anlegen</button>'+attachBlock+'<label>Übersicht</label><div class="list">'+(structureRows||'<div class="muted">Noch keine Klassen.</div>')+'</div></div>';
 
@@ -1011,7 +1054,13 @@ async function renderAdminArea(){
  box.innerHTML='<div class="grid">'+schoolCard+classCard+teacherCard+'</div>';
 }
 async function createSchoolFromAdmin(){var n=el("adminNewSchoolName").value.trim();if(!n)return;var r=await sb.rpc("create_school",{p_name:n});if(r.error){toast("Schule konnte nicht angelegt werden");return}await load();S.schoolRow=S.schools.find(function(s){return s.id===r.data})||S.schools[0];S.teacherArea="admin";showTeacherArea("admin");toast("Schule angelegt")}
-async function saveAdminSettings(){var r=await sb.rpc("update_school_admin_settings",{p_school_id:S.schoolRow.id,p_name:el("adminSchoolName").value,p_default_school_year:el("adminDefaultYear").value,p_default_retention_days:Number(el("adminRetention").value),p_teachers_can_create_classes:el("adminTeacherCreateClass").checked});if(r.error){toast("Einstellungen konnten nicht gespeichert werden");return}await load();S.teacherArea="admin";showTeacherArea("admin");toast("Einstellungen gespeichert")}
+async function saveAdminSettings(){
+ var r=await sb.rpc("update_school_admin_settings",{p_school_id:S.schoolRow.id,p_name:el("adminSchoolName").value,p_default_school_year:el("adminDefaultYear").value,p_default_retention_days:Number(el("adminRetention").value),p_teachers_can_create_classes:el("adminTeacherCreateClass").checked});
+ if(r.error){toast("Einstellungen konnten nicht gespeichert werden");return}
+ var p=await sb.rpc("set_school_pilot_mode",{p_school_id:S.schoolRow.id,p_pilot_mode:el("adminPilotMode").checked});
+ if(p.error){toast("Pilotmodus konnte nicht gespeichert werden");return}
+ await load();S.teacherArea="admin";showTeacherArea("admin");toast("Einstellungen gespeichert")
+}
 async function createTeacherAccount(){
  var name=el("newTeacherName").value.trim(),email=el("newTeacherEmail").value.trim(),role=el("newTeacherRole").value,ids=Array.from(document.querySelectorAll(".teacherClassCheck:checked")).map(function(x){return x.value}),grades=Array.from(document.querySelectorAll(".teacherGradeCheck:checked")).map(function(x){return Number(x.value)});
  if(!name||!email){toast("Name und E-Mail fehlen");return}
@@ -1030,6 +1079,29 @@ async function resetTeacherPassword(uid,email){
 async function removeSchoolMember(uid){if(!confirm("Lehrkraft aus dieser Schule entfernen? Klassenzuordnungen dieser Schule werden ebenfalls entfernt."))return;var r=await sb.rpc("remove_school_member",{p_school_id:S.schoolRow.id,p_user_id:uid});if(r.error){toast("Entfernen nicht möglich");return}await renderAdminArea();toast("Entfernt")}
 function resetTeacherPasswordIndex(i){var m=S.schoolMembers[Number(i)];if(m)resetTeacherPassword(m.user_id,m.email)}
 function removeSchoolMemberIndex(i){var m=S.schoolMembers[Number(i)];if(m)removeSchoolMember(m.user_id)}
+
+async function openTeacherEditIndex(i){
+ var m=S.schoolMembers[Number(i)];if(!m)return;
+ var r=await sb.rpc("get_teacher_permissions",{p_school_id:S.schoolRow.id,p_user_id:m.user_id});
+ if(r.error||!r.data){toast("Berechtigungen konnten nicht geladen werden");return}
+ var p=r.data;S.adminTeacherEdit=p;
+ el("teacherEditTitle").textContent=(p.display_name||m.display_name)+" bearbeiten";
+ el("editTeacherName").value=p.display_name||m.display_name||"";
+ el("editTeacherRole").value=p.role==="admin"?"admin":"teacher";
+ var ids=Array.isArray(p.class_ids)?p.class_ids:[];
+ el("editTeacherClassList").innerHTML=S.adminClasses.map(function(x){return '<label class="check-item"><input type="checkbox" class="editTeacherClassCheck" value="'+x.class_id+'" '+(ids.indexOf(x.class_id)>=0?"checked":"")+'><span>'+esc(x.class_name)+(x.grade_level?" · Stufe "+x.grade_level:"")+'</span></label>'}).join("")||'<div class="muted">Keine Klassen vorhanden.</div>';
+ var grades=Array.isArray(p.grade_levels)?p.grade_levels.map(Number):[];
+ el("editTeacherGradeList").innerHTML=[1,2,3,4].map(function(g){return '<label class="check-item"><input type="checkbox" class="editTeacherGradeCheck" value="'+g+'" '+(grades.indexOf(g)>=0?"checked":"")+'><span>Stufe '+g+(g===2?" · Gesamtüberblick":"")+'</span></label>'}).join("");
+ modal("teacherEditModal",true)
+}
+async function saveTeacherEdit(){
+ var p=S.adminTeacherEdit;if(!p)return;
+ var classes=Array.from(document.querySelectorAll(".editTeacherClassCheck:checked")).map(function(x){return x.value});
+ var grades=Array.from(document.querySelectorAll(".editTeacherGradeCheck:checked")).map(function(x){return Number(x.value)});
+ var r=await sb.rpc("configure_teacher_account",{p_user_id:p.user_id,p_school_id:S.schoolRow.id,p_display_name:el("editTeacherName").value.trim(),p_role:el("editTeacherRole").value,p_class_ids:classes,p_grade_levels:grades,p_must_change_password:false});
+ if(r.error){toast("Berechtigungen konnten nicht gespeichert werden");return}
+ modal("teacherEditModal",false);S.adminTeacherEdit=null;await renderAdminArea();toast("Lehrkraft aktualisiert")
+}
 
 function openAdminClassEditIndex(i){
  var x=S.adminClasses[Number(i)];if(!x)return;
