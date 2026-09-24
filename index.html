@@ -613,7 +613,7 @@ function renderWeek(target,click){
  }
  el(target).innerHTML=out
 }
-function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id);el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+S.entry.lesson_no+". Stunde";el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
+function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id),isToday=new Date().getDay()===S.entry.weekday;el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+S.entry.lesson_no+". Stunde"+(isToday?" · Heute":"");el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
 function offlineQueue(){try{return JSON.parse(localStorage.getItem("otterplan-rating-queue")||"[]")}catch(e){return[]}}
 function saveQueue(q){localStorage.setItem("otterplan-rating-queue",JSON.stringify(q))}
 async function saveRating(v){
@@ -909,7 +909,7 @@ function queue(){clearTimeout(reload);reload=setTimeout(async function(){
 },320)}
 function stopRealtime(){S.channels.forEach(function(c){sb.removeChannel(c)});S.channels=[]}
 function updateNet(){var n=navigator.onLine;el("netState").textContent=n?"● Online":"● Offline";el("netState").classList.toggle("online",n);el("netState").classList.toggle("offline",!n);if(n)syncOfflineRatings()}
-window.addEventListener("online",updateNet);window.addEventListener("offline",updateNet);updateNet();
+window.addEventListener("online",updateNet);window.addEventListener("offline",updateNet);updateNet();updateDateUI();setInterval(updateDateUI,60000);
 
 window.APP={
  login:login,logout:logout,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,
