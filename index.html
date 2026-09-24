@@ -242,12 +242,35 @@ textarea{min-height:88px;resize:vertical}
   .kid-card,.mini-card,.card{border-radius:26px}.kid-goal{font-size:26px}.child-mini{grid-template-columns:1fr 1fr}
   .choice-row,.decision-row{grid-template-columns:1fr}.modal{border-radius:26px;padding:22px}
 }
+
+.dashboard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.dash-card{padding:18px;border-radius:24px;background:rgba(255,255,255,.68);border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow-soft);backdrop-filter:blur(18px)}
+.dash-value{font-size:28px;font-weight:830;letter-spacing:-.045em}
+.dash-label{font-size:11px;color:var(--muted);font-weight:720;margin-top:3px}
+.class-select{border:0;background:transparent;color:var(--ink);font-size:34px;font-weight:800;letter-spacing:-.05em;outline:none;max-width:100%;padding:0 28px 0 0;box-shadow:none}
+.home-tools{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.status-chip{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:5px 8px;background:rgba(255,255,255,.68);font-size:10px;font-weight:760;color:var(--muted);margin-right:5px;margin-top:7px}
+.student-top{display:flex;align-items:center;gap:10px}.student-avatar{font-size:27px}.student-status{margin-top:4px}
+.list{display:flex;flex-direction:column;gap:9px}.list-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 13px;border-radius:17px;background:rgba(245,247,250,.72);border:1px solid rgba(255,255,255,.85)}
+.list-main{min-width:0}.list-main b{display:block}.list-main span{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.inline-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.compact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.check-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:230px;overflow:auto}.check-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:15px;background:rgba(245,247,250,.75)}.check-item input{width:auto}
+select{width:100%;border:1px solid rgba(255,255,255,.8);border-radius:17px;padding:13px 14px;background:rgba(244,246,249,.76);color:var(--ink);outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+select:focus{background:rgba(255,255,255,.92);border-color:rgba(94,166,154,.34);box-shadow:0 0 0 5px rgba(89,165,152,.09)}
+.today-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px}.today-tile{padding:14px;border-radius:19px;background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.9);text-align:center}.today-tile b{display:block;font-size:13px}.today-tile span{display:block;font-size:24px;margin-top:6px}
+.shell-pop{animation:shellPop .7s ease}@keyframes shellPop{0%{transform:scale(1)}35%{transform:scale(1.18) rotate(-3deg);box-shadow:0 0 35px rgba(126,214,200,.48)}100%{transform:scale(1)}}
+.offline{background:rgba(255,239,213,.78)!important;color:#7c5d22!important}.online{color:#326f66!important}
+.history-row{display:grid;grid-template-columns:92px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05)}.history-row:last-child{border-bottom:0}
+details.clean{margin-top:14px}details.clean summary{cursor:pointer;color:var(--muted);font-size:12px;font-weight:740}
+.school-grade{margin-top:16px}.school-grade h3{margin:0 0 8px}.school-classes{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.school-class{padding:14px;border-radius:18px;background:rgba(245,247,250,.75);border:1px solid rgba(255,255,255,.86);text-align:left}.school-class.locked{opacity:.55}
+hr.soft{border:0;border-top:1px solid rgba(0,0,0,.06);margin:22px 0}
+@media(max-width:760px){.dashboard-grid{grid-template-columns:1fr 1fr}.class-select{font-size:30px}.compact-grid{grid-template-columns:1fr}.check-list{grid-template-columns:1fr}.inline-grid{grid-template-columns:1fr}.school-classes{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
 <div class="brand"><div class="logo">🦦</div><div><b>OtterPlan</b></div></div>
-<div id="session" class="toolbar" style="display:none"><span id="sessionLabel" class="pill"></span><button class="btn secondary" onclick="APP.logout()">Abmelden</button></div>
+<div id="session" class="toolbar" style="display:none"><span id="netState" class="pill">● Online</span><span id="sessionLabel" class="pill"></span><button class="btn secondary" onclick="APP.logout()">Abmelden</button></div>
 </header>
 <div class="banner">🧪 Testbetrieb: Bitte noch keine echten Schülerdaten verwenden, bis die schulische Datenschutzfreigabe abgeschlossen ist.</div>
 <main>
@@ -274,59 +297,121 @@ textarea{min-height:88px;resize:vertical}
 
 <section id="teacher" class="screen">
 <div id="teacherHome">
-<div class="hero"><div><h2 id="className">Meine Klasse</h2></div><div class="teacher-actions"><button class="btn ghost" onclick="APP.addStudent()">＋ Kind</button><button class="btn ghost" onclick="APP.downloadCodes()">▦ Alle QR-Codes</button><span class="pill">● Live</span></div></div>
-<div class="card"><div id="studentGrid" class="student-grid"></div></div>
+  <div class="hero">
+    <div><select id="classSelect" class="class-select" onchange="APP.switchClass(this.value)"></select><div id="classMeta" class="muted" style="font-size:12px;margin-top:4px"></div></div>
+    <span class="pill">● Live</span>
+  </div>
+  <div id="dashboard" class="dashboard-grid"></div>
+  <div class="home-tools">
+    <button class="btn" onclick="APP.addStudent()">＋ Kind</button>
+    <button class="btn ghost" onclick="APP.openBatchGoals()">🎯 Ziele</button>
+    <button class="btn ghost" onclick="APP.carryGoals()">↻ Vorwoche</button>
+    <button class="btn ghost" onclick="APP.openTimetable()">🗓 Plan</button>
+    <button class="btn ghost" onclick="APP.downloadCodes()">▦ QR-Karten</button>
+    <button class="btn ghost" onclick="APP.openExport()">⇩ Export</button>
+    <button class="btn ghost" onclick="APP.openSchoolHub()">🏫 Schule</button>
+    <button class="btn ghost" onclick="APP.openClassAdmin()">⚙︎ Klasse</button>
+  </div>
+  <div class="card"><div id="studentGrid" class="student-grid"></div></div>
 </div>
 <div id="teacherDetail" style="display:none">
-<div class="toolbar" style="justify-content:space-between;margin-bottom:20px"><button class="btn secondary" onclick="APP.back()">← Klasse</button><div class="teacher-actions"><button class="btn ghost" onclick="APP.checkin()">🎯 Ziel</button><button class="btn ghost" onclick="APP.checkout()">✅ Abschluss</button><button class="btn ghost" onclick="APP.qr()">▦ QR</button><button class="btn ghost" onclick="APP.reward()">🐚 Belohnung</button></div></div>
-<div class="hero"><div><h2 id="teacherName"></h2><p id="teacherMeta" class="muted"></p></div></div>
-<div class="grid"><div class="card s12"><div class="eyebrow">Wochenziel</div><div id="teacherGoal" class="teacher-goal" style="margin-top:8px"></div></div><div class="card s12"><h3 style="margin-top:0">Plan</h3><div id="teacherWeek" class="week"></div></div></div>
+  <div class="toolbar" style="justify-content:space-between;margin-bottom:20px">
+    <button class="btn secondary" onclick="APP.back()">← Klasse</button>
+    <div class="teacher-actions">
+      <button class="btn ghost" onclick="APP.checkin()">🎯 Ziel</button>
+      <button class="btn ghost" onclick="APP.checkout()">✅ Abschluss</button>
+      <button class="btn ghost" onclick="APP.qr()">▦ QR</button>
+      <button class="btn ghost" onclick="APP.reward()">🐚 Belohnung</button>
+      <button class="btn ghost" onclick="APP.history()">↗ Verlauf</button>
+      <button class="btn ghost" onclick="APP.manageStudent()">•••</button>
+    </div>
+  </div>
+  <div class="hero"><div><h2 id="teacherName"></h2><p id="teacherMeta" class="muted"></p></div><button class="btn ghost" onclick="APP.exportStudent()">⇩ PDF</button></div>
+  <div class="grid"><div class="card s12"><div class="eyebrow">Wochenziel</div><div id="teacherGoal" class="teacher-goal" style="margin-top:8px"></div></div><div class="card s12"><h3 style="margin-top:0">Plan</h3><div id="teacherWeek" class="week"></div></div></div>
 </div>
 </section>
 
 <section id="childView" class="screen">
-<div class="child-top">
-  <h2 id="childTitle" class="child-name"></h2>
-  <div class="child-shells">🐚 <span id="childShells"></span></div>
-</div>
+<div class="child-top"><h2 id="childTitle" class="child-name"></h2><div id="childShellBadge" class="child-shells">🐚 <span id="childShells"></span></div></div>
 <div class="child-main">
-  <div class="kid-card">
-    <div class="kid-label">Mein Ziel</div>
-    <div id="childGoal" class="kid-goal"></div>
-    <div id="childHelp" class="kid-tip"></div>
-  </div>
-  <div class="kid-card kid-reward">
-    <div>
-      <div class="kid-label">Belohnung</div>
-      <div id="childRewardTitle" class="kid-reward-title"></div>
-    </div>
-    <div>
-      <div id="childReward" class="kid-reward-count"></div>
-      <div class="progress"><div id="childBar"></div></div>
-      <div id="childRewardHint" class="kid-tip"></div>
-    </div>
-  </div>
+  <div class="kid-card"><div class="kid-label">Mein Ziel</div><div id="childGoal" class="kid-goal"></div><div id="childHelp" class="kid-tip"></div></div>
+  <div class="kid-card kid-reward"><div><div class="kid-label">Belohnung</div><div id="childRewardTitle" class="kid-reward-title"></div></div><div><div id="childReward" class="kid-reward-count"></div><div class="progress"><div id="childBar"></div></div><div id="childRewardHint" class="kid-tip"></div></div></div>
 </div>
-<div class="child-mini">
-  <div class="mini-card"><div id="childGood" class="mini-value">0</div><div class="mini-label">😊 geschafft</div></div>
-  <div class="mini-card"><div id="childRated" class="mini-value">0</div><div class="mini-label">bewertet</div></div>
-</div>
-<div id="childCheckoutCard" class="card" style="display:none;margin-bottom:16px">
-  <div class="checkout-compact">
-    <div id="childCheckoutFace" class="checkout-face"></div>
-    <div class="checkout-copy"><b id="childCheckoutSelf"></b><span id="childCheckoutDecision"></span><div id="childCheckoutNote" style="margin-top:4px;font-size:12px"></div></div>
-  </div>
-</div>
-<div class="card"><h3 style="margin-top:0">Mein Plan</h3><div id="childWeek" class="week"></div></div>
+<div class="child-mini"><div class="mini-card"><div id="childGood" class="mini-value">0</div><div class="mini-label">😊 geschafft</div></div><div class="mini-card"><div id="childRated" class="mini-value">0</div><div class="mini-label">bewertet</div></div></div>
+<div class="card" style="margin-bottom:16px"><div class="kid-label">Heute</div><div id="childToday" class="today-grid"></div></div>
+<div id="childCheckoutCard" class="card" style="display:none;margin-bottom:16px"><div class="checkout-compact"><div id="childCheckoutFace" class="checkout-face"></div><div class="checkout-copy"><b id="childCheckoutSelf"></b><span id="childCheckoutDecision"></span><div id="childCheckoutNote" style="margin-top:4px;font-size:12px"></div></div></div></div>
+<details class="card clean"><summary>Ganze Woche anzeigen</summary><div id="childWeek" class="week" style="margin-top:14px"></div></details>
 </section>
 
 </main>
 
 <div id="ratingModal" class="modal-bg"><div class="modal"><h3 id="ratingTitle">Bewertung</h3><div id="ratingGoal" class="goal"></div><div class="ratings"><button onclick="APP.saveRating('good')">😊<small>geschafft</small></button><button onclick="APP.saveRating('partial')">😐<small>teilweise</small></button><button onclick="APP.saveRating('difficult')">🙁<small>noch nicht</small></button></div><div class="toolbar" style="justify-content:space-between"><button class="btn ghost" onclick="APP.clearRating()">Löschen</button><button class="btn secondary" onclick="APP.close('ratingModal')">Abbrechen</button></div></div></div>
-<div id="checkinModal" class="modal-bg"><div class="modal"><div class="eyebrow">🎯 Wochenstart</div><h2 style="margin:5px 0 4px">Check-in mit <span id="checkinName"></span></h2><label>Ziel</label><textarea id="checkinGoal" placeholder="Ich ..."></textarea><label>Hilft dabei</label><textarea id="checkinHelp" placeholder="Zum Beispiel: Ich lege mein Material vorher bereit."></textarea><label>Startgefühl</label><div class="choice-row"><button id="ci-good" class="choice" onclick="APP.pickCheckin('good')"><span class="emoji">😊</span>Gut</button><button id="ci-partial" class="choice" onclick="APP.pickCheckin('partial')"><span class="emoji">😐</span>Okay</button><button id="ci-difficult" class="choice" onclick="APP.pickCheckin('difficult')"><span class="emoji">🙁</span>Schwierig</button></div><div class="toolbar" style="justify-content:flex-end"><button class="btn secondary" onclick="APP.close('checkinModal')">Abbrechen</button><button class="btn" onclick="APP.saveCheckin()">Check-in speichern</button></div></div></div>
+<div id="checkinModal" class="modal-bg"><div class="modal"><div class="eyebrow">🎯 Wochenstart</div><h2 style="margin:5px 0 4px">Check-in mit <span id="checkinName"></span></h2><label>Vorlage</label><select id="checkinTemplate" onchange="APP.fillCheckinTemplate()"><option value="">Ohne Vorlage</option></select><label>Ziel</label><textarea id="checkinGoal" placeholder="Ich ..."></textarea><label>Hilft dabei</label><textarea id="checkinHelp" placeholder="Zum Beispiel: Ich lege mein Material vorher bereit."></textarea><label>Startgefühl</label><div class="choice-row"><button id="ci-good" class="choice" onclick="APP.pickCheckin('good')"><span class="emoji">😊</span>Gut</button><button id="ci-partial" class="choice" onclick="APP.pickCheckin('partial')"><span class="emoji">😐</span>Okay</button><button id="ci-difficult" class="choice" onclick="APP.pickCheckin('difficult')"><span class="emoji">🙁</span>Schwierig</button></div><div class="toolbar" style="justify-content:flex-end"><button class="btn secondary" onclick="APP.close('checkinModal')">Abbrechen</button><button class="btn" onclick="APP.saveCheckin()">Check-in speichern</button></div></div></div>
 <div id="checkoutModal" class="modal-bg"><div class="modal"><div class="eyebrow">✅ Wochenabschluss</div><h2 style="margin:5px 0 4px">Check-out mit <span id="checkoutName"></span></h2><label>Wie lief es?</label><div class="choice-row"><button id="co-good" class="choice" onclick="APP.pickCheckoutSelf('good')"><span class="emoji">😊</span>Gut</button><button id="co-partial" class="choice" onclick="APP.pickCheckoutSelf('partial')"><span class="emoji">😐</span>Teilweise</button><button id="co-difficult" class="choice" onclick="APP.pickCheckoutSelf('difficult')"><span class="emoji">🙁</span>Noch schwierig</button></div><label>Weiter?</label><div class="decision-row"><button id="dec-done" class="decision" onclick="APP.pickCheckoutDecision('done')">✅ Geschafft</button><button id="dec-continue" class="decision" onclick="APP.pickCheckoutDecision('continue')">🔁 Weiter</button><button id="dec-change" class="decision" onclick="APP.pickCheckoutDecision('change')">✏️ Ändern</button></div><label>Notiz</label><textarea id="checkoutNote" placeholder="Was lief gut? Was nehmen wir mit?"></textarea><div class="toolbar" style="justify-content:flex-end"><button class="btn secondary" onclick="APP.close('checkoutModal')">Abbrechen</button><button class="btn" onclick="APP.saveCheckout()">Check-out speichern</button></div></div></div>
-<div id="addStudentModal" class="modal-bg"><div class="modal"><div class="eyebrow">Klasse</div><h2 style="margin:5px 0 14px">Neues Kind</h2><label>Name</label><input id="newStudentName" maxlength="60" autocomplete="off" placeholder="Name"><div class="toolbar" style="justify-content:flex-end;margin-top:18px"><button class="btn secondary" onclick="APP.close('addStudentModal')">Abbrechen</button><button class="btn" onclick="APP.saveStudent()">Erstellen</button></div></div></div>
-<div id="qrModal" class="modal-bg"><div class="modal"><h3>QR-Zugang für <span id="qrName"></span></h3><button id="newQrBtn" class="btn" style="width:100%" onclick="APP.createQr()">QR-Code anzeigen</button><div id="qrResult" style="display:none;margin-top:14px"><div class="qr"><div id="teacherQr"></div></div><button class="btn secondary" style="width:100%;margin-top:12px" onclick="APP.resetQr()">QR-Code zurücksetzen</button><button class="btn danger" style="width:100%;margin-top:10px" onclick="APP.revoke()">Geräte trennen</button></div><button class="btn secondary" style="width:100%;margin-top:12px" onclick="APP.close('qrModal')">Schließen</button></div></div>
+<div id="addStudentModal" class="modal-bg"><div class="modal"><div class="eyebrow">Klasse</div><h2 style="margin:5px 0 14px">Neues Kind</h2><label>Name</label><input id="newStudentName" maxlength="60" autocomplete="off" placeholder="Name"><label>Symbol</label><input id="newStudentAvatar" maxlength="8" value="🦦" placeholder="🦦"><div class="toolbar" style="justify-content:flex-end;margin-top:18px"><button class="btn secondary" onclick="APP.close('addStudentModal')">Abbrechen</button><button class="btn" onclick="APP.saveStudent()">Erstellen</button></div></div></div>
+<div id="qrModal" class="modal-bg"><div class="modal"><h3>QR-Zugang für <span id="qrName"></span></h3><button id="newQrBtn" class="btn" style="width:100%" onclick="APP.createQr()">QR-Code anzeigen</button><div id="qrResult" style="display:none;margin-top:14px"><div class="qr"><div id="teacherQr"></div></div><button class="btn secondary" style="width:100%;margin-top:12px" onclick="APP.downloadSingleQr()">Karte als PDF</button><button class="btn secondary" style="width:100%;margin-top:10px" onclick="APP.resetQr()">QR-Code zurücksetzen</button><button class="btn danger" style="width:100%;margin-top:10px" onclick="APP.revoke()">Geräte trennen</button></div><button class="btn secondary" style="width:100%;margin-top:12px" onclick="APP.close('qrModal')">Schließen</button></div></div>
+<div id="studentManageModal" class="modal-bg"><div class="modal">
+<div class="eyebrow">Kind verwalten</div><h2 id="manageStudentTitle" style="margin:5px 0 14px"></h2>
+<div class="inline-grid"><div><label>Name</label><input id="manageStudentName"></div><div><label>Symbol</label><input id="manageStudentAvatar" maxlength="8"></div></div>
+<div class="toolbar" style="margin-top:16px"><button class="btn secondary" onclick="APP.moveStudent(-1)">↑ Hoch</button><button class="btn secondary" onclick="APP.moveStudent(1)">↓ Runter</button></div>
+<div class="toolbar" style="justify-content:flex-end;margin-top:18px"><button class="btn secondary" onclick="APP.close('studentManageModal')">Abbrechen</button><button class="btn" onclick="APP.saveStudentManage()">Speichern</button></div>
+<details class="clean"><summary>Weitere Optionen</summary><div class="toolbar" style="margin-top:12px"><button class="btn secondary" onclick="APP.archiveStudent()">Archivieren</button><button class="btn danger" onclick="APP.deleteStudent()">Endgültig löschen</button></div></details>
+</div></div>
+
+<div id="batchGoalModal" class="modal-bg"><div class="modal">
+<div class="eyebrow">Wochenziele</div><h2 style="margin:5px 0 14px">Ziel vergeben</h2>
+<label>Vorlage</label><select id="batchGoalTemplate" onchange="APP.fillBatchTemplate()"><option value="">Ohne Vorlage</option></select>
+<label>Ziel</label><textarea id="batchGoalText" placeholder="Ich ..."></textarea><label>Hilft dabei</label><textarea id="batchGoalHelp"></textarea>
+<div class="toolbar"><button class="btn secondary" onclick="APP.saveGoalTemplate()">Als Vorlage speichern</button><button class="btn ghost" onclick="APP.deleteGoalTemplate()">Vorlage löschen</button></div>
+<label>Kinder</label><div id="batchStudentList" class="check-list"></div>
+<div class="toolbar" style="justify-content:flex-end;margin-top:16px"><button class="btn secondary" onclick="APP.close('batchGoalModal')">Abbrechen</button><button class="btn" onclick="APP.applyBatchGoal()">Übernehmen</button></div>
+</div></div>
+
+<div id="rewardModal" class="modal-bg"><div class="modal">
+<div class="eyebrow">Belohnungen</div><h2 id="rewardName" style="margin:5px 0 12px"></h2>
+<div class="inline-grid"><div><label>Muscheln</label><input id="manualShells" type="number" min="0"></div><div style="display:flex;align-items:flex-end"><button class="btn secondary" style="width:100%" onclick="APP.setShells()">Stand setzen</button></div></div>
+<label>Vorlage</label><select id="rewardTemplate" onchange="APP.fillRewardTemplate()"><option value="">Ohne Vorlage</option></select>
+<div class="inline-grid"><div><label>Belohnung</label><input id="rewardTitle"></div><div><label>Ab Muscheln</label><input id="rewardShells" type="number" min="1"></div></div>
+<div class="toolbar" style="margin-top:12px"><button class="btn" onclick="APP.addReward()">Hinzufügen</button><button class="btn secondary" onclick="APP.saveRewardTemplate()">Als Vorlage speichern</button></div>
+<label>Aktiv</label><div id="rewardList" class="list"></div>
+<div class="toolbar" style="justify-content:flex-end;margin-top:16px"><button class="btn secondary" onclick="APP.close('rewardModal')">Schließen</button></div>
+</div></div>
+
+<div id="timetableModal" class="modal-bg"><div class="modal">
+<div class="eyebrow">Stundenplan</div><h2 style="margin:5px 0 12px">Plan bearbeiten</h2><input id="ttId" type="hidden">
+<div class="compact-grid"><div><label>Tag</label><select id="ttDay"><option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option></select></div><div><label>Stunde</label><input id="ttLesson" type="number" min="1" max="12" value="1"></div><div><label>Fach</label><input id="ttSubject" placeholder="D"></div></div>
+<div class="toolbar" style="margin-top:12px"><button class="btn" onclick="APP.saveTimetable()">Speichern</button><button class="btn secondary" onclick="APP.clearTimetableForm()">Neu</button></div>
+<label>Aktueller Plan</label><div id="timetableList" class="list"></div>
+<div class="toolbar" style="justify-content:flex-end;margin-top:16px"><button class="btn secondary" onclick="APP.close('timetableModal')">Schließen</button></div>
+</div></div>
+
+<div id="historyModal" class="modal-bg"><div class="modal"><div class="eyebrow">Verlauf</div><h2 id="historyName" style="margin:5px 0 12px"></h2><div id="historyList"></div><div class="toolbar" style="justify-content:flex-end;margin-top:16px"><button class="btn secondary" onclick="APP.close('historyModal')">Schließen</button></div></div></div>
+
+<div id="exportModal" class="modal-bg"><div class="modal"><div class="eyebrow">Export</div><h2 style="margin:5px 0 14px">Dokumentation</h2><div class="list"><button class="btn ghost" onclick="APP.exportWeekly()">Wochenübersicht als PDF</button><button class="btn ghost" onclick="APP.exportMonthly()">Monatsübersicht als PDF</button></div><div class="toolbar" style="justify-content:flex-end;margin-top:16px"><button class="btn secondary" onclick="APP.close('exportModal')">Schließen</button></div></div></div>
+
+<div id="classModal" class="modal-bg"><div class="modal">
+<div class="eyebrow">Klasse & Datenschutz</div><h2 style="margin:5px 0 14px">Verwalten</h2>
+<div class="inline-grid"><div><label>Klassenname</label><input id="classEditName"></div><div><label>Schuljahr</label><input id="classEditYear" placeholder="2026/27"></div></div>
+<label>Stufe</label><select id="classEditGrade"><option value="">Keine</option><option value="1">Stufe 1</option><option value="2">Stufe 2</option><option value="3">Stufe 3</option><option value="4">Stufe 4</option><option value="5">Stufe 5</option><option value="6">Stufe 6</option></select>
+<label>Archivierte Kinder automatisch löschen nach Tagen</label><input id="retentionDays" type="number" min="7" max="1095" value="90">
+<div class="toolbar" style="margin-top:12px"><button class="btn" onclick="APP.saveClassSettings()">Speichern</button><button class="btn secondary" onclick="APP.cleanupArchived()">Jetzt bereinigen</button></div>
+<label>Lehrkräfte</label><div id="classTeacherList" class="list"></div>
+<div class="inline-grid"><input id="assignTeacherEmail" type="email" placeholder="E-Mail der Lehrkraft"><button class="btn secondary" onclick="APP.assignTeacher()">Lehrkraft zuordnen</button></div>
+<details class="clean"><summary>Schuljahresende</summary><button class="btn danger" style="margin-top:12px" onclick="APP.archiveClass()">Klasse archivieren</button></details>
+<hr class="soft"><div class="eyebrow">Neue eigene Klasse</div><div class="inline-grid"><input id="newClassName" placeholder="Klasse 2a"><input id="newClassYear" placeholder="2026/27"></div><button class="btn secondary" style="margin-top:12px" onclick="APP.createClass()">Klasse anlegen</button>
+<div class="toolbar" style="justify-content:flex-end;margin-top:16px"><button class="btn secondary" onclick="APP.close('classModal')">Schließen</button></div>
+</div></div>
+
+<div id="schoolModal" class="modal-bg"><div class="modal">
+<div class="eyebrow">Schulbereich</div><h2 style="margin:5px 0 14px">Schule & Stufen</h2>
+<div id="schoolEmpty"><label>Schule anlegen</label><div class="inline-grid"><input id="newSchoolName" placeholder="Meine Schule"><button class="btn" onclick="APP.createSchool()">Schule anlegen</button></div></div>
+<div id="schoolArea" style="display:none"><label>Schule</label><select id="schoolSelect" onchange="APP.loadSchoolStructure()"></select><div id="schoolStructure"></div>
+<hr class="soft"><div class="eyebrow">Aktuelle Klasse zuordnen</div><div class="inline-grid"><select id="attachGrade"><option value="1">Stufe 1</option><option value="2">Stufe 2</option><option value="3">Stufe 3</option><option value="4">Stufe 4</option><option value="5">Stufe 5</option><option value="6">Stufe 6</option></select><button class="btn secondary" onclick="APP.attachCurrentClass()">Zuordnen</button></div>
+<div class="eyebrow" style="margin-top:18px">Neue Klasse in der Schule</div><div class="compact-grid"><input id="schoolClassName" placeholder="Klasse 2b"><select id="schoolClassGrade"><option value="1">Stufe 1</option><option value="2">Stufe 2</option><option value="3">Stufe 3</option><option value="4">Stufe 4</option><option value="5">Stufe 5</option><option value="6">Stufe 6</option></select><input id="schoolClassYear" placeholder="2026/27"></div><button class="btn secondary" style="margin-top:10px" onclick="APP.createSchoolClass()">Klasse anlegen</button>
+<div class="eyebrow" style="margin-top:18px">Schulteam</div><div class="inline-grid"><input id="schoolMemberEmail" type="email" placeholder="E-Mail der Lehrkraft"><button class="btn secondary" onclick="APP.addSchoolMember()">Lehrkraft hinzufügen</button></div></div>
+<div class="toolbar" style="justify-content:flex-end;margin-top:16px"><button class="btn secondary" onclick="APP.close('schoolModal')">Schließen</button></div>
+</div></div>
+
 <div id="toast" class="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
