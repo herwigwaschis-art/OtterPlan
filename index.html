@@ -228,7 +228,7 @@ function queue(){clearTimeout(reload);reload=setTimeout(async function(){var sid
 function stopRealtime(){S.channels.forEach(function(c){sb.removeChannel(c)});S.channels=[]}
 window.APP={login:login,logout:logout,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,openStudent:openStudent,back:back,openRating:openRating,saveRating:saveRating,clearRating:clearRating,checkin:checkin,pickCheckin:pickCheckin,saveCheckin:saveCheckin,checkout:checkout,pickCheckoutSelf:pickCheckoutSelf,pickCheckoutDecision:pickCheckoutDecision,saveCheckout:saveCheckout,qr:qr,createQr:createQr,revoke:revoke,reward:reward,close:closeM};
 sb.auth.onAuthStateChange(function(event,session){if(event==="SIGNED_OUT"&&!session){S.user=null;S.profile=null;S.role=null;el("session").style.display="none";show("login")}});sb.auth.getSession().then(function(r){if(r.data.session)bootstrap()});
-if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js").catch(function(){})});
+if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js").then(function(r){r.update()}).catch(function(){})});
 })();
 </script>
 </body>
