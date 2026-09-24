@@ -137,7 +137,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
       <div id="todayFocus" class="today-focus"></div>
       <div id="dashboard" class="dashboard-grid"></div>
       <div id="homeTools" class="home-tools">
-        <button class="btn home-primary" onclick="APP.openQuickRating()">😊 Heute bewerten</button>
+        <button id="homePrimaryRating" class="btn home-primary" onclick="APP.openQuickRating()">😊 Heute bewerten</button>
         <div class="home-secondary-actions">
           <button class="home-secondary-action" onclick="APP.openBatchGoals()">🎯 Ziel vergeben</button>
           <button class="home-more-action" aria-label="Weitere Funktionen" title="Weitere Funktionen" onclick="APP.openClassMore()">•••</button>
@@ -628,9 +628,10 @@ function gradeCheckout(i){
 function backFromGrade(){S.gradeActivePlan=null;S.gradeStudentData=null;S.student=null;S.gradeRows=[];S.ratings=[];S.scheduleSlots=[];showTeacherArea("class");if(!S.classRow&&S.gradeLinks.length)setTimeout(openClassChooser,80)}
 
 function renderHome(){
- el("teacherHome").style.display="block";el("teacherDetail").style.display="none";
+ el("teacherHome").style.display="block";el("teacherDetail").style.display="none";updateDateUI();
  if(!S.classRow){
    el("homeTools").style.display="none";
+   el("todayFocus").style.display="none";
    el("dashboard").innerHTML="";
    var canSetUp=adminSchools().length>0||S.schools.length===0;
    if(S.gradeLinks.length){
@@ -643,22 +644,49 @@ function renderHome(){
    }
    return
  }
+ el("todayFocus").style.display="grid";
  el("homeTools").style.display="flex";
- var noGoal=S.students.filter(function(s){return !plan(s.id)}).length;
- var unrated=S.students.filter(function(s){return stats(s.id).total===0}).length;
- var difficult=S.ratings.filter(function(r){return r.rating==="difficult"}).length;
- el("dashboard").innerHTML='<div class="dash-card"><div class="dash-value">'+S.students.length+'</div><div class="dash-label">Kinder</div></div><div class="dash-card"><div class="dash-value">'+noGoal+'</div><div class="dash-label">ohne Wochenziel</div></div><div class="dash-card"><div class="dash-value">'+unrated+'</div><div class="dash-label">noch ohne Bewertung</div></div><div class="dash-card"><div class="dash-value">'+difficult+'</div><div class="dash-label">🙁 diese Woche</div></div>';
+ var primary=el("homePrimaryRating");if(primary)primary.textContent=isCurrentWeek()?"😊 Heute bewerten":"😊 Woche bewerten";
+ var plans=S.students.filter(function(s){return !!plan(s.id)});
+ var noGoal=S.students.length-plans.length;
+ var totalRatings=S.ratings.length;
+ var completed=plans.filter(function(s){var p=plan(s.id);return !!(p&&p.checkout_self)}).length;
+ var day=isCurrentWeek()?new Date().getDay():0;
+ if(day>=1&&day<=5){
+   var todayRatings=S.ratings.filter(function(r){return Number(r.weekday)===day}).length;
+   var ratedKids=plans.filter(function(s){return S.ratings.some(function(r){return r.student_id===s.id&&Number(r.weekday)===day})}).length;
+   var remaining=Math.max(0,plans.length-ratedKids);
+   el("todayFocus").innerHTML='<div><h3>'+todayLong()+'</h3><p>'+ (remaining?remaining+" "+(remaining===1?"Kind":"Kinder")+" mit Wochenziel heute noch ohne Bewertung.":"Alle Kinder mit Wochenziel wurden heute schon bewertet.") +'</p><div class="today-stats"><span class="today-stat">😊 '+todayRatings+' Bewertungen heute</span><span class="today-stat">🎯 '+plans.length+' Wochenziele</span><span class="today-stat">✅ '+completed+'/'+plans.length+' abgeschlossen</span></div></div><div class="today-progress"><strong>'+ratedKids+'/'+plans.length+'</strong><span>Kinder heute bewertet</span></div>';
+ }else if(isCurrentWeek()){
+   el("todayFocus").innerHTML='<div><h3>'+todayLong()+'</h3><p>Heute ist kein regulärer Schultag. Du kannst die Woche in Ruhe prüfen oder abschließen.</p><div class="today-stats"><span class="today-stat">🎯 '+plans.length+' Wochenziele</span><span class="today-stat">✅ '+completed+'/'+plans.length+' abgeschlossen</span></div></div><div class="today-progress"><strong>'+totalRatings+'</strong><span>Bewertungen diese Woche</span></div>';
+ }else{
+   el("todayFocus").innerHTML='<div><h3>Woche '+weekRangeLabel()+'</h3><p>Du siehst gerade eine andere Woche. Mit „Diese Woche“ springst du jederzeit zurück.</p><div class="today-stats"><span class="today-stat">🎯 '+plans.length+' Wochenziele</span><span class="today-stat">😊 '+totalRatings+' Bewertungen</span></div></div><div class="today-progress"><strong>'+completed+'/'+plans.length+'</strong><span>Wochenabschlüsse</span></div>';
+ }
+ el("dashboard").innerHTML='<div class="dash-card"><div class="dash-value">'+plans.length+'/'+S.students.length+'</div><div class="dash-label">Wochenziele</div></div><div class="dash-card"><div class="dash-value">'+totalRatings+'</div><div class="dash-label">Bewertungen</div></div><button class="dash-card action" onclick="APP.openWeekClose()"><div class="dash-value">'+completed+'/'+plans.length+'</div><div class="dash-label">Wochenabschluss · öffnen →</div></button>';
  el("studentGrid").innerHTML=S.students.map(function(s){
    var p=plan(s.id),sh=shells(s.id),x=stats(s.id),ci=p&&p.checkin_completed,co=p&&p.checkout_self;
    return '<button class="student" onclick="APP.openStudent(\''+s.id+'\')"><div class="student-top"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div class="name">'+esc(s.display_name)+'</div></div><div class="goal">'+esc(p?p.goal:"Noch kein Ziel")+'</div><div class="student-status">'+(ci?'<span class="status-chip">🎯 Check-in</span>':'')+(co?'<span class="status-chip">✅ Abschluss</span>':'')+'</div><div class="foot"><span>🐚 '+sh+'</span><span>'+x.good+'/'+x.total+' 😊</span></div></button>';
- }).join("")||'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h3 style="margin:0 0 6px">Noch keine Kinder</h3><p class="muted" style="margin:0 0 12px">Starte mit „Kind hinzufügen“.</p><button class="btn" onclick="APP.addStudent()">＋ Kind hinzufügen</button></div>';
+ }).join("")||'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h3 style="margin:0 0 6px">Noch keine Kinder</h3><p class="muted" style="margin:0 0 12px">Starte über „•••“ mit „Kind hinzufügen“.</p></div>';
+}
+function openWeekClose(){
+ var rows=S.students.filter(function(s){return !!plan(s.id)});
+ var completed=rows.filter(function(s){return !!plan(s.id).checkout_self}).length;
+ el("weekCloseText").textContent=completed+" von "+rows.length+" Wochenplänen abgeschlossen · "+weekRangeLabel();
+ el("weekCloseList").innerHTML=rows.map(function(s){
+   var p=plan(s.id),done=!!p.checkout_self;
+   return '<div class="list-row"><div class="list-main"><b>'+esc(s.avatar_emoji||"🦦")+' '+esc(s.display_name)+'</b><span>'+esc(p.goal)+'</span></div><div class="toolbar"><span class="week-close-status">'+(done?"✅ abgeschlossen":"○ offen")+'</span><button class="btn '+(done?"secondary ":"")+'small" onclick="APP.openWeekCloseStudent(\''+s.id+'\')">'+(done?"Ansehen":"Abschließen")+'</button></div></div>'
+ }).join("")||'<div class="muted">In dieser Woche gibt es noch keine Wochenpläne.</div>';
+ modal("weekCloseModal",true)
+}
+function openWeekCloseStudent(id){
+ modal("weekCloseModal",false);openStudent(id);checkout()
 }
 function openStudent(id){S.student=S.students.find(function(s){return s.id===id});if(!S.student)return;el("teacherHome").style.display="none";el("teacherDetail").style.display="block";renderTeacher()}
 function back(){S.student=null;renderHome()}
-function renderTeacher(){var p=plan(S.student.id);el("teacherName").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name;el("teacherMeta").textContent="🐚 "+shells(S.student.id)+" Muscheln · "+todayLong();if(p){var ci=p.checkin_completed?" · "+(FACE[p.checkin_feeling]||""):"";var co=p.checkout_self?" · "+(FACE[p.checkout_self]||""):"";el("teacherGoal").innerHTML="<strong>"+esc(p.goal)+"</strong>"+(p.help_text?'<div class="muted" style="margin-top:6px">💡 '+esc(p.help_text)+"</div>":"")+'<div class="muted" style="margin-top:7px;font-size:11px">'+esc(ci+co)+"</div>"}else el("teacherGoal").textContent="Noch kein Ziel";renderWeek("teacherWeek",true)}
+function renderTeacher(){var p=plan(S.student.id);el("teacherName").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name;el("teacherMeta").textContent="🐚 "+shells(S.student.id)+" Muscheln · "+(isCurrentWeek()?todayLong():"Woche "+weekRangeLabel());if(p){var ci=p.checkin_completed?" · "+(FACE[p.checkin_feeling]||""):"";var co=p.checkout_self?" · "+(FACE[p.checkout_self]||""):"";el("teacherGoal").innerHTML="<strong>"+esc(p.goal)+"</strong>"+(p.help_text?'<div class="muted" style="margin-top:6px">💡 '+esc(p.help_text)+"</div>":"")+'<div class="muted" style="margin-top:7px;font-size:11px">'+esc(ci+co)+"</div>"}else el("teacherGoal").textContent="Noch kein Ziel";renderWeek("teacherWeek",true)}
 
 function renderWeek(target,click){
- var today=new Date().getDay();
+ var today=isCurrentWeek()?new Date().getDay():0;
  var out='<div class="head"></div>'+DAYS.map(function(d,i){return '<div class="head '+(today===i+1?'today-head':'')+'">'+d+'</div>'}).join("");
  for(var n=1;n<=6;n++){
    out+='<div class="time">'+n+'. Std.</div>';
@@ -671,7 +699,7 @@ function renderWeek(target,click){
  }
  el(target).innerHTML=out
 }
-function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id),isToday=new Date().getDay()===S.entry.weekday;el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+S.entry.lesson_no+". Stunde"+(isToday?" · Heute":"");el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
+function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id),isToday=isCurrentWeek()&&new Date().getDay()===S.entry.weekday;el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+S.entry.lesson_no+". Stunde"+(isToday?" · Heute":"");el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
 function offlineQueue(){try{return JSON.parse(localStorage.getItem("otterplan-rating-queue")||"[]")}catch(e){return[]}}
 function saveQueue(q){localStorage.setItem("otterplan-rating-queue",JSON.stringify(q))}
 async function saveRating(v){
