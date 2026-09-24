@@ -1,7 +1,7 @@
 {
-  "name":"OtterPlan",
-  "short_name":"OtterPlan",
-  "description":"Digitaler Wochenziel- und Smileyplan",
+  "name":"MILO",
+  "short_name":"MILO",
+  "description":"MILO – digitaler Wochenziel- und Verstärkerplan",
   "start_url":"./",
   "scope":"./",
   "display":"standalone",
