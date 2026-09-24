@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 180" role="img" aria-labelledby="t d">
+<title id="t">MILO</title><desc id="d">Motivation · Individuelle Ziele · Lernen · Orientierung</desc>
+<rect width="620" height="180" rx="34" fill="#fff" fill-opacity="0"/>
+<g transform="translate(28 20)">
+  <path d="M20 104V25c0-15 19-20 27-7l33 53 33-53c8-13 27-8 27 7v79" fill="none" stroke="#0EA5A0" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="169" y="12" width="30" height="106" rx="15" fill="#A7E3C1"/>
+  <path d="M232 25v79h61" fill="none" stroke="#60A5FA" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="382" cy="65" r="52" fill="#FBC02D"/>
+  <circle cx="382" cy="65" r="20" fill="#fff"/>
+  <ellipse cx="456" cy="15" rx="9" ry="19" transform="rotate(18 456 15)" fill="#60A5FA"/>
+  <ellipse cx="486" cy="37" rx="17" ry="9" transform="rotate(-20 486 37)" fill="#A7E3C1"/>
+</g>
+<g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif" font-size="18" font-weight="650" fill="#344154">
+  <text x="34" y="164"><tspan fill="#0EA5A0">M</tspan>otivation <tspan fill="#A7E3C1">•</tspan> Individuelle Ziele <tspan fill="#60A5FA">•</tspan> Lernen <tspan fill="#FBC02D">•</tspan> Orientierung</text>
+</g>
+</svg>
