@@ -751,18 +751,41 @@ function renderWeek(target,click){
 function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id),isToday=isCurrentWeek()&&new Date().getDay()===S.entry.weekday;el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+S.entry.lesson_no+". Stunde"+(isToday?" · Heute":"");el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
 function offlineQueue(){try{return JSON.parse(localStorage.getItem("otterplan-rating-queue")||"[]")}catch(e){return[]}}
 function saveQueue(q){localStorage.setItem("otterplan-rating-queue",JSON.stringify(q))}
+function offerRatingUndo(previous,mode,source){
+ clearTimeout(S.undoTimer);
+ S.undoRating={student_id:S.student?S.student.id:null,week_start:week(),weekday:Number(S.entry&&S.entry.weekday),lesson_no:Number(S.entry&&S.entry.lesson_no),previous:previous?previous.rating:null,mode:mode||"class",source:source||"detail"};
+ var t=el("undoToast");if(!t)return;t.classList.add("show");
+ S.undoTimer=setTimeout(function(){t.classList.remove("show");S.undoRating=null},5000)
+}
+async function undoLastRating(){
+ var u=S.undoRating;if(!u)return;clearTimeout(S.undoTimer);el("undoToast").classList.remove("show");S.undoRating=null;
+ if(u.mode==="grade"){
+   var r=u.previous
+     ?await sb.rpc("grade_save_rating",{p_student_id:u.student_id,p_week_start:u.week_start,p_weekday:u.weekday,p_lesson_no:u.lesson_no,p_rating:u.previous})
+     :await sb.rpc("grade_clear_rating",{p_student_id:u.student_id,p_week_start:u.week_start,p_weekday:u.weekday,p_lesson_no:u.lesson_no});
+   if(r.error){toast("Rückgängig nicht möglich");return}
+   if(S.teacherArea==="grade"&&S.gradeStudentData&&S.student&&S.student.id===u.student_id)await loadGradeStudent(u.student_id);else if(S.teacherArea==="grade")await loadGradeOverview();
+   toast("Bewertung zurückgenommen");return
+ }
+ var r2=u.previous
+   ?await sb.from("ratings").upsert({student_id:u.student_id,week_start:u.week_start,weekday:u.weekday,lesson_no:u.lesson_no,rating:u.previous,updated_by:S.user.id},{onConflict:"student_id,week_start,weekday,lesson_no"})
+   :await sb.from("ratings").delete().eq("student_id",u.student_id).eq("week_start",u.week_start).eq("weekday",u.weekday).eq("lesson_no",u.lesson_no);
+ if(r2.error){toast("Rückgängig nicht möglich");return}
+ var sid=S.student&&S.student.id;await load();if(sid&&S.students.some(function(x){return x.id===sid}))openStudent(sid);if(u.source==="quick"&&el("quickRatingModal").classList.contains("show"))renderQuickRating();toast("Bewertung zurückgenommen")
+}
 async function saveRating(v){
+ var previous=rating(S.student.id,S.entry.weekday,S.entry.lesson_no);
  var row={student_id:S.student.id,week_start:week(),weekday:S.entry.weekday,lesson_no:S.entry.lesson_no,rating:v,updated_by:S.user.id};
  if(S.teacherArea==="grade"&&S.gradeStudentData){
    if(!navigator.onLine){toast("Im Stufenüberblick ist die Bewertung nur online möglich");return}
    var gr=await sb.rpc("grade_save_rating",{p_student_id:S.student.id,p_week_start:week(),p_weekday:Number(S.entry.weekday),p_lesson_no:Number(S.entry.lesson_no),p_rating:v});
    if(gr.error){toast("Bewertung konnte nicht gespeichert werden");return}
-   modal("ratingModal",false);await loadGradeStudent(S.student.id);toast("Bewertung gespeichert");return
+   modal("ratingModal",false);var gradeSid=S.student.id;await loadGradeStudent(gradeSid);offerRatingUndo(previous,"grade","detail");return
  }
  if(!navigator.onLine){queueRating(row);modal("ratingModal",false);applyLocalRating(row);toast("Offline gespeichert");return}
  var r=await sb.from("ratings").upsert(row,{onConflict:"student_id,week_start,weekday,lesson_no"});
  if(r.error){queueRating(row);modal("ratingModal",false);applyLocalRating(row);toast("Zwischengespeichert");return}
- modal("ratingModal",false);var sid=S.student.id;await load();openStudent(sid);toast("Bewertung gespeichert")
+ modal("ratingModal",false);var sid=S.student.id;await load();openStudent(sid);offerRatingUndo(previous,"class","detail")
 }
 function queueRating(row){var q=offlineQueue().filter(function(x){return !(x.student_id===row.student_id&&x.week_start===row.week_start&&Number(x.weekday)===Number(row.weekday)&&Number(x.lesson_no)===Number(row.lesson_no))});q.push(row);saveQueue(q)}
 function applyLocalRating(row){var old=S.ratings.find(function(x){return x.student_id===row.student_id&&Number(x.weekday)===Number(row.weekday)&&Number(x.lesson_no)===Number(row.lesson_no)});if(old)old.rating=row.rating;else S.ratings.push(row);renderTeacher()}
@@ -817,12 +840,13 @@ function renderQuickRating(){
 }
 async function quickRate(sid,value){
  if(!plan(sid)){toast("Bitte zuerst ein Wochenziel vergeben");return}
- var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value);
+ var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value),old=rating(sid,day,lesson),previous=old?{rating:old.rating}:null;
  var row={student_id:sid,week_start:week(),weekday:day,lesson_no:lesson,rating:value,updated_by:S.user.id};
- if(!navigator.onLine){queueRating(row);var old=rating(sid,day,lesson);if(old)old.rating=value;else S.ratings.push(row);renderQuickRating();renderHome();toast("Offline gespeichert");return}
+ if(!navigator.onLine){queueRating(row);if(old)old.rating=value;else S.ratings.push(row);renderQuickRating();renderHome();toast("Offline gespeichert");return}
  var r=await sb.from("ratings").upsert(row,{onConflict:"student_id,week_start,weekday,lesson_no"});
  if(r.error){toast("Bewertung konnte nicht gespeichert werden");return}
- var old=rating(sid,day,lesson);if(old)old.rating=value;else S.ratings.push(row);
+ if(old)old.rating=value;else S.ratings.push(row);
+ var keepStudent=S.student;S.student={id:sid};S.entry={weekday:day,lesson_no:lesson};offerRatingUndo(previous,"class","quick");S.student=keepStudent;
  renderQuickRating();renderHome()
 }
 
@@ -832,11 +856,22 @@ function setSelected(prefix,value,values){values.forEach(function(v){var b=el(pr
 function checkin(){var p=plan(S.student.id);S.checkinFeeling=p&&p.checkin_feeling?p.checkin_feeling:"partial";el("checkinName").textContent=S.student.display_name;fillGoalSelect("checkinTemplate");el("checkinGoal").value=p?p.goal:"";el("checkinHelp").value=p&&p.help_text?p.help_text:"";setSelected("ci-",S.checkinFeeling,["good","partial","difficult"]);modal("checkinModal",true)}
 function fillCheckinTemplate(){var g=goalFromValue(el("checkinTemplate").value);if(g){el("checkinGoal").value=g.goal;el("checkinHelp").value=g.help||""}}
 function pickCheckin(v){S.checkinFeeling=v;setSelected("ci-",v,["good","partial","difficult"])}
+async function afterGradeAction(sid,kind,wasDetail){
+ await loadGradeOverview();
+ if(!wasDetail){S.student=null;S.gradeActivePlan=null;return}
+ if(S.gradeQuickMode&&((kind==="checkin"&&S.gradeFilter==="checkin")||(kind==="checkout"&&S.gradeFilter==="checkout"))){
+   var rows=gradeFilteredRows();
+   if(rows.length){var idx=Math.min(S.gradeQuickIndex,rows.length-1);await openGradeStudentById(rows[idx].student_id);return}
+   gradeBackToOverview();toast("Alle Kinder in diesem Filter geschafft");return
+ }
+ await loadGradeStudent(sid)
+}
 async function saveCheckin(){var g=el("checkinGoal").value.trim(),h=el("checkinHelp").value.trim();if(!g){toast("Ziel fehlt");return}
  if(S.teacherArea==="grade"){
-   var gr=await sb.rpc("grade_save_checkin",{p_student_id:S.student.id,p_week_start:week(),p_goal:g,p_help_text:h,p_feeling:S.checkinFeeling});
+   var gradeSid=S.student.id,wasDetail=!!S.gradeStudentData;
+   var gr=await sb.rpc("grade_save_checkin",{p_student_id:gradeSid,p_week_start:week(),p_goal:g,p_help_text:h,p_feeling:S.checkinFeeling});
    if(gr.error){toast("Check-in konnte nicht gespeichert werden");return}
-   modal("checkinModal",false);S.student=null;S.gradeActivePlan=null;await loadGradeOverview();toast("Check-in gespeichert");return
+   modal("checkinModal",false);await afterGradeAction(gradeSid,"checkin",wasDetail);toast("Check-in gespeichert");return
  }
  var row={student_id:S.student.id,week_start:week(),goal:g,help_text:h,checkin_feeling:S.checkinFeeling,checkin_completed:true};var r=await sb.from("weekly_plans").upsert(row,{onConflict:"student_id,week_start"});if(r.error){toast("Speichern fehlgeschlagen");return}modal("checkinModal",false);var sid=S.student.id;await load();openStudent(sid);toast("Check-in gespeichert")}
 function checkout(){var p=plan(S.student.id);if(!p){toast("Bitte zuerst ein Ziel anlegen");return}S.checkoutSelf=p.checkout_self||"partial";S.checkoutDecision=p.checkout_decision||"continue";el("checkoutName").textContent=S.student.display_name;el("checkoutNote").value=p.checkout_note||"";setSelected("co-",S.checkoutSelf,["good","partial","difficult"]);setSelected("dec-",S.checkoutDecision,["done","continue","change"]);modal("checkoutModal",true)}
@@ -844,9 +879,10 @@ function pickCheckoutSelf(v){S.checkoutSelf=v;setSelected("co-",v,["good","parti
 function pickCheckoutDecision(v){S.checkoutDecision=v;setSelected("dec-",v,["done","continue","change"])}
 async function saveCheckout(){var p=plan(S.student.id);if(!p)return;
  if(S.teacherArea==="grade"){
-   var gr=await sb.rpc("grade_save_checkout",{p_student_id:S.student.id,p_week_start:week(),p_self:S.checkoutSelf,p_decision:S.checkoutDecision,p_note:el("checkoutNote").value.trim()});
+   var gradeSid=S.student.id,wasDetail=!!S.gradeStudentData;
+   var gr=await sb.rpc("grade_save_checkout",{p_student_id:gradeSid,p_week_start:week(),p_self:S.checkoutSelf,p_decision:S.checkoutDecision,p_note:el("checkoutNote").value.trim()});
    if(gr.error){toast("Check-out konnte nicht gespeichert werden");return}
-   modal("checkoutModal",false);S.student=null;S.gradeActivePlan=null;await loadGradeOverview();toast("Check-out gespeichert");return
+   modal("checkoutModal",false);await afterGradeAction(gradeSid,"checkout",wasDetail);toast("Check-out gespeichert");return
  }
  var st=stats(S.student.id);var r=await sb.from("weekly_plans").update({checkout_self:S.checkoutSelf,checkout_decision:S.checkoutDecision,checkout_note:el("checkoutNote").value.trim(),checkout_published:false,published_good_count:st.good,published_rated_count:st.total}).eq("id",p.id);if(r.error){toast("Speichern fehlgeschlagen");return}modal("checkoutModal",false);var sid=S.student.id;await load();openStudent(sid);toast("Abschluss gespeichert")}
 
