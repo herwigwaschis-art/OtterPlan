@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f5f7">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="OtterPlan">
+<meta name="apple-mobile-web-app-title" content="MILO">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
-<title>OtterPlan</title>
+<title>MILO</title>
 <style>
 :root{--bg:#f7f8fb;--glass:rgba(255,255,255,.72);--ink:#161719;--muted:#686c73;--accent:#3f8f84;--accent2:#7ed6c8;--soft:rgba(111,201,187,.14);--danger:#a64d4d;--shadow:0 12px 34px rgba(37,46,63,.08)}
 *{box-sizing:border-box}html{background:var(--bg)}
@@ -60,11 +60,11 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
 </head>
 <body>
 <header>
-  <div class="brand"><div class="logo">🦦</div><div><b>OtterPlan</b></div></div>
+  <div class="brand"><div class="logo">🦦</div><div><b>MILO</b></div></div>
   <div id="session" class="top-menu-wrap" style="display:none" onclick="event.stopPropagation()">
     <button class="menu-trigger" aria-label="Menü öffnen" onclick="APP.toggleTopMenu()">☰</button>
     <div id="topMenu" class="menu-pop">
-      <div class="menu-user"><b id="sessionLabel"></b><span>OtterPlan</span></div>
+      <div class="menu-user"><b id="sessionLabel"></b><span>MILO</span></div>
       <div class="menu-status"><span>Status</span><span id="netState" class="pill online">● Online</span></div>
       <button id="topAdminItem" class="menu-item" style="display:none" onclick="APP.requestAdmin()">Admin</button>
       <button class="menu-item" onclick="APP.help();APP.closeTopMenu()">Hilfe</button>
@@ -78,7 +78,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
 <main>
 <section id="login" class="screen active">
   <div class="login">
-    <div class="login-title"><div class="mark">🦦</div><h1>OtterPlan</h1><p class="muted">Dein Ziel. Deine Woche.</p></div>
+    <div class="login-title"><div class="mark">🦦</div><h1>MILO</h1><p class="muted">Motivation · Individuelle Ziele · Lernen · Orientierung</p></div>
     <div class="card child-entry">
       <div class="entry-icon">📷</div>
       <h2>Für Kinder</h2>
@@ -208,7 +208,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
 </div></div>
 
 <div id="helpModal" class="modal-bg"><div class="modal">
-  <div class="eyebrow">Hilfe</div><h2 style="margin:5px 0 10px">So funktioniert OtterPlan</h2>
+  <div class="eyebrow">Hilfe</div><h2 style="margin:5px 0 10px">So funktioniert MILO</h2>
   <div class="list">
     <div class="list-row"><div class="list-main"><b>1. Kind hinzufügen</b><span>Einmalig Name und Symbol anlegen.</span></div></div>
     <div class="list-row"><div class="list-main"><b>2. Wochenziel vergeben</b><span>Ein Kind öffnen oder „Ziel vergeben“ für mehrere Kinder nutzen.</span></div></div>
@@ -667,8 +667,8 @@ async function createQr(){var r=await sb.rpc("get_or_create_child_qr_code",{p_st
 async function resetQr(){if(!confirm("QR-Code zurücksetzen? Die alte Karte funktioniert danach nicht mehr."))return;var r=await sb.rpc("reset_child_qr_code",{p_student_id:S.student.id});if(r.error){toast("Zurücksetzen fehlgeschlagen");return}var row=Array.isArray(r.data)?r.data[0]:r.data;el("teacherQr").innerHTML="";new QRCode(el("teacherQr"),{text:"otterplan:"+row.qr_token,width:220,height:220,correctLevel:QRCode.CorrectLevel.H});el("teacherQr").dataset.token=row.qr_token;toast("Neuer QR-Code aktiv")}
 async function revoke(){if(!confirm("Alle gekoppelten Geräte trennen?"))return;var r=await sb.rpc("revoke_child_devices",{p_student_id:S.student.id});toast(r.error?"Trennen fehlgeschlagen":"Geräte getrennt")}
 function qrImage(text){return new Promise(function(resolve,reject){var host=document.createElement("div");host.style.position="fixed";host.style.left="-9999px";document.body.appendChild(host);try{new QRCode(host,{text:text,width:320,height:320,correctLevel:QRCode.CorrectLevel.H});setTimeout(function(){var canvas=host.querySelector("canvas"),img=host.querySelector("img"),data=canvas?canvas.toDataURL("image/png"):(img?img.src:null);host.remove();data?resolve(data):reject(new Error("QR fehlt"))},70)}catch(e){host.remove();reject(e)}})}
-async function downloadSingleQr(){var token=el("teacherQr").dataset.token;if(!token){toast("QR-Code zuerst anzeigen");return}var data=await qrImage("otterplan:"+token),doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});doc.setFont("helvetica","bold");doc.setFontSize(22);doc.text(S.student.display_name,105,35,{align:"center"});doc.addImage(data,"PNG",65,50,80,80);doc.setFont("helvetica","normal");doc.setFontSize(11);doc.text("OtterPlan · QR-Code scannen",105,145,{align:"center"});doc.save("OtterPlan_QR_"+safeName(S.student.display_name)+".pdf")}
-async function downloadCodes(){if(!S.students.length){toast("Noch keine Kinder");return}toast("QR-Karten werden erstellt …");var r=await sb.rpc("get_or_create_class_child_qr_codes",{p_class_id:S.classRow.id});if(r.error){toast("QR-Karten konnten nicht erstellt werden");return}var rows=r.data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"}),xs=[14,110],ys=[14,104,194];for(var i=0;i<rows.length;i++){if(i>0&&i%6===0)doc.addPage();var p=i%6,x=xs[p%2],y=ys[Math.floor(p/2)],data=await qrImage("otterplan:"+rows[i].qr_token);doc.setDrawColor(225,228,233);doc.roundedRect(x,y,86,82,5,5,"S");doc.setFont("helvetica","bold");doc.setFontSize(14);doc.text(String(rows[i].display_name),57+x-14,y+10,{align:"center",maxWidth:76});doc.addImage(data,"PNG",x+19,y+16,48,48);doc.setFont("helvetica","normal");doc.setFontSize(8);doc.text("OtterPlan · scannen",x+43,y+74,{align:"center"})}doc.save("OtterPlan_QR_"+safeName(S.classRow.name)+".pdf");toast("PDF erstellt")}
+async function downloadSingleQr(){var token=el("teacherQr").dataset.token;if(!token){toast("QR-Code zuerst anzeigen");return}var data=await qrImage("otterplan:"+token),doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});doc.setFont("helvetica","bold");doc.setFontSize(22);doc.text(S.student.display_name,105,35,{align:"center"});doc.addImage(data,"PNG",65,50,80,80);doc.setFont("helvetica","normal");doc.setFontSize(11);doc.text("MILO · QR-Code scannen",105,145,{align:"center"});doc.save("MILO_QR_"+safeName(S.student.display_name)+".pdf")}
+async function downloadCodes(){if(!S.students.length){toast("Noch keine Kinder");return}toast("QR-Karten werden erstellt …");var r=await sb.rpc("get_or_create_class_child_qr_codes",{p_class_id:S.classRow.id});if(r.error){toast("QR-Karten konnten nicht erstellt werden");return}var rows=r.data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"}),xs=[14,110],ys=[14,104,194];for(var i=0;i<rows.length;i++){if(i>0&&i%6===0)doc.addPage();var p=i%6,x=xs[p%2],y=ys[Math.floor(p/2)],data=await qrImage("otterplan:"+rows[i].qr_token);doc.setDrawColor(225,228,233);doc.roundedRect(x,y,86,82,5,5,"S");doc.setFont("helvetica","bold");doc.setFontSize(14);doc.text(String(rows[i].display_name),57+x-14,y+10,{align:"center",maxWidth:76});doc.addImage(data,"PNG",x+19,y+16,48,48);doc.setFont("helvetica","normal");doc.setFontSize(8);doc.text("MILO · scannen",x+43,y+74,{align:"center"})}doc.save("MILO_QR_"+safeName(S.classRow.name)+".pdf");toast("PDF erstellt")}
 
 function openStudentSchedule(){
  if(!S.student)return;
@@ -697,10 +697,10 @@ async function history(){el("historyName").textContent=S.student.display_name;el
 
 function openExport(){modal("exportModal",true)}
 function pdfHeader(doc,title,sub){doc.setFont("helvetica","bold");doc.setFontSize(20);doc.text(title,14,18);doc.setFont("helvetica","normal");doc.setFontSize(9);doc.setTextColor(110);doc.text(sub,14,25);doc.setTextColor(25)}
-function safeName(s){return String(s||"OtterPlan").replace(/[^a-zA-Z0-9äöüÄÖÜß_-]+/g,"_")}
-async function exportWeekly(){var doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});pdfHeader(doc,"OtterPlan · "+S.classRow.name,"Woche ab "+fmtDate(week()));var y=36;S.students.forEach(function(s){var p=plan(s.id),x=stats(s.id);if(y>275){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text((s.avatar_emoji||"")+" "+s.display_name,14,y);doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text((p?p.goal:"Kein Ziel").slice(0,105),14,y+5);doc.text(x.good+"/"+x.total+" geschafft · "+shells(s.id)+" Muscheln",14,y+10);y+=18});doc.save("OtterPlan_Woche_"+safeName(S.classRow.name)+".pdf")}
-async function exportStudent(){var d=new Date();d.setDate(d.getDate()-84);var since=d.toISOString().slice(0,10),q=await Promise.all([sb.from("weekly_plans").select("*").eq("student_id",S.student.id).gte("week_start",since).order("week_start",{ascending:false}),sb.from("ratings").select("*").eq("student_id",S.student.id).gte("week_start",since)]),plans=q[0].data||[],ratings=q[1].data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});pdfHeader(doc,"OtterPlan · "+S.student.display_name,"Verlauf letzte 12 Wochen");var y=36;plans.forEach(function(p){var rr=ratings.filter(function(x){return x.week_start===p.week_start}),good=rr.filter(function(x){return x.rating==="good"}).length;if(y>272){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.setFontSize(10);doc.text(fmtDate(p.week_start)+" · "+good+"/"+rr.length+" geschafft",14,y);doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text(p.goal.slice(0,105),14,y+5);if(p.checkout_note)doc.text(p.checkout_note.slice(0,105),14,y+10);y+=17});doc.save("OtterPlan_"+safeName(S.student.display_name)+".pdf")}
-async function exportMonthly(){var start=startOfMonth(),ids=S.students.map(function(s){return s.id});if(!ids.length)return;var q=await Promise.all([sb.from("ratings").select("*").in("student_id",ids).gte("week_start",start),sb.from("weekly_plans").select("*").in("student_id",ids).gte("week_start",start)]),ratings=q[0].data||[],plans=q[1].data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});pdfHeader(doc,"OtterPlan · "+S.classRow.name,"Monatsübersicht ab "+fmtDate(start));var y=36;S.students.forEach(function(s){var rr=ratings.filter(function(x){return x.student_id===s.id}),good=rr.filter(function(x){return x.rating==="good"}).length,pp=plans.filter(function(x){return x.student_id===s.id});if(y>275){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text(s.display_name,14,y);doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text(good+"/"+rr.length+" geschafft · "+pp.length+" Wochenziele",14,y+5);y+=14});doc.save("OtterPlan_Monat_"+safeName(S.classRow.name)+".pdf")}
+function safeName(s){return String(s||"MILO").replace(/[^a-zA-Z0-9äöüÄÖÜß_-]+/g,"_")}
+async function exportWeekly(){var doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});pdfHeader(doc,"MILO · "+S.classRow.name,"Woche ab "+fmtDate(week()));var y=36;S.students.forEach(function(s){var p=plan(s.id),x=stats(s.id);if(y>275){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text((s.avatar_emoji||"")+" "+s.display_name,14,y);doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text((p?p.goal:"Kein Ziel").slice(0,105),14,y+5);doc.text(x.good+"/"+x.total+" geschafft · "+shells(s.id)+" Muscheln",14,y+10);y+=18});doc.save("MILO_Woche_"+safeName(S.classRow.name)+".pdf")}
+async function exportStudent(){var d=new Date();d.setDate(d.getDate()-84);var since=d.toISOString().slice(0,10),q=await Promise.all([sb.from("weekly_plans").select("*").eq("student_id",S.student.id).gte("week_start",since).order("week_start",{ascending:false}),sb.from("ratings").select("*").eq("student_id",S.student.id).gte("week_start",since)]),plans=q[0].data||[],ratings=q[1].data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});pdfHeader(doc,"MILO · "+S.student.display_name,"Verlauf letzte 12 Wochen");var y=36;plans.forEach(function(p){var rr=ratings.filter(function(x){return x.week_start===p.week_start}),good=rr.filter(function(x){return x.rating==="good"}).length;if(y>272){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.setFontSize(10);doc.text(fmtDate(p.week_start)+" · "+good+"/"+rr.length+" geschafft",14,y);doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text(p.goal.slice(0,105),14,y+5);if(p.checkout_note)doc.text(p.checkout_note.slice(0,105),14,y+10);y+=17});doc.save("MILO_"+safeName(S.student.display_name)+".pdf")}
+async function exportMonthly(){var start=startOfMonth(),ids=S.students.map(function(s){return s.id});if(!ids.length)return;var q=await Promise.all([sb.from("ratings").select("*").in("student_id",ids).gte("week_start",start),sb.from("weekly_plans").select("*").in("student_id",ids).gte("week_start",start)]),ratings=q[0].data||[],plans=q[1].data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});pdfHeader(doc,"MILO · "+S.classRow.name,"Monatsübersicht ab "+fmtDate(start));var y=36;S.students.forEach(function(s){var rr=ratings.filter(function(x){return x.student_id===s.id}),good=rr.filter(function(x){return x.rating==="good"}).length,pp=plans.filter(function(x){return x.student_id===s.id});if(y>275){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text(s.display_name,14,y);doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text(good+"/"+rr.length+" geschafft · "+pp.length+" Wochenziele",14,y+5);y+=14});doc.save("MILO_Monat_"+safeName(S.classRow.name)+".pdf")}
 
 async function openClassAdmin(){if(!S.classRow){el("classTeacherList").innerHTML="";el("classEditName").value="";el("classEditYear").value="2026/27";el("classEditGrade").value="";modal("classModal",true);return}el("classEditName").value=S.classRow.name;el("classEditYear").value=S.classRow.school_year||"";el("classEditGrade").value=S.classRow.grade_level||"";var ts=await sb.from("teacher_settings").select("*").eq("user_id",S.user.id).maybeSingle();el("retentionDays").value=ts.data?ts.data.retention_days:90;await renderClassTeachers();modal("classModal",true)}
 async function renderClassTeachers(){if(!S.classRow)return;var r=await sb.rpc("list_class_teachers",{p_class_id:S.classRow.id});el("classTeacherList").innerHTML=r.error?'<div class="muted">Nicht verfügbar</div>':(r.data||[]).map(function(t){return '<div class="list-row"><div class="list-main"><b>'+esc(t.display_name)+'</b><span>'+(t.is_owner?"Verantwortlich":"Zugeordnet")+'</span></div>'+(t.is_owner?'':'<button class="btn secondary small" onclick="APP.removeTeacher(\''+t.user_id+'\')">Entfernen</button>')+'</div>'}).join("")}
@@ -713,7 +713,7 @@ async function archiveClass(){if(!confirm("Klasse und alle Kinder archivieren?")
 function account(){
  var required=!!(S.profile&&S.profile.must_change_password);
  el("newOwnPassword").value="";el("newOwnPassword2").value="";
- el("passwordModalTitle").textContent=required?"Willkommen bei OtterPlan":"Passwort ändern";
+ el("passwordModalTitle").textContent=required?"Willkommen bei MILO":"Passwort ändern";
  el("passwordRequiredText").textContent=required?"Lege jetzt dein persönliches Passwort fest. Danach ist dein Konto fertig eingerichtet.":"";
  el("passwordCloseBtn").style.display=required?"none":"inline-block";
  modal("passwordModal",true)
