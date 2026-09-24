@@ -13,7 +13,7 @@
 <style>
 :root{--bg:#f7f8fb;--glass:rgba(255,255,255,.72);--ink:#161719;--muted:#7b7f87;--accent:#3f8f84;--accent2:#7ed6c8;--soft:rgba(111,201,187,.14);--danger:#a64d4d;--shadow:0 12px 34px rgba(37,46,63,.08)}
 *{box-sizing:border-box}html{background:var(--bg)}
-body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at 10% 8%,rgba(117,222,205,.21),transparent 30%),radial-gradient(circle at 90% 15%,rgba(174,190,255,.19),transparent 28%),linear-gradient(180deg,#fbfcff,#f3f5f9);background-attachment:fixed;-webkit-font-smoothing:antialiased}
+body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--ink);font-size:16px;background:radial-gradient(circle at 10% 8%,rgba(117,222,205,.21),transparent 30%),radial-gradient(circle at 90% 15%,rgba(174,190,255,.19),transparent 28%),linear-gradient(180deg,#fbfcff,#f3f5f9);background-attachment:fixed;-webkit-font-smoothing:antialiased}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.13),transparent 65%);z-index:-1}
 button,input,textarea,select{font:inherit}button{cursor:pointer}
 header{position:sticky;top:0;z-index:30;height:68px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(247,248,251,.65);backdrop-filter:blur(28px) saturate(140%);-webkit-backdrop-filter:blur(28px) saturate(140%);border-bottom:1px solid rgba(255,255,255,.72)}
@@ -21,20 +21,20 @@ header{position:sticky;top:0;z-index:30;height:68px;padding:0 22px;display:flex;
 main{max-width:1180px;margin:auto;padding:34px 22px 58px}.screen{display:none}.screen.active{display:block}.muted{color:var(--muted)}
 .card,.student,.kid-card,.mini-card,.dash-card,.school-card{background:linear-gradient(145deg,rgba(255,255,255,.87),rgba(255,255,255,.63));border:1px solid rgba(255,255,255,.93);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.9);backdrop-filter:blur(22px) saturate(135%);-webkit-backdrop-filter:blur(22px) saturate(135%)}
 .card{border-radius:29px;padding:23px}
-.btn{border:1px solid rgba(255,255,255,.72);border-radius:999px;padding:10px 16px;background:linear-gradient(135deg,#438f84,#67b7a9);color:#fff;font-weight:760;box-shadow:0 9px 23px rgba(62,143,132,.18),inset 0 1px 0 rgba(255,255,255,.35);transition:.16s transform,.16s filter}
-.btn:hover{filter:brightness(1.025)}.btn:active{transform:scale(.97)}.btn.secondary,.btn.ghost{background:rgba(255,255,255,.75);color:var(--ink);box-shadow:var(--shadow)}.btn.danger{background:linear-gradient(135deg,#994747,#b85d5d)}.btn.small{padding:7px 11px;font-size:12px}
+.btn{border:1px solid rgba(255,255,255,.72);border-radius:999px;padding:10px 16px;min-height:44px;background:linear-gradient(135deg,#438f84,#67b7a9);color:#fff;font-weight:760;box-shadow:0 9px 23px rgba(62,143,132,.18),inset 0 1px 0 rgba(255,255,255,.35);transition:.16s transform,.16s filter}
+.btn:hover{filter:brightness(1.025)}.btn:active{transform:scale(.97)}.btn.secondary,.btn.ghost{background:rgba(255,255,255,.75);color:var(--ink);box-shadow:var(--shadow)}.btn.danger{background:linear-gradient(135deg,#994747,#b85d5d)}.btn.small{padding:8px 12px;font-size:12px;min-height:38px}
 .toolbar,.home-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.home-tools{margin-bottom:16px}
 .pill{padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.72);font-size:12px;font-weight:760;border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow);white-space:nowrap}
 .pill.online{color:#326f66}.pill.offline{color:#7c5d22;background:rgba(255,239,213,.88)}
 .banner{max-width:1180px;margin:12px auto 0;padding:8px 14px;border-radius:999px;background:rgba(255,248,225,.84);color:#7a5b14;font-size:11px;font-weight:650;width:max-content;max-width:calc(100% - 32px);border:1px solid rgba(255,255,255,.8)}
 .login{max-width:880px;margin:52px auto}.login-title{text-align:center;margin-bottom:28px}.login-title .mark{width:76px;height:76px;border-radius:25px;margin:auto;display:grid;place-items:center;font-size:44px;background:rgba(255,255,255,.87);border:1px solid rgba(255,255,255,.95);box-shadow:0 18px 44px rgba(70,138,127,.14)}.login-title h1{font-size:47px;letter-spacing:-.055em;margin:13px 0 2px}.login-title p{margin:0}.login-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.login-card{min-height:260px;display:flex;flex-direction:column;justify-content:space-between}.login-card h3{font-size:22px;margin:0 0 4px}
-label{display:block;font-size:10px;font-weight:780;color:var(--muted);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.055em}
+label{display:block;font-size:12px;font-weight:780;color:var(--muted);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.055em}
 input,textarea,select{width:100%;border:1px solid rgba(255,255,255,.84);border-radius:16px;padding:12px 13px;background:rgba(244,246,249,.78);color:var(--ink);outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.75)}
 input:focus,textarea:focus,select:focus{background:rgba(255,255,255,.94);border-color:rgba(94,166,154,.34);box-shadow:0 0 0 5px rgba(89,165,152,.08)}textarea{min-height:82px;resize:vertical}
-.hero{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:20px}.hero h2{margin:0;font-size:35px;letter-spacing:-.05em}.hero p{margin:4px 0 0;font-size:12px}
+.hero{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:20px}.hero h2{margin:0;font-size:35px;letter-spacing:-.05em}.hero p{margin:5px 0 0;font-size:13px}
 .class-select{border:0;background:transparent;box-shadow:none;font-size:34px;font-weight:810;letter-spacing:-.05em;padding:0 30px 0 0;max-width:100%}.view-tabs{display:inline-flex;padding:4px;border-radius:999px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.88);box-shadow:var(--shadow);margin-bottom:20px}.view-tab{border:0;background:transparent;border-radius:999px;padding:8px 14px;font-weight:760;color:var(--muted)}.view-tab.active{background:#fff;color:var(--ink);box-shadow:0 4px 14px rgba(30,40,50,.07)}
-.dashboard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.dash-card{border-radius:23px;padding:17px}.dash-value{font-size:28px;font-weight:830;letter-spacing:-.045em}.dash-label{font-size:10px;color:var(--muted);font-weight:750;margin-top:3px}
-.student-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.student{border-radius:25px;padding:18px;text-align:left;min-height:150px;transition:.18s transform,.18s box-shadow}.student:hover{transform:translateY(-3px);box-shadow:0 20px 42px rgba(37,46,63,.11)}.student-top{display:flex;align-items:center;gap:9px}.student-avatar{font-size:27px}.student .name{font-weight:800;font-size:19px;letter-spacing:-.025em}.student .goal{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.student .foot{display:flex;justify-content:space-between;margin-top:16px;font-size:11px;font-weight:760}.student-status{margin-top:7px}.status-chip{display:inline-block;border-radius:999px;padding:4px 7px;background:rgba(255,255,255,.72);font-size:9px;font-weight:780;color:var(--muted);margin-right:4px}
+.dashboard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.dash-card{border-radius:23px;padding:17px}.dash-value{font-size:28px;font-weight:830;letter-spacing:-.045em}.dash-label{font-size:12px;color:var(--muted);font-weight:750;margin-top:3px}
+.student-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.student{border-radius:25px;padding:18px;text-align:left;min-height:150px;transition:.18s transform,.18s box-shadow}.student:hover{transform:translateY(-3px);box-shadow:0 20px 42px rgba(37,46,63,.11)}.student-top{display:flex;align-items:center;gap:9px}.student-avatar{font-size:27px}.student .name{font-weight:800;font-size:19px;letter-spacing:-.025em}.student .goal{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.student .foot{display:flex;justify-content:space-between;margin-top:16px;font-size:12px;font-weight:760}.student-status{margin-top:7px}.status-chip{display:inline-block;border-radius:999px;padding:5px 8px;background:rgba(255,255,255,.72);font-size:11px;font-weight:780;color:var(--muted);margin-right:4px}
 .school-toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:16px}.school-toolbar select{max-width:320px}.grade-block{margin-bottom:22px}.grade-title{font-size:22px;font-weight:810;letter-spacing:-.035em;margin:0 0 10px}.school-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.school-card{border-radius:24px;padding:18px}.school-card h3{margin:0;font-size:20px}.school-card .meta{font-size:11px;color:var(--muted);margin:5px 0 14px}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:15px}.s12{grid-column:span 12}.teacher-actions{display:flex;gap:7px;flex-wrap:wrap}.teacher-goal{font-size:22px;font-weight:790;letter-spacing:-.028em;line-height:1.25}.eyebrow{font-size:9px;font-weight:780;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
 .week{display:grid;grid-template-columns:52px repeat(5,1fr);gap:8px;overflow:auto;padding:2px 0}
@@ -43,7 +43,7 @@ input:focus,textarea:focus,select:focus{background:rgba(255,255,255,.94);border-
 .schedule-row{font-size:11px;font-weight:760;color:var(--muted)}
 .schedule-slot{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px;border-radius:15px;background:rgba(245,247,250,.78);border:1px solid rgba(255,255,255,.88)}
 .schedule-slot input{width:auto;margin:0}
-.slot-face{display:grid;place-items:center;min-height:46px;font-size:24px}.head,.time,.cell{border-radius:16px;padding:9px;min-height:73px}.head{min-height:auto;text-align:center;font-size:10px;color:var(--muted);font-weight:760}.time{display:grid;place-items:center;color:var(--muted);font-size:10px;font-weight:720}.cell{display:flex;flex-direction:column;justify-content:space-between;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.86);box-shadow:0 6px 18px rgba(48,57,74,.04)}.cell.click:hover{transform:translateY(-2px)}.subject{font-weight:790;font-size:12px}.face{font-size:24px}.none{font-size:10px;color:#9da1a7}
+.slot-face{display:grid;place-items:center;min-height:46px;font-size:24px}.head,.time,.cell{border-radius:16px;padding:9px;min-height:73px}.head{min-height:auto;text-align:center;font-size:12px;color:var(--muted);font-weight:760}.time{display:grid;place-items:center;color:var(--muted);font-size:12px;font-weight:720}.cell{display:flex;flex-direction:column;justify-content:space-between;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.86);box-shadow:0 6px 18px rgba(48,57,74,.04)}.cell.click:hover{transform:translateY(-2px)}.subject{font-weight:790;font-size:12px}.face{font-size:24px}.none{font-size:10px;color:#9da1a7}
 .modal-bg{display:none;position:fixed;inset:0;z-index:80;background:rgba(34,40,50,.23);backdrop-filter:blur(14px);align-items:center;justify-content:center;padding:17px}.modal-bg.show{display:flex}.modal{width:min(590px,100%);max-height:91vh;overflow:auto;background:linear-gradient(145deg,rgba(255,255,255,.95),rgba(248,250,253,.89));border:1px solid rgba(255,255,255,.96);border-radius:30px;padding:25px;box-shadow:0 35px 100px rgba(30,38,50,.2)}.modal.wide{width:min(850px,100%)}.modal h2,.modal h3{letter-spacing:-.03em}
 .ratings{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:17px 0}.ratings button{background:rgba(245,247,250,.84);border:1px solid rgba(255,255,255,.88);border-radius:21px;padding:15px 8px;font-size:33px}.ratings small{display:block;font-size:10px;color:var(--muted);font-weight:720;margin-top:3px}
 .choice-row,.decision-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:9px 0 15px}.choice,.decision{border:1px solid rgba(255,255,255,.86);background:rgba(245,247,250,.82);border-radius:19px;padding:12px 8px;text-align:center;font-weight:760;color:var(--ink)}.choice .emoji{font-size:29px;display:block;margin-bottom:4px}.choice.selected,.decision.selected{background:rgba(224,247,241,.95);box-shadow:0 0 0 2px rgba(80,160,148,.13)}
@@ -63,11 +63,12 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
   <div id="session" class="toolbar" style="display:none">
     <span id="netState" class="pill online">● Online</span>
     <span id="sessionLabel" class="pill session-label-hide"></span>
+    <button class="btn secondary small" onclick="APP.help()">Hilfe</button>
     <button class="btn secondary small" onclick="APP.account()">Konto</button>
     <button class="btn secondary small" onclick="APP.logout()">Abmelden</button>
   </div>
 </header>
-<div class="banner">🧪 Testbetrieb: Bitte noch keine echten Schülerdaten verwenden, bis die schulische Datenschutzfreigabe abgeschlossen ist.</div>
+<div class="banner">🧪 Testbetrieb · noch keine echten Schülerdaten verwenden</div>
 
 <main>
 <section id="login" class="screen active">
@@ -92,7 +93,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
 </section>
 
 <section id="teacher" class="screen">
-  <div class="view-tabs"><button id="tabClass" class="view-tab active" onclick="APP.showTeacherArea('class')">Klasse</button><button id="tabSchool" class="view-tab" onclick="APP.showTeacherArea('school')">Schule</button><button id="tabAdmin" class="view-tab" style="display:none" onclick="APP.showTeacherArea('admin')">Admin</button></div>
+  <div class="view-tabs"><button id="tabClass" class="view-tab active" onclick="APP.showTeacherArea('class')">Klassen</button><button id="tabSchool" class="view-tab" onclick="APP.showTeacherArea('school')">Schule</button><button id="tabAdmin" class="view-tab" style="display:none" onclick="APP.showTeacherArea('admin')">Admin</button></div>
 
   <div id="classArea">
     <div id="teacherHome">
@@ -102,12 +103,10 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
       </div>
       <div id="dashboard" class="dashboard-grid"></div>
       <div class="home-tools">
-        <button class="btn" onclick="APP.addStudent()">＋ Kind</button>
-        <button class="btn ghost" onclick="APP.openBatchGoals()">🎯 Ziele</button>
-        <button class="btn ghost" onclick="APP.carryGoals()">↻ Vorwoche</button>
-        <button class="btn ghost" onclick="APP.downloadCodes()">▦ QR-Karten</button>
-        <button class="btn ghost" onclick="APP.openExport()">⇩ Export</button>
-        <button class="btn ghost" onclick="APP.openClassAdmin()">⚙︎ Klasse</button>
+        <button class="btn" onclick="APP.openQuickRating()">😊 Heute bewerten</button>
+        <button class="btn ghost" onclick="APP.openBatchGoals()">🎯 Ziel vergeben</button>
+        <button class="btn ghost" onclick="APP.addStudent()">＋ Kind hinzufügen</button>
+        <button class="btn ghost" onclick="APP.openClassMore()">Mehr …</button>
       </div>
       <div class="card"><div id="studentGrid" class="student-grid"></div></div>
     </div>
@@ -115,7 +114,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
     <div id="teacherDetail" style="display:none">
       <div class="toolbar" style="justify-content:space-between;margin-bottom:18px">
         <button class="btn secondary" onclick="APP.back()">← Klasse</button>
-        <div class="teacher-actions"><button class="btn ghost" onclick="APP.checkin()">🎯 Ziel</button><button class="btn ghost" onclick="APP.checkout()">✅ Abschluss</button><button class="btn ghost" onclick="APP.qr()">▦ QR</button><button class="btn ghost" onclick="APP.reward()">🐚 Belohnung</button><button class="btn ghost" onclick="APP.openStudentSchedule()">🗓 Stunden</button><button class="btn ghost" onclick="APP.history()">↗ Verlauf</button><button class="btn ghost" onclick="APP.manageStudent()">•••</button></div>
+        <div class="teacher-actions"><button class="btn" onclick="APP.checkin()">🎯 Ziel</button><button class="btn ghost" onclick="APP.checkout()">✅ Wochenabschluss</button><button class="btn ghost" onclick="APP.reward()">🐚 Belohnung</button><button class="btn ghost" onclick="APP.openStudentMore()">Mehr …</button></div>
       </div>
       <div class="hero"><div><h2 id="teacherName"></h2><p id="teacherMeta" class="muted"></p></div><button class="btn ghost" onclick="APP.exportStudent()">⇩ PDF</button></div>
       <div class="grid">
@@ -150,6 +149,51 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
   <details class="card clean"><summary>Ganze Woche anzeigen</summary><div id="childWeek" class="week" style="margin-top:13px"></div></details>
 </section>
 </main>
+
+<div id="quickRatingModal" class="modal-bg"><div class="modal wide">
+  <div class="eyebrow">Schnellbewertung</div>
+  <h2 style="margin:5px 0 5px">Heute bewerten</h2>
+  <p class="muted" style="font-size:13px;margin-top:0">Tag und Stunde wählen. Danach direkt bei den Kindern auf einen Smiley tippen.</p>
+  <div class="inline-grid"><div><label>Tag</label><select id="quickDay" onchange="APP.renderQuickRating()"><option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option></select></div><div><label>Stunde</label><select id="quickLesson" onchange="APP.renderQuickRating()"><option value="1">1. Stunde</option><option value="2">2. Stunde</option><option value="3">3. Stunde</option><option value="4">4. Stunde</option><option value="5">5. Stunde</option><option value="6">6. Stunde</option></select></div></div>
+  <div id="quickRatingProgress" class="muted" style="font-size:13px;margin:14px 0 8px"></div>
+  <div id="quickRatingList" class="list"></div>
+  <div class="toolbar" style="justify-content:flex-end;margin-top:16px"><button class="btn secondary" onclick="APP.close('quickRatingModal')">Fertig</button></div>
+</div></div>
+
+<div id="classMoreModal" class="modal-bg"><div class="modal">
+  <div class="eyebrow">Klasse</div><h2 style="margin:5px 0 12px">Weitere Funktionen</h2>
+  <div class="list">
+    <button class="btn ghost" onclick="APP.moreCarryGoals()">↻ Ziele aus der Vorwoche übernehmen</button>
+    <button class="btn ghost" onclick="APP.moreQrCards()">▦ QR-Karten herunterladen</button>
+    <button class="btn ghost" onclick="APP.moreExport()">⇩ Dokumentation exportieren</button>
+    <button class="btn ghost" onclick="APP.moreClassSettings()">⚙︎ Klasse verwalten</button>
+  </div>
+  <div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('classMoreModal')">Schließen</button></div>
+</div></div>
+
+<div id="studentMoreModal" class="modal-bg"><div class="modal">
+  <div class="eyebrow">Kind</div><h2 id="studentMoreName" style="margin:5px 0 12px">Weitere Funktionen</h2>
+  <div class="list">
+    <button class="btn ghost" onclick="APP.moreStudentQr()">▦ QR-Code</button>
+    <button class="btn ghost" onclick="APP.moreStudentHours()">🗓 Individuelle Stunden</button>
+    <button class="btn ghost" onclick="APP.moreStudentHistory()">↗ Verlauf</button>
+    <button class="btn ghost" onclick="APP.moreStudentPdf()">⇩ PDF</button>
+    <button class="btn ghost" onclick="APP.moreStudentManage()">⚙︎ Kind bearbeiten</button>
+  </div>
+  <div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('studentMoreModal')">Schließen</button></div>
+</div></div>
+
+<div id="helpModal" class="modal-bg"><div class="modal">
+  <div class="eyebrow">Hilfe</div><h2 style="margin:5px 0 10px">So funktioniert OtterPlan</h2>
+  <div class="list">
+    <div class="list-row"><div class="list-main"><b>1. Kind hinzufügen</b><span>Einmalig Name und Symbol anlegen.</span></div></div>
+    <div class="list-row"><div class="list-main"><b>2. Wochenziel vergeben</b><span>Ein Kind öffnen oder „Ziel vergeben“ für mehrere Kinder nutzen.</span></div></div>
+    <div class="list-row"><div class="list-main"><b>3. Im Unterricht bewerten</b><span>Am schnellsten über „Heute bewerten“. Smiley antippen, fertig.</span></div></div>
+    <div class="list-row"><div class="list-main"><b>4. Woche abschließen</b><span>Beim Kind „Wochenabschluss“ öffnen und Ziel weiterführen oder beenden.</span></div></div>
+  </div>
+  <p class="muted" style="font-size:13px;margin:15px 0 0">Selten benötigte Funktionen findest du immer unter „Mehr …“.</p>
+  <div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn" onclick="APP.close('helpModal')">Verstanden</button></div>
+</div></div>
 
 <div id="ratingModal" class="modal-bg"><div class="modal"><h3 id="ratingTitle">Bewertung</h3><div id="ratingGoal" class="card" style="padding:15px"></div><div class="ratings"><button onclick="APP.saveRating('good')">😊<small>geschafft</small></button><button onclick="APP.saveRating('partial')">😐<small>teilweise</small></button><button onclick="APP.saveRating('difficult')">🙁<small>noch nicht</small></button></div><div class="toolbar" style="justify-content:space-between"><button class="btn ghost" onclick="APP.clearRating()">Löschen</button><button class="btn secondary" onclick="APP.close('ratingModal')">Abbrechen</button></div></div></div>
 
@@ -323,7 +367,7 @@ function renderTeacherShell(){
  }
  var ss=el("schoolSelect");ss.innerHTML=S.schools.length?S.schools.map(function(s){return '<option value="'+s.id+'" '+(S.schoolRow&&S.schoolRow.id===s.id?'selected':'')+'>'+esc(s.name)+'</option>'}).join(""):'<option value="">Noch keine Schule</option>';
  var admins=adminSchools(),as=el("adminSchoolSelect");as.innerHTML=admins.length?admins.map(function(s){return '<option value="'+s.id+'" '+(S.schoolRow&&S.schoolRow.id===s.id?'selected':'')+'>'+esc(s.name)+'</option>'}).join(""):'<option value="">Neue Schule anlegen</option>';
- var showAdmin=admins.length>0||S.schools.length===0;el("tabAdmin").style.display=showAdmin?"inline-block":"none";el("schoolAdminShortcut").style.display=(S.schoolRow&&isSchoolAdmin(S.schoolRow.id))?"inline-block":"none";
+ var showAdmin=admins.length>0||S.schools.length===0;el("tabSchool").style.display=S.schools.length?"inline-block":"none";el("tabAdmin").style.display=showAdmin?"inline-block":"none";el("schoolAdminShortcut").style.display=(S.schoolRow&&isSchoolAdmin(S.schoolRow.id))?"inline-block":"none";
 }
 async function switchClass(id){S.classRow=S.classes.find(function(x){return x.id===id})||null;S.student=null;await load();showTeacherArea("class")}
 function showTeacherArea(area){
@@ -347,7 +391,7 @@ function renderHome(){
  el("studentGrid").innerHTML=S.students.map(function(s){
    var p=plan(s.id),sh=shells(s.id),x=stats(s.id),ci=p&&p.checkin_completed,co=p&&p.checkout_self;
    return '<button class="student" onclick="APP.openStudent(\''+s.id+'\')"><div class="student-top"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div class="name">'+esc(s.display_name)+'</div></div><div class="goal">'+esc(p?p.goal:"Noch kein Ziel")+'</div><div class="student-status">'+(ci?'<span class="status-chip">🎯 Check-in</span>':'')+(co?'<span class="status-chip">✅ Abschluss</span>':'')+'</div><div class="foot"><span>🐚 '+sh+'</span><span>'+x.good+'/'+x.total+' 😊</span></div></button>';
- }).join("")||'<div class="muted">Noch keine Kinder angelegt.</div>';
+ }).join("")||'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h3 style="margin:0 0 6px">Noch keine Kinder</h3><p class="muted" style="margin:0 0 12px">Starte mit „Kind hinzufügen“.</p><button class="btn" onclick="APP.addStudent()">＋ Kind hinzufügen</button></div>';
 }
 function openStudent(id){S.student=S.students.find(function(s){return s.id===id});if(!S.student)return;el("teacherHome").style.display="none";el("teacherDetail").style.display="block";renderTeacher()}
 function back(){S.student=null;renderHome()}
@@ -380,6 +424,48 @@ function queueRating(row){var q=offlineQueue().filter(function(x){return !(x.stu
 function applyLocalRating(row){var old=S.ratings.find(function(x){return x.student_id===row.student_id&&Number(x.weekday)===Number(row.weekday)&&Number(x.lesson_no)===Number(row.lesson_no)});if(old)old.rating=row.rating;else S.ratings.push(row);renderTeacher()}
 async function syncOfflineRatings(){if(!navigator.onLine||S.role!=="teacher")return;var q=offlineQueue();if(!q.length)return;var r=await sb.from("ratings").upsert(q,{onConflict:"student_id,week_start,weekday,lesson_no"});if(!r.error){saveQueue([]);toast("Offline-Bewertungen synchronisiert");await load()}}
 async function clearRating(){var r=await sb.from("ratings").delete().eq("student_id",S.student.id).eq("week_start",week()).eq("weekday",S.entry.weekday).eq("lesson_no",S.entry.lesson_no);if(r.error){toast("Löschen fehlgeschlagen");return}modal("ratingModal",false);var sid=S.student.id;await load();openStudent(sid)}
+
+function help(){modal("helpModal",true)}
+function openClassMore(){modal("classMoreModal",true)}
+function openStudentMore(){if(!S.student)return;el("studentMoreName").textContent=S.student.display_name+" · Mehr";modal("studentMoreModal",true)}
+function moreCarryGoals(){modal("classMoreModal",false);carryGoals()}
+function moreQrCards(){modal("classMoreModal",false);downloadCodes()}
+function moreExport(){modal("classMoreModal",false);openExport()}
+function moreClassSettings(){modal("classMoreModal",false);openClassAdmin()}
+function moreStudentQr(){modal("studentMoreModal",false);qr()}
+function moreStudentHours(){modal("studentMoreModal",false);openStudentSchedule()}
+function moreStudentHistory(){modal("studentMoreModal",false);history()}
+function moreStudentPdf(){modal("studentMoreModal",false);exportStudent()}
+function moreStudentManage(){modal("studentMoreModal",false);manageStudent()}
+
+function currentSchoolDay(){var d=new Date().getDay();return d>=1&&d<=5?d:1}
+function openQuickRating(){
+ if(!S.students.length){toast("Noch keine Kinder angelegt");return}
+ el("quickDay").value=String(currentSchoolDay());
+ el("quickLesson").value="1";
+ renderQuickRating();
+ modal("quickRatingModal",true)
+}
+function renderQuickRating(){
+ var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value);
+ var kids=S.students.filter(function(s){return slotEnabled(s.id,day,lesson)});
+ var done=kids.filter(function(s){return !!rating(s.id,day,lesson)}).length;
+ el("quickRatingProgress").textContent=done+" von "+kids.length+" bewertet";
+ el("quickRatingList").innerHTML=kids.map(function(s){
+   var r=rating(s.id,day,lesson);
+   function b(v,face){return '<button class="btn '+(r&&r.rating===v?'':'secondary')+' small" onclick="APP.quickRate(\''+s.id+'\',\''+v+'\')">'+face+'</button>'}
+   return '<div class="list-row"><div class="student-top"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div class="list-main"><b>'+esc(s.display_name)+'</b><span>'+(r?"Bewertet":"Noch offen")+'</span></div></div><div class="toolbar">'+b("good","😊")+b("partial","😐")+b("difficult","🙁")+'</div></div>'
+ }).join("")||'<div class="muted">Für diese Stunde sind keine Kinder eingetragen.</div>';
+}
+async function quickRate(sid,value){
+ var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value);
+ var row={student_id:sid,week_start:week(),weekday:day,lesson_no:lesson,rating:value,updated_by:S.user.id};
+ if(!navigator.onLine){queueRating(row);var old=rating(sid,day,lesson);if(old)old.rating=value;else S.ratings.push(row);renderQuickRating();renderHome();toast("Offline gespeichert");return}
+ var r=await sb.from("ratings").upsert(row,{onConflict:"student_id,week_start,weekday,lesson_no"});
+ if(r.error){toast("Bewertung konnte nicht gespeichert werden");return}
+ var old=rating(sid,day,lesson);if(old)old.rating=value;else S.ratings.push(row);
+ renderQuickRating();renderHome()
+}
 
 function fillGoalSelect(id){var s=el(id),opts=['<option value="">Ohne Vorlage</option>'];BUILTIN_GOALS.forEach(function(g,i){opts.push('<option value="b:'+i+'">'+esc(g.title)+'</option>')});S.goalTemplates.forEach(function(g){opts.push('<option value="c:'+g.id+'">'+esc(g.title)+'</option>')});s.innerHTML=opts.join("")}
 function goalFromValue(v){if(!v)return null;if(v.indexOf("b:")===0)return BUILTIN_GOALS[Number(v.slice(2))];var id=v.slice(2),x=S.goalTemplates.find(function(g){return g.id===id});return x?{title:x.title,goal:x.goal,help:x.help_text}:null}
@@ -555,8 +641,8 @@ function updateNet(){var n=navigator.onLine;el("netState").textContent=n?"● On
 window.addEventListener("online",updateNet);window.addEventListener("offline",updateNet);updateNet();
 
 window.APP={
- login:login,logout:logout,account:account,saveOwnPassword:saveOwnPassword,copyCredentials:copyCredentials,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,
- showTeacherArea:showTeacherArea,switchClass:switchClass,switchSchool:switchSchool,switchAdminSchool:switchAdminSchool,openSchoolClass:openSchoolClass,
+ login:login,logout:logout,help:help,account:account,saveOwnPassword:saveOwnPassword,copyCredentials:copyCredentials,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,
+ showTeacherArea:showTeacherArea,switchClass:switchClass,switchSchool:switchSchool,switchAdminSchool:switchAdminSchool,openSchoolClass:openSchoolClass,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
  openStudent:openStudent,back:back,openRating:openRating,saveRating:saveRating,clearRating:clearRating,
  checkin:checkin,fillCheckinTemplate:fillCheckinTemplate,pickCheckin:pickCheckin,saveCheckin:saveCheckin,
