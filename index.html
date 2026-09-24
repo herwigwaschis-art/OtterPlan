@@ -102,7 +102,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
         <span class="pill">● Live</span>
       </div>
       <div id="dashboard" class="dashboard-grid"></div>
-      <div class="home-tools">
+      <div id="homeTools" class="home-tools">
         <button class="btn" onclick="APP.openQuickRating()">😊 Heute bewerten</button>
         <button class="btn ghost" onclick="APP.openBatchGoals()">🎯 Ziel vergeben</button>
         <button class="btn ghost" onclick="APP.addStudent()">＋ Kind hinzufügen</button>
@@ -114,7 +114,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
     <div id="teacherDetail" style="display:none">
       <div class="toolbar" style="justify-content:space-between;margin-bottom:18px">
         <button class="btn secondary" onclick="APP.back()">← Klasse</button>
-        <div class="teacher-actions"><button class="btn" onclick="APP.checkin()">🎯 Ziel</button><button class="btn ghost" onclick="APP.checkout()">✅ Wochenabschluss</button><button class="btn ghost" onclick="APP.reward()">🐚 Belohnung</button><button class="btn ghost" onclick="APP.openStudentMore()">Mehr …</button></div>
+        <div class="teacher-actions"><button class="btn" onclick="APP.checkin()">🎯 Ziel</button><button class="btn ghost" onclick="APP.checkout()">✅ Woche abschließen</button><button class="btn ghost" onclick="APP.reward()">🐚 Belohnung</button><button class="btn ghost" onclick="APP.openStudentMore()">Mehr …</button></div>
       </div>
       <div class="hero"><div><h2 id="teacherName"></h2><p id="teacherMeta" class="muted"></p></div><button class="btn ghost" onclick="APP.exportStudent()">⇩ PDF</button></div>
       <div class="grid">
@@ -166,7 +166,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
     <button class="btn ghost" onclick="APP.moreCarryGoals()">↻ Ziele aus der Vorwoche übernehmen</button>
     <button class="btn ghost" onclick="APP.moreQrCards()">▦ QR-Karten herunterladen</button>
     <button class="btn ghost" onclick="APP.moreExport()">⇩ Dokumentation exportieren</button>
-    <button class="btn ghost" onclick="APP.moreClassSettings()">⚙︎ Klasse verwalten</button>
+    <button id="moreClassSettingsBtn" class="btn ghost" onclick="APP.moreClassSettings()">⚙︎ Klasse verwalten</button>
   </div>
   <div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('classMoreModal')">Schließen</button></div>
 </div></div>
@@ -224,7 +224,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
 
 <div id="exportModal" class="modal-bg"><div class="modal"><div class="eyebrow">Export</div><h2 style="margin:5px 0 13px">Dokumentation</h2><div class="list"><button class="btn ghost" onclick="APP.exportWeekly()">Wochenübersicht als PDF</button><button class="btn ghost" onclick="APP.exportMonthly()">Monatsübersicht als PDF</button></div><div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('exportModal')">Schließen</button></div></div></div>
 
-<div id="classModal" class="modal-bg"><div class="modal wide"><div class="eyebrow">Klasse</div><h2 style="margin:5px 0 13px">Verwalten</h2><div class="inline-grid"><div><label>Klassenname</label><input id="classEditName"></div><div><label>Schuljahr</label><input id="classEditYear"></div></div><label>Stufe</label><select id="classEditGrade"><option value="">Keine</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select><button class="btn" style="margin-top:11px" onclick="APP.saveClassSettings()">Speichern</button><label>Lehrkräfte der Klasse</label><div id="classTeacherList" class="list"></div><div class="inline-grid" style="margin-top:9px"><input id="assignTeacherEmail" type="email" placeholder="E-Mail der Lehrkraft"><button class="btn secondary" onclick="APP.assignTeacher()">Zuordnen</button></div><label>Archivierte Kinder automatisch löschen nach Tagen</label><input id="retentionDays" type="number" min="7" max="1095" value="90"><button class="btn secondary" style="margin-top:10px" onclick="APP.saveRetention()">Speichern</button><details class="clean"><summary>Schuljahresende</summary><button class="btn danger" style="margin-top:11px" onclick="APP.archiveClass()">Klasse archivieren</button></details><hr style="border:0;border-top:1px solid rgba(0,0,0,.06);margin:21px 0"><div class="eyebrow">Weitere Klasse</div><div class="inline-grid"><input id="newClassName" placeholder="Klasse 2b"><input id="newClassYear" placeholder="2026/27"></div><button class="btn secondary" style="margin-top:11px" onclick="APP.createClass()">Klasse anlegen</button><div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('classModal')">Schließen</button></div></div></div>
+<div id="classModal" class="modal-bg"><div class="modal wide"><div class="eyebrow">Klasse</div><h2 style="margin:5px 0 13px">Verwalten</h2><div class="inline-grid"><div><label>Klassenname</label><input id="classEditName"></div><div><label>Schuljahr</label><input id="classEditYear"></div></div><label>Stufe</label><select id="classEditGrade"><option value="">Keine</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select><button class="btn" style="margin-top:11px" onclick="APP.saveClassSettings()">Speichern</button><label>Lehrkräfte der Klasse</label><div id="classTeacherList" class="list"></div><div class="inline-grid" style="margin-top:9px"><input id="assignTeacherEmail" type="email" placeholder="E-Mail der Lehrkraft"><button class="btn secondary" onclick="APP.assignTeacher()">Zuordnen</button></div><label>Archivierte Kinder automatisch löschen nach Tagen</label><input id="retentionDays" type="number" min="7" max="1095" value="90"><button class="btn secondary" style="margin-top:10px" onclick="APP.saveRetention()">Speichern</button><details class="clean"><summary>Schuljahresende</summary><button class="btn danger" style="margin-top:11px" onclick="APP.archiveClass()">Klasse archivieren</button></details><div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('classModal')">Schließen</button></div></div></div>
 
 <div id="schoolModal" class="modal-bg"><div class="modal wide"><div class="eyebrow">Schulverwaltung</div><h2 style="margin:5px 0 13px">Schule & Stufen</h2><div id="schoolAdminContent"></div><hr style="border:0;border-top:1px solid rgba(0,0,0,.06);margin:20px 0"><div class="eyebrow">Neue Schule</div><div class="inline-grid"><input id="newSchoolName" placeholder="Schulname"><button class="btn" onclick="APP.createSchool()">Schule anlegen</button></div><div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('schoolModal')">Schließen</button></div></div></div>
 
@@ -322,7 +322,7 @@ async function load(){
    S.classes=all[0].data||[];S.goalTemplates=all[1].data||[];S.rewardTemplates=all[2].data||[];S.schools=all[3].data||[];S.schoolMemberships=all[4].data||[];S.schoolSettings=all[5].data||[];
    if(S.classRow){S.classRow=S.classes.find(function(x){return x.id===S.classRow.id})||S.classes[0]||null}else S.classRow=S.classes[0]||null;
    if(S.schoolRow){S.schoolRow=S.schools.find(function(x){return x.id===S.schoolRow.id})||S.schools[0]||null}else S.schoolRow=S.schools[0]||null;
-   if(!S.classRow){S.students=[];S.timetable=[];S.scheduleSlots=[];S.plans=[];S.ratings=[];S.rewards=[];S.progress=[];renderTeacherShell();show("teacher");return}
+   if(!S.classRow){S.students=[];S.timetable=[];S.scheduleSlots=[];S.plans=[];S.ratings=[];S.rewards=[];S.progress=[];renderTeacherShell();renderHome();show("teacher");return}
    var st=await sb.from("students").select("*").eq("class_id",S.classRow.id).is("archived_at",null).order("sort_order").order("display_name");
    S.students=st.data||[];var ids=S.students.map(function(x){return x.id});
    var q=await Promise.all([
@@ -356,6 +356,7 @@ async function loadStudent(withRatings){
 
 function isSchoolAdmin(id){return S.schoolMemberships.some(function(m){return m.school_id===id&&m.role==="admin"})}
 function adminSchools(){return S.schools.filter(function(s){return isSchoolAdmin(s.id)})}
+function canManageCurrentClass(){return !!(S.classRow&&(S.classRow.teacher_id===S.user.id||(S.classRow.school_id&&isSchoolAdmin(S.classRow.school_id))))}
 function renderTeacherShell(){
  var sel=el("classSelect");
  if(!S.classes.length){sel.innerHTML='<option>Keine Klasse</option>';el("classMeta").textContent="Noch keine eigene oder zugeordnete Klasse."}
@@ -382,8 +383,14 @@ async function switchSchool(id){S.schoolRow=S.schools.find(function(s){return s.
 async function switchAdminSchool(id){S.schoolRow=S.schools.find(function(s){return s.id===id})||null;renderTeacherShell();await renderAdminArea()}
 
 function renderHome(){
- if(!S.classRow){el("studentGrid").innerHTML='<div class="muted">Noch keine Klasse.</div>';return}
  el("teacherHome").style.display="block";el("teacherDetail").style.display="none";
+ if(!S.classRow){
+   el("homeTools").style.display="none";
+   el("dashboard").innerHTML="";
+   el("studentGrid").innerHTML='<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse</h2><p class="muted" style="margin:0 0 13px">Richte zuerst deine Schule und Klasse ein.</p><button class="btn" onclick="APP.showTeacherArea(\'admin\')">Einrichtung öffnen</button></div>';
+   return
+ }
+ el("homeTools").style.display="flex";
  var noGoal=S.students.filter(function(s){return !plan(s.id)}).length;
  var unrated=S.students.filter(function(s){return stats(s.id).total===0}).length;
  var difficult=S.ratings.filter(function(r){return r.rating==="difficult"}).length;
@@ -426,7 +433,7 @@ async function syncOfflineRatings(){if(!navigator.onLine||S.role!=="teacher")ret
 async function clearRating(){var r=await sb.from("ratings").delete().eq("student_id",S.student.id).eq("week_start",week()).eq("weekday",S.entry.weekday).eq("lesson_no",S.entry.lesson_no);if(r.error){toast("Löschen fehlgeschlagen");return}modal("ratingModal",false);var sid=S.student.id;await load();openStudent(sid)}
 
 function help(){modal("helpModal",true)}
-function openClassMore(){modal("classMoreModal",true)}
+function openClassMore(){el("moreClassSettingsBtn").style.display=canManageCurrentClass()?"block":"none";modal("classMoreModal",true)}
 function openStudentMore(){if(!S.student)return;el("studentMoreName").textContent=S.student.display_name+" · Mehr";modal("studentMoreModal",true)}
 function moreCarryGoals(){modal("classMoreModal",false);carryGoals()}
 function moreQrCards(){modal("classMoreModal",false);downloadCodes()}
@@ -449,15 +456,19 @@ function openQuickRating(){
 function renderQuickRating(){
  var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value);
  var kids=S.students.filter(function(s){return slotEnabled(s.id,day,lesson)});
- var done=kids.filter(function(s){return !!rating(s.id,day,lesson)}).length;
- el("quickRatingProgress").textContent=done+" von "+kids.length+" bewertet";
+ var withGoal=kids.filter(function(s){return !!plan(s.id)});
+ var done=withGoal.filter(function(s){return !!rating(s.id,day,lesson)}).length;
+ var noGoal=kids.length-withGoal.length;
+ el("quickRatingProgress").textContent=done+" von "+withGoal.length+" bewertet"+(noGoal?" · "+noGoal+" ohne Ziel":"");
  el("quickRatingList").innerHTML=kids.map(function(s){
-   var r=rating(s.id,day,lesson);
+   var r=rating(s.id,day,lesson),p=plan(s.id);
    function b(v,face){return '<button class="btn '+(r&&r.rating===v?'':'secondary')+' small" onclick="APP.quickRate(\''+s.id+'\',\''+v+'\')">'+face+'</button>'}
-   return '<div class="list-row"><div class="student-top"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div class="list-main"><b>'+esc(s.display_name)+'</b><span>'+(r?"Bewertet":"Noch offen")+'</span></div></div><div class="toolbar">'+b("good","😊")+b("partial","😐")+b("difficult","🙁")+'</div></div>'
+   var actions=p?'<div class="toolbar">'+b("good","😊")+b("partial","😐")+b("difficult","🙁")+'</div>':'<span class="pill">Ziel fehlt</span>';
+   return '<div class="list-row"><div class="student-top"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div class="list-main"><b>'+esc(s.display_name)+'</b><span>'+esc(p?p.goal:"Noch kein Wochenziel")+'</span></div></div>'+actions+'</div>'
  }).join("")||'<div class="muted">Für diese Stunde sind keine Kinder eingetragen.</div>';
 }
 async function quickRate(sid,value){
+ if(!plan(sid)){toast("Bitte zuerst ein Wochenziel vergeben");return}
  var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value);
  var row={student_id:sid,week_start:week(),weekday:day,lesson_no:lesson,rating:value,updated_by:S.user.id};
  if(!navigator.onLine){queueRating(row);var old=rating(sid,day,lesson);if(old)old.rating=value;else S.ratings.push(row);renderQuickRating();renderHome();toast("Offline gespeichert");return}
@@ -560,7 +571,7 @@ async function copyCredentials(){var t="OtterPlan\nE-Mail: "+el("credEmail").val
 async function renderAdminArea(){
  var admins=adminSchools(),box=el("adminContent");
  if(!admins.length){
-   box.innerHTML='<div class="card"><div class="eyebrow">Neue Schule</div><h2 style="margin:6px 0 12px">Schule einrichten</h2><p class="muted" style="font-size:12px">Danach bist du Schul-Admin und kannst Lehrerkonten und Klassen verwalten.</p><div class="inline-grid"><input id="adminNewSchoolName" placeholder="Schulname"><button class="btn" onclick="APP.createSchoolFromAdmin()">Schule anlegen</button></div></div>';
+   box.innerHTML='<div class="card"><div class="eyebrow">Neue Schule</div><h2 style="margin:6px 0 12px">Schule einrichten</h2><p class="muted" style="font-size:13px">Danach kannst du Klassen und Lehrerkonten zentral verwalten.</p><div class="inline-grid"><input id="adminNewSchoolName" placeholder="Schulname"><button class="btn" onclick="APP.createSchoolFromAdmin()">Schule anlegen</button></div></div>';
    return;
  }
  if(!S.schoolRow||!isSchoolAdmin(S.schoolRow.id))S.schoolRow=admins[0];
@@ -570,9 +581,13 @@ async function renderAdminArea(){
  var settings=S.schoolSettings.find(function(x){return x.school_id===S.schoolRow.id})||{default_school_year:"2026/27",default_retention_days:90,teachers_can_create_classes:false};
  var memberRows=S.schoolMembers.map(function(m){var own=m.user_id===S.user.id;return '<div class="list-row"><div class="list-main"><b>'+esc(m.display_name)+'</b><span>'+esc(m.email)+" · "+(m.role==="admin"?"Admin":"Lehrkraft")+'</span></div><div class="toolbar">'+(!own?'<button class="btn secondary small" onclick="APP.resetTeacherPassword(\''+m.user_id+'\',\''+esc(m.email)+'\')">Passwort neu</button><button class="btn secondary small" onclick="APP.removeSchoolMember(\''+m.user_id+'\')">Entfernen</button>':'<span class="pill">Du</span>')+'</div></div>'}).join("");
  var classChecks=classes.map(function(x){return '<label class="check-item"><input type="checkbox" class="teacherClassCheck" value="'+x.class_id+'"><span>'+esc(x.class_name)+(x.grade_level?" · Stufe "+x.grade_level:"")+'</span></label>'}).join("");
+ var unassigned=S.classes.filter(function(x){return !x.school_id});
+ var attachBlock=unassigned.length?'<label>Bestehende Klasse zuordnen</label><div class="inline-grid"><select id="attachClass">'+unassigned.map(function(x){return '<option value="'+x.id+'">'+esc(x.name)+'</option>'}).join("")+'</select><select id="attachGrade">'+gradeOptions(false)+'</select></div><button class="btn secondary" style="margin-top:9px" onclick="APP.attachClass()">Zur Schule hinzufügen</button>':'';
+ var structureRows=classes.map(function(x){return '<div class="list-row"><div class="list-main"><b>'+esc(x.class_name)+'</b><span>'+(x.grade_level?"Stufe "+x.grade_level+" · ":"")+x.student_count+" Kinder</span></div><span class="pill">'+(x.has_access?"Zugriff":"Übersicht")+'</span></div>'}).join("");
  box.innerHTML='<div class="grid">'+
    '<div class="card s12"><div class="eyebrow">Schule</div><h2 style="margin:6px 0 12px">'+esc(S.schoolRow.name)+'</h2><div class="inline-grid"><div><label>Name</label><input id="adminSchoolName" value="'+esc(S.schoolRow.name)+'"></div><div><label>Standard-Schuljahr</label><input id="adminDefaultYear" value="'+esc(settings.default_school_year||"2026/27")+'"></div></div><label>Archivierte Daten löschen nach Tagen</label><input id="adminRetention" type="number" min="7" max="1095" value="'+Number(settings.default_retention_days||90)+'"><label class="check-item" style="margin-top:12px"><input id="adminTeacherCreateClass" type="checkbox" '+(settings.teachers_can_create_classes?"checked":"")+'><span>Lehrkräfte dürfen selbst neue Klassen anlegen</span></label><button class="btn" style="margin-top:12px" onclick="APP.saveAdminSettings()">Einstellungen speichern</button></div>'+
-   '<div class="card s12"><div class="eyebrow">Lehrerkonten</div><h2 style="margin:6px 0 12px">Neue Lehrkraft</h2><div class="inline-grid"><div><label>Name</label><input id="newTeacherName" placeholder="Vorname Nachname"></div><div><label>E-Mail</label><input id="newTeacherEmail" type="email" placeholder="name@schule.de"></div></div><label>Rolle</label><select id="newTeacherRole"><option value="teacher">Lehrkraft</option><option value="admin">Admin</option></select><label>Klassen zuordnen</label><div class="check-list">'+classChecks+'</div><button class="btn" style="margin-top:12px" onclick="APP.createTeacherAccount()">Lehrerkonto erstellen</button><label>Kollegium</label><div class="list">'+memberRows+'</div></div>'+
+   '<div class="card s12"><div class="eyebrow">Klassen & Stufen</div><h2 style="margin:6px 0 12px">Klassen verwalten</h2><div class="compact-grid"><input id="schoolClassName" placeholder="z. B. 2a"><select id="schoolClassGrade">'+gradeOptions(false)+'</select><input id="schoolClassYear" value="'+esc(settings.default_school_year||"2026/27")+'"></div><button class="btn" style="margin-top:9px" onclick="APP.createSchoolClass()">Klasse anlegen</button>'+attachBlock+'<label>Übersicht</label><div class="list">'+(structureRows||'<div class="muted">Noch keine Klassen.</div>')+'</div></div>'+
+   '<div class="card s12"><div class="eyebrow">Lehrerkonten</div><h2 style="margin:6px 0 12px">Neue Lehrkraft</h2><div class="inline-grid"><div><label>Name</label><input id="newTeacherName" placeholder="Vorname Nachname"></div><div><label>E-Mail</label><input id="newTeacherEmail" type="email" placeholder="name@schule.de"></div></div><label>Rolle</label><select id="newTeacherRole"><option value="teacher">Lehrkraft</option><option value="admin">Admin</option></select><label>Klassen zuordnen</label><div class="check-list">'+(classChecks||'<div class="muted">Noch keine Klassen vorhanden.</div>')+'</div><button class="btn" style="margin-top:12px" onclick="APP.createTeacherAccount()">Lehrerkonto erstellen</button><label>Kollegium</label><div class="list">'+memberRows+'</div></div>'+
    '</div>';
 }
 async function createSchoolFromAdmin(){var n=el("adminNewSchoolName").value.trim();if(!n)return;var r=await sb.rpc("create_school",{p_name:n});if(r.error){toast("Schule konnte nicht angelegt werden");return}await load();S.schoolRow=S.schools.find(function(s){return s.id===r.data})||S.schools[0];S.teacherArea="admin";showTeacherArea("admin");toast("Schule angelegt")}
