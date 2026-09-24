@@ -347,7 +347,7 @@ var BUILTIN_GOALS=[
  {title:"Friedlich lösen",goal:"Ich löse Streit friedlich.",help:"Ich stoppe, spreche ruhig und hole Hilfe, wenn ich sie brauche."}
 ];
 var BUILTIN_REWARDS=[{title:"Sticker auswählen",shells:5},{title:"Spiel auswählen",shells:10},{title:"Wunschbelohnung",shells:20}];
-var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],timetable:[],scheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,gradeStudentData:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null};
+var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],timetable:[],scheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,gradeStudentData:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null,weekOffset:0,gradeFilter:"all",gradeClassFilter:"all",gradeQuickMode:false,gradeQuickIndex:0,undoRating:null,undoTimer:null,adminTeacherEdit:null};
 var idleTimer=null,reload=null;
 
 function el(id){return document.getElementById(id)}
@@ -356,7 +356,33 @@ function toast(m){var t=el("toast");t.textContent=m;t.classList.add("show");setT
 function show(id){document.querySelectorAll(".screen").forEach(function(x){x.classList.remove("active")});el(id).classList.add("active")}
 function modal(id,on){el(id).classList.toggle("show",on!==false)}
 function closeM(id){modal(id,false)}
-function week(){var d=new Date(),n=d.getDay()||7;d.setDate(d.getDate()-n+1);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function currentWeekDate(){var d=new Date(),n=d.getDay()||7;d.setHours(12,0,0,0);d.setDate(d.getDate()-n+1);return d}
+function selectedWeekDate(){var d=currentWeekDate();d.setDate(d.getDate()+Number(S.weekOffset||0)*7);return d}
+function dateISO(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function week(){return dateISO(selectedWeekDate())}
+function isCurrentWeek(){return Number(S.weekOffset||0)===0}
+function weekRangeLabel(){
+ var a=selectedWeekDate(),b=new Date(a);b.setDate(b.getDate()+4);
+ var sameMonth=a.getMonth()===b.getMonth();
+ var end=new Intl.DateTimeFormat("de-DE",{day:"numeric",month:"long",year:"numeric"}).format(b);
+ return sameMonth?a.getDate()+".–"+end:new Intl.DateTimeFormat("de-DE",{day:"numeric",month:"short"}).format(a)+" – "+end
+}
+async function changeWeek(delta){
+ S.weekOffset=Number(S.weekOffset||0)+Number(delta||0);
+ S.gradeQuickMode=false;S.gradeStudentData=null;S.gradeActivePlan=null;
+ var sid=S.student&&S.student.id;
+ if(S.teacherArea==="grade"&&S.gradeLevel){
+   S.student=null;await loadGradeOverview();el("gradeOverviewContent").style.display="block";el("gradeStudentDetail").style.display="none";
+ }else if(S.role==="teacher"){
+   await load();
+   if(sid&&S.students.some(function(x){return x.id===sid}))openStudent(sid)
+ }
+ updateDateUI()
+}
+async function goCurrentWeek(){
+ if(isCurrentWeek()){updateDateUI();return}
+ S.weekOffset=0;await changeWeek(0)
+}
 function startOfMonth(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-01"}
 function fmtDate(s){if(!s)return"";var p=s.split("-");return p.length===3?p[2]+"."+p[1]+".":s}
 function cap(v){v=String(v||"");return v?v.charAt(0).toUpperCase()+v.slice(1):v}
@@ -364,7 +390,9 @@ function todayLong(){return cap(new Intl.DateTimeFormat("de-DE",{weekday:"long",
 function todayShort(){return cap(new Intl.DateTimeFormat("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"}).format(new Date()))}
 function updateDateUI(){
  var map={todayBadge:"📅 "+todayShort(),classToday:"📅 "+todayLong(),gradeDate:"📅 "+todayLong(),childDate:"📅 "+todayLong(),gradeStudentDate:todayShort(),quickRatingDate:"📅 "+todayLong()};
- Object.keys(map).forEach(function(id){var x=el(id);if(x)x.textContent=map[id]})
+ Object.keys(map).forEach(function(id){var x=el(id);if(x)x.textContent=map[id]});
+ var w=el("weekNavLabel");if(w)w.textContent=(isCurrentWeek()?"Diese Woche · ":"")+weekRangeLabel();
+ var n=el("teacherWeekNav");if(n)n.style.display=S.role==="teacher"&&S.teacherArea!=="admin"?"flex":"none"
 }
 function plan(sid){if(S.gradeActivePlan&&S.gradeActivePlan.student_id===sid)return S.gradeActivePlan;return S.plans.find(function(p){return p.student_id===sid})||null}
 function shells(sid){var p=S.progress.find(function(x){return x.student_id===sid});return p?p.shells||0:0}
@@ -382,7 +410,7 @@ function norm(v){v=String(v||"").trim();if(v.indexOf("otterplan:")===0)v=v.slice
 async function scan(){if(!window.Html5Qrcode){toast("Kamera nicht verfügbar");return}await stopScan();try{S.scanner=new Html5Qrcode("qr-reader");await S.scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:220,height:220}},function(code){el("childToken").value=norm(code);stopScan().then(redeem)},function(){})}catch(e){toast("Kamera konnte nicht gestartet werden")}}
 async function stopScan(){if(S.scanner){try{await S.scanner.stop()}catch(e){}try{S.scanner.clear()}catch(e){}S.scanner=null}}
 async function redeem(){var token=norm(el("childToken").value);if(!token){toast("QR-Code fehlt");return}await stopScan();var ses=await sb.auth.getSession();if(ses.data.session&&S.role==="teacher"){toast("Kinderzugang bitte auf dem Kindergerät testen.");return}if(ses.data.session)await sb.auth.signOut();var a=await sb.auth.signInAnonymously();if(a.error){toast("Kinderzugang konnte nicht gestartet werden");return}var r=await sb.rpc("redeem_child_qr",{p_qr_token:token});if(r.error){await sb.auth.signOut();toast("QR-Code ungültig");return}el("childToken").value="";await bootstrap()}
-async function logout(){closeTopMenu();Object.keys(sessionStorage).filter(function(k){return k.indexOf("otter_admin_")===0}).forEach(function(k){sessionStorage.removeItem(k)});stopRealtime();await stopScan();await sb.auth.signOut();S.user=null;S.profile=null;S.role=null;el("session").style.display="none";show("login")}
+async function logout(){closeTopMenu();Object.keys(sessionStorage).filter(function(k){return k.indexOf("otter_admin_")===0}).forEach(function(k){sessionStorage.removeItem(k)});stopRealtime();await stopScan();await sb.auth.signOut();S.user=null;S.profile=null;S.role=null;S.weekOffset=0;S.gradeQuickMode=false;S.undoRating=null;el("session").style.display="none";show("login")}
 
 async function bootstrap(){
  var u=await sb.auth.getUser();if(!u.data.user){show("login");return}
@@ -501,6 +529,7 @@ function showTeacherArea(area){
  el("gradeArea").style.display=area==="grade"?"block":"none";
  el("adminArea").style.display=area==="admin"?"block":"none";
  if(area==="admin")renderAdminArea();
+ updateDateUI();
 }
 
 function adminGateKey(){return "otter_admin_"+(S.schoolRow?S.schoolRow.id:"school")}
