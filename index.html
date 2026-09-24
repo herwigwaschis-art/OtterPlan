@@ -398,9 +398,15 @@ function canManageCurrentClass(){return !!(S.classRow&&(S.classRow.teacher_id===
 function renderTeacherShell(){
  var switchName=el("classSwitchName"),switchBtn=el("classSwitchBtn");
  if(!S.classes.length){
-   switchName.textContent="Keine Klasse";
-   switchBtn.disabled=true;
-   el("classMeta").textContent="Noch keine eigene oder zugeordnete Klasse.";
+   if(S.gradeLinks.length){
+     switchName.textContent="Stufenüberblick";
+     switchBtn.disabled=false;
+     el("classMeta").textContent="Zugeordnete Stufe auswählen";
+   }else{
+     switchName.textContent="Keine Klasse";
+     switchBtn.disabled=true;
+     el("classMeta").textContent="Noch keine eigene oder zugeordnete Klasse.";
+   }
  }else{
    switchBtn.disabled=false;
    switchName.textContent=S.classRow?S.classRow.name:"Klasse wählen";
@@ -508,7 +514,7 @@ function gradeCheckout(i){
  S.student={id:x.student_id,display_name:x.display_name,avatar_emoji:x.avatar_emoji};
  checkout()
 }
-function backFromGrade(){S.gradeActivePlan=null;S.student=null;S.gradeRows=[];showTeacherArea("class")}
+function backFromGrade(){S.gradeActivePlan=null;S.student=null;S.gradeRows=[];showTeacherArea("class");if(!S.classRow&&S.gradeLinks.length)setTimeout(openClassChooser,80)}
 
 function renderHome(){
  el("teacherHome").style.display="block";el("teacherDetail").style.display="none";
@@ -516,9 +522,14 @@ function renderHome(){
    el("homeTools").style.display="none";
    el("dashboard").innerHTML="";
    var canSetUp=adminSchools().length>0||S.schools.length===0;
-   el("studentGrid").innerHTML=canSetUp
-     ?'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse</h2><p class="muted" style="margin:0 0 13px">Richte zuerst deine Schule und Klasse ein.</p><button class="btn" onclick="APP.requestAdmin()">Einrichtung öffnen</button></div>'
-     :'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse zugeordnet</h2><p class="muted" style="margin:0">Bitte den Schul-Admin, dir eine Klasse zuzuordnen.</p></div>';
+   if(S.gradeLinks.length){
+     var g=S.gradeLinks[0].grade_level;
+     el("studentGrid").innerHTML='<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Stufenüberblick</h2><p class="muted" style="margin:0 0 13px">Du hast Zugriff auf den Überblick der Stufe '+g+'.</p><button class="btn" onclick="APP.openGradeOverview('+g+')">Stufe '+g+' öffnen</button></div>';
+   }else{
+     el("studentGrid").innerHTML=canSetUp
+       ?'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse</h2><p class="muted" style="margin:0 0 13px">Richte zuerst deine Schule und Klasse ein.</p><button class="btn" onclick="APP.requestAdmin()">Einrichtung öffnen</button></div>'
+       :'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse zugeordnet</h2><p class="muted" style="margin:0">Bitte den Schul-Admin, dir eine Klasse zuzuordnen.</p></div>';
+   }
    return
  }
  el("homeTools").style.display="flex";
