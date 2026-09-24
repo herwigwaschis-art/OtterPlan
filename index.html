@@ -1044,7 +1044,8 @@ async function renderAdminArea(){
    return '<div class="list-row"><div class="list-main"><b>'+esc(x.class_name)+'</b><span>'+esc(meta)+'</span></div><div class="toolbar"><span class="pill">'+(x.has_access?"Zugriff":"Übersicht")+'</span><button class="btn secondary small" onclick="APP.openAdminClassEditIndex('+i+')">Bearbeiten</button></div></div>';
  }).join("");
 
- var schoolCard='<div class="card s12"><div class="eyebrow">Schule</div><h2 style="margin:6px 0 12px">'+esc(S.schoolRow.name)+'</h2><div class="inline-grid"><div><label>Name</label><input id="adminSchoolName" value="'+esc(S.schoolRow.name)+'"></div><div><label>Standard-Schuljahr</label><input id="adminDefaultYear" value="'+esc(settings.default_school_year||"2026/27")+'"></div></div><label>Archivierte Daten löschen nach Tagen</label><input id="adminRetention" type="number" min="7" max="1095" value="'+Number(settings.default_retention_days||90)+'"><label class="check-item" style="margin-top:12px"><input id="adminTeacherCreateClass" type="checkbox" '+(settings.teachers_can_create_classes?"checked":"")+'><span>Lehrkräfte dürfen selbst neue Klassen anlegen</span></label><div class="pilot-box"><label class="check-item" style="margin:0"><input id="adminPilotMode" type="checkbox" '+(settings.pilot_mode!==false?"checked":"")+'><span><b>Pilotmodus aktiv</b>Testhinweise bleiben in MILO sichtbar.</span></label><p>Das Abschalten des Hinweises bedeutet nicht automatisch, dass alle schulischen oder datenschutzrechtlichen Voraussetzungen erfüllt sind.</p></div><button class="btn" style="margin-top:12px" onclick="APP.saveAdminSettings()">Einstellungen speichern</button></div>';
+ var demoClassOptions=classes.map(function(x){return '<option value="'+x.class_id+'">'+esc(x.class_name)+(x.grade_level?" · Stufe "+x.grade_level:"")+'</option>'}).join("");
+ var schoolCard='<div class="card s12"><div class="eyebrow">Schule</div><h2 style="margin:6px 0 12px">'+esc(S.schoolRow.name)+'</h2><div class="inline-grid"><div><label>Name</label><input id="adminSchoolName" value="'+esc(S.schoolRow.name)+'"></div><div><label>Standard-Schuljahr</label><input id="adminDefaultYear" value="'+esc(settings.default_school_year||"2026/27")+'"></div></div><label>Archivierte Daten löschen nach Tagen</label><input id="adminRetention" type="number" min="7" max="1095" value="'+Number(settings.default_retention_days||90)+'"><label class="check-item" style="margin-top:12px"><input id="adminTeacherCreateClass" type="checkbox" '+(settings.teachers_can_create_classes?"checked":"")+'><span>Lehrkräfte dürfen selbst neue Klassen anlegen</span></label><div class="pilot-box"><label class="check-item" style="margin:0"><input id="adminPilotMode" type="checkbox" '+(settings.pilot_mode!==false?"checked":"")+'><span><b>Pilotmodus aktiv</b>Testhinweise bleiben in MILO sichtbar.</span></label><p>Das Abschalten des Hinweises bedeutet nicht automatisch, dass alle schulischen oder datenschutzrechtlichen Voraussetzungen erfüllt sind.</p><div style="margin-top:12px"><label style="margin-top:0">Testdaten</label><select id="adminDemoClass">'+demoClassOptions+'</select><div class="toolbar" style="margin-top:8px"><button class="btn secondary small" onclick="APP.createDemoStudent()">🧪 Testkind anlegen</button><button class="btn secondary small" onclick="APP.deleteDemoStudents()">Testkinder löschen</button></div></div></div><button class="btn" style="margin-top:12px" onclick="APP.saveAdminSettings()">Einstellungen speichern</button></div>';
 
  var classCard='<div class="card s12"><div class="eyebrow">Klassen & Stufen</div><h2 style="margin:6px 0 12px">Klassen verwalten</h2><div class="compact-grid"><input id="schoolClassName" placeholder="z. B. 2a"><select id="schoolClassGrade">'+gradeOptions(false)+'</select><input id="schoolClassYear" value="'+esc(settings.default_school_year||"2026/27")+'"></div><button class="btn" style="margin-top:9px" onclick="APP.createSchoolClass()">Klasse anlegen</button>'+attachBlock+'<label>Übersicht</label><div class="list">'+(structureRows||'<div class="muted">Noch keine Klassen.</div>')+'</div></div>';
 
@@ -1060,6 +1061,18 @@ async function saveAdminSettings(){
  var p=await sb.rpc("set_school_pilot_mode",{p_school_id:S.schoolRow.id,p_pilot_mode:el("adminPilotMode").checked});
  if(p.error){toast("Pilotmodus konnte nicht gespeichert werden");return}
  await load();S.teacherArea="admin";showTeacherArea("admin");toast("Einstellungen gespeichert")
+}
+async function createDemoStudent(){
+ var cid=el("adminDemoClass")&&el("adminDemoClass").value;if(!cid){toast("Bitte Klasse auswählen");return}
+ var r=await sb.rpc("create_demo_student_for_class",{p_class_id:cid,p_week_start:week()});
+ if(r.error){toast("Testkind konnte nicht angelegt werden");return}
+ await renderAdminArea();toast("Testkind mit Wochenplan angelegt")
+}
+async function deleteDemoStudents(){
+ if(!confirm("Alle von MILO angelegten Testkinder dieser Schule löschen? Echte Kinder werden nicht berührt."))return;
+ var r=await sb.rpc("delete_demo_students_for_school",{p_school_id:S.schoolRow.id});
+ if(r.error){toast("Testkinder konnten nicht gelöscht werden");return}
+ await renderAdminArea();toast((r.data||0)+" Testkinder gelöscht")
 }
 async function createTeacherAccount(){
  var name=el("newTeacherName").value.trim(),email=el("newTeacherEmail").value.trim(),role=el("newTeacherRole").value,ids=Array.from(document.querySelectorAll(".teacherClassCheck:checked")).map(function(x){return x.value}),grades=Array.from(document.querySelectorAll(".teacherGradeCheck:checked")).map(function(x){return Number(x.value)});
@@ -1167,7 +1180,7 @@ window.APP={
  openStudentSchedule:openStudentSchedule,schedulePreset:schedulePreset,saveStudentSchedule:saveStudentSchedule,
  history:history,openExport:openExport,exportWeekly:exportWeekly,exportMonthly:exportMonthly,exportStudent:exportStudent,
  openClassAdmin:openClassAdmin,saveClassSettings:saveClassSettings,assignTeacher:assignTeacher,removeTeacher:removeTeacher,saveRetention:saveRetention,archiveClass:archiveClass,
- attachClass:attachClass,createSchoolClass:createSchoolClass,openTeacherEditIndex:openTeacherEditIndex,saveTeacherEdit:saveTeacherEdit,openAdminClassEditIndex:openAdminClassEditIndex,saveAdminClassEdit:saveAdminClassEdit,archiveAdminClass:archiveAdminClass,renderAdminArea:renderAdminArea,createSchoolFromAdmin:createSchoolFromAdmin,saveAdminSettings:saveAdminSettings,createTeacherAccount:createTeacherAccount,resetTeacherPassword:resetTeacherPassword,removeSchoolMember:removeSchoolMember,resetTeacherPasswordIndex:resetTeacherPasswordIndex,removeSchoolMemberIndex:removeSchoolMemberIndex
+ attachClass:attachClass,createSchoolClass:createSchoolClass,openTeacherEditIndex:openTeacherEditIndex,saveTeacherEdit:saveTeacherEdit,openAdminClassEditIndex:openAdminClassEditIndex,saveAdminClassEdit:saveAdminClassEdit,archiveAdminClass:archiveAdminClass,renderAdminArea:renderAdminArea,createSchoolFromAdmin:createSchoolFromAdmin,saveAdminSettings:saveAdminSettings,createDemoStudent:createDemoStudent,deleteDemoStudents:deleteDemoStudents,createTeacherAccount:createTeacherAccount,resetTeacherPassword:resetTeacherPassword,removeSchoolMember:removeSchoolMember,resetTeacherPasswordIndex:resetTeacherPasswordIndex,removeSchoolMemberIndex:removeSchoolMemberIndex
 };
 
 sb.auth.onAuthStateChange(function(event,session){if(event==="SIGNED_OUT"&&!session){S.user=null;S.profile=null;S.role=null;el("session").style.display="none";show("login")}});
