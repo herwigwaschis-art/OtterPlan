@@ -389,7 +389,7 @@ function cap(v){v=String(v||"");return v?v.charAt(0).toUpperCase()+v.slice(1):v}
 function todayLong(){return cap(new Intl.DateTimeFormat("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(new Date()))}
 function todayShort(){return cap(new Intl.DateTimeFormat("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"}).format(new Date()))}
 function updateDateUI(){
- var map={todayBadge:"📅 "+todayShort(),classToday:"📅 "+todayLong(),gradeDate:"📅 "+todayLong(),childDate:"📅 "+todayLong(),gradeStudentDate:todayShort(),quickRatingDate:"📅 "+todayLong()};
+ var map={todayBadge:"📅 "+todayShort(),classToday:"📅 "+todayLong(),gradeDate:"📅 "+todayLong(),childDate:"📅 "+todayLong(),gradeStudentDate:isCurrentWeek()?todayShort():"Woche "+weekRangeLabel(),quickRatingDate:isCurrentWeek()?"📅 "+todayLong():"📅 Woche "+weekRangeLabel()};
  Object.keys(map).forEach(function(id){var x=el(id);if(x)x.textContent=map[id]});
  var w=el("weekNavLabel");if(w)w.textContent=(isCurrentWeek()?"Diese Woche · ":"")+weekRangeLabel();
  var n=el("teacherWeekNav");if(n)n.style.display=S.role==="teacher"&&S.teacherArea!=="admin"?"flex":"none"
