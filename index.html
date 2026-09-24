@@ -24,7 +24,7 @@ main{max-width:1120px;margin:auto;padding:42px 28px 70px}.screen{display:none}.s
 .card{border-radius:29px;padding:23px}
 .btn{border:1px solid rgba(255,255,255,.72);border-radius:999px;padding:10px 16px;min-height:44px;background:linear-gradient(135deg,#438f84,#67b7a9);color:#fff;font-weight:760;box-shadow:0 9px 23px rgba(62,143,132,.18),inset 0 1px 0 rgba(255,255,255,.35);transition:.16s transform,.16s filter}
 .btn:hover{filter:brightness(1.025)}.btn:active{transform:scale(.97)}.btn.secondary,.btn.ghost{background:rgba(255,255,255,.75);color:var(--ink);box-shadow:var(--shadow)}.btn.danger{background:linear-gradient(135deg,#994747,#b85d5d)}.btn.small{padding:8px 12px;font-size:12px;min-height:38px}
-.toolbar,.home-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.home-tools{justify-content:center;margin:4px auto 24px;gap:10px}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.home-tools{display:flex;flex-direction:column;align-items:center;justify-content:center;margin:2px auto 28px;gap:9px}.home-primary{min-width:245px;padding:12px 20px;font-size:16px}.home-secondary-actions{display:flex;align-items:center;justify-content:center;gap:7px}.home-secondary-action{border:0;background:transparent;color:var(--muted);font-size:13px;font-weight:740;padding:7px 10px;border-radius:12px;box-shadow:none}.home-secondary-action:hover{background:rgba(255,255,255,.72);color:var(--ink)}.home-more-action{width:36px;height:36px;padding:0;border:0;border-radius:12px;background:rgba(255,255,255,.66);color:var(--muted);font-size:20px;line-height:1;box-shadow:none}.home-more-action:hover{background:#fff;color:var(--ink)}
 .pill{padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.72);font-size:12px;font-weight:760;border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow);white-space:nowrap}
 .pill.online{color:#326f66}.pill.offline{color:#7c5d22;background:rgba(255,239,213,.88)}
 .banner{max-width:1180px;margin:12px auto 0;padding:8px 14px;border-radius:999px;background:rgba(255,248,225,.84);color:#7a5b14;font-size:11px;font-weight:650;width:max-content;max-width:calc(100% - 32px);border:1px solid rgba(255,255,255,.8)}body:has(#login.active)>.banner{display:none}
@@ -128,10 +128,11 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
       </div>
       <div id="dashboard" class="dashboard-grid"></div>
       <div id="homeTools" class="home-tools">
-        <button class="btn" onclick="APP.openQuickRating()">😊 Heute bewerten</button>
-        <button class="btn ghost" onclick="APP.openBatchGoals()">🎯 Ziel vergeben</button>
-        <button class="btn ghost" onclick="APP.addStudent()">＋ Kind hinzufügen</button>
-        <button class="btn ghost" onclick="APP.openClassMore()">Mehr …</button>
+        <button class="btn home-primary" onclick="APP.openQuickRating()">😊 Heute bewerten</button>
+        <div class="home-secondary-actions">
+          <button class="home-secondary-action" onclick="APP.openBatchGoals()">🎯 Ziel vergeben</button>
+          <button class="home-more-action" aria-label="Weitere Funktionen" title="Weitere Funktionen" onclick="APP.openClassMore()">•••</button>
+        </div>
       </div>
       <div id="studentGrid" class="student-grid"></div>
     </div>
@@ -197,6 +198,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
 <div id="classMoreModal" class="modal-bg"><div class="modal">
   <div class="eyebrow">Klasse</div><h2 style="margin:5px 0 12px">Weitere Funktionen</h2>
   <div class="list">
+    <button class="btn ghost" onclick="APP.close('classMoreModal');APP.addStudent()">＋ Kind hinzufügen</button>
     <button class="btn ghost" onclick="APP.moreCarryGoals()">↻ Ziele aus der Vorwoche übernehmen</button>
     <button class="btn ghost" onclick="APP.moreQrCards()">▦ QR-Karten herunterladen</button>
     <button class="btn ghost" onclick="APP.moreExport()">⇩ Dokumentation exportieren</button>
@@ -220,12 +222,12 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
 <div id="helpModal" class="modal-bg"><div class="modal">
   <div class="eyebrow">Hilfe</div><h2 style="margin:5px 0 10px">So funktioniert MILO</h2>
   <div class="list">
-    <div class="list-row"><div class="list-main"><b>1. Kind hinzufügen</b><span>Einmalig Name und Symbol anlegen.</span></div></div>
+    <div class="list-row"><div class="list-main"><b>1. Kind hinzufügen</b><span>Unter „•••“ findest du „Kind hinzufügen“.</span></div></div>
     <div class="list-row"><div class="list-main"><b>2. Wochenziel vergeben</b><span>Ein Kind öffnen oder „Ziel vergeben“ für mehrere Kinder nutzen.</span></div></div>
     <div class="list-row"><div class="list-main"><b>3. Im Unterricht bewerten</b><span>Am schnellsten über „Heute bewerten“. Smiley antippen, fertig.</span></div></div>
     <div class="list-row"><div class="list-main"><b>4. Woche abschließen</b><span>Beim Kind „Wochenabschluss“ öffnen und Ziel weiterführen oder beenden.</span></div></div>
   </div>
-  <p class="muted" style="font-size:13px;margin:15px 0 0">Selten benötigte Funktionen findest du immer unter „Mehr …“.</p>
+  <p class="muted" style="font-size:13px;margin:15px 0 0">Selten benötigte Funktionen findest du unter „•••“.</p>
   <div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn" onclick="APP.close('helpModal')">Verstanden</button></div>
 </div></div>
 
