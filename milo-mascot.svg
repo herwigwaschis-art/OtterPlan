@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 330" role="img" aria-labelledby="t">
+<title id="t">MILO Otter Maskottchen</title>
+<defs>
+  <linearGradient id="water" x1="0" x2="1"><stop stop-color="#8EDDFB"/><stop offset="1" stop-color="#60A5FA"/></linearGradient>
+  <linearGradient id="fur" x1=".2" y1="0" x2=".8" y2="1"><stop stop-color="#C79469"/><stop offset="1" stop-color="#8B5E3C"/></linearGradient>
+  <filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#31545A" flood-opacity=".16"/></filter>
+</defs>
+<ellipse cx="210" cy="280" rx="170" ry="36" fill="url(#water)" opacity=".9"/>
+<ellipse cx="210" cy="276" rx="128" ry="18" fill="none" stroke="#DFF6FF" stroke-width="8" opacity=".9"/>
+<g filter="url(#s)">
+  <circle cx="118" cy="96" r="34" fill="#765036"/>
+  <circle cx="302" cy="96" r="34" fill="#765036"/>
+  <ellipse cx="210" cy="160" rx="122" ry="130" fill="url(#fur)"/>
+  <ellipse cx="210" cy="190" rx="82" ry="85" fill="#F3D8BA"/>
+  <ellipse cx="210" cy="132" rx="88" ry="76" fill="#EAC8A5"/>
+  <ellipse cx="210" cy="172" rx="72" ry="48" fill="#F8E8D4"/>
+  <circle cx="164" cy="125" r="15" fill="#172027"/><circle cx="256" cy="125" r="15" fill="#172027"/>
+  <circle cx="159" cy="120" r="5" fill="#fff"/><circle cx="251" cy="120" r="5" fill="#fff"/>
+  <ellipse cx="210" cy="153" rx="20" ry="14" fill="#111"/>
+  <path d="M190 174c8 12 32 12 40 0" fill="none" stroke="#4E2F23" stroke-width="5" stroke-linecap="round"/>
+  <path d="M207 177c0 14 15 21 26 10" fill="#F08272"/>
+  <path d="M146 162l-55-12M146 171l-58 4M274 162l55-12M274 171l58 4" stroke="#5B3B2D" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="147" cy="218" rx="36" ry="28" transform="rotate(18 147 218)" fill="#855A3B"/>
+  <ellipse cx="273" cy="218" rx="36" ry="28" transform="rotate(-18 273 218)" fill="#855A3B"/>
+  <path d="M210 196l16 31 34 5-25 24 6 34-31-16-31 16 6-34-25-24 34-5z" fill="#66D7B7" stroke="#4ABF9F" stroke-width="4" stroke-linejoin="round"/>
+</g>
+<path d="M332 52l12-23M354 67l23-11" stroke="#FBC02D" stroke-width="10" stroke-linecap="round"/>
+<path d="M71 229c-20 3-29 14-36 31M341 224c23 3 36 14 44 29" fill="none" stroke="#79D4F5" stroke-width="9" stroke-linecap="round"/>
+</svg>
