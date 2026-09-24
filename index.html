@@ -44,7 +44,7 @@ input:focus,textarea:focus,select:focus{background:rgba(255,255,255,.94);border-
 .schedule-row{font-size:11px;font-weight:760;color:var(--muted)}
 .schedule-slot{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px;border-radius:15px;background:rgba(245,247,250,.78);border:1px solid rgba(255,255,255,.88)}
 .schedule-slot input{width:auto;margin:0}
-.slot-face{display:grid;place-items:center;min-height:46px;font-size:24px}.head,.time,.cell{border-radius:16px;padding:9px;min-height:73px}.head{min-height:auto;text-align:center;font-size:12px;color:var(--muted);font-weight:760}.time{display:grid;place-items:center;color:var(--muted);font-size:12px;font-weight:720}.cell{display:flex;flex-direction:column;justify-content:space-between;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.86);box-shadow:0 6px 18px rgba(48,57,74,.04)}.cell.click:hover{transform:translateY(-2px)}.subject{font-weight:790;font-size:12px}.face{font-size:24px}.none{font-size:10px;color:#9da1a7}
+.slot-face{display:grid;place-items:center;min-height:46px;font-size:24px}.head,.time,.cell{border-radius:16px;padding:9px;min-height:73px}.head{min-height:auto;text-align:center;font-size:12px;color:var(--muted);font-weight:760}.time{display:grid;place-items:center;color:var(--muted);font-size:12px;font-weight:720}.cell{display:flex;flex-direction:column;justify-content:space-between;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.86);box-shadow:0 6px 18px rgba(48,57,74,.04)}.cell.click:hover{transform:translateY(-2px)}.subject{font-weight:790;font-size:12px}.face{font-size:24px}.none{font-size:10px;color:#9da1a7}.head.today-head{background:rgba(14,165,160,.10);color:var(--accent);font-weight:820}.cell.today-cell{background:rgba(232,249,245,.72);box-shadow:inset 0 0 0 1px rgba(14,165,160,.08),0 6px 18px rgba(48,57,74,.04)}
 .modal-bg{display:none;position:fixed;inset:0;z-index:80;background:rgba(34,40,50,.23);backdrop-filter:blur(14px);align-items:center;justify-content:center;padding:17px}.modal-bg.show{display:flex}.modal{width:min(590px,100%);max-height:91vh;overflow:auto;background:linear-gradient(145deg,rgba(255,255,255,.95),rgba(248,250,253,.89));border:1px solid rgba(255,255,255,.96);border-radius:30px;padding:25px;box-shadow:0 35px 100px rgba(30,38,50,.2)}.modal.wide{width:min(850px,100%)}.modal h2,.modal h3{letter-spacing:-.03em}
 .ratings{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:17px 0}.ratings button{background:rgba(245,250,249,.9);border:1px solid rgba(255,255,255,.92);border-radius:22px;padding:18px 8px;font-size:40px;min-height:90px;display:grid;place-items:center;box-shadow:0 8px 20px rgba(37,61,68,.06)}.ratings button:hover{background:rgba(232,249,245,.98);transform:translateY(-1px)}.ratings small{display:none}
 .choice-row,.decision-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:9px 0 15px}.choice,.decision{border:1px solid rgba(255,255,255,.86);background:rgba(245,247,250,.82);border-radius:19px;padding:12px 8px;text-align:center;font-weight:760;color:var(--ink)}.choice .emoji{font-size:29px;display:block;margin-bottom:4px}.choice.selected,.decision.selected{background:rgba(224,247,241,.95);box-shadow:0 0 0 2px rgba(80,160,148,.13)}
@@ -318,7 +318,7 @@ var BUILTIN_GOALS=[
  {title:"Friedlich lösen",goal:"Ich löse Streit friedlich.",help:"Ich stoppe, spreche ruhig und hole Hilfe, wenn ich sie brauche."}
 ];
 var BUILTIN_REWARDS=[{title:"Sticker auswählen",shells:5},{title:"Spiel auswählen",shells:10},{title:"Wunschbelohnung",shells:20}];
-var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],timetable:[],scheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null};
+var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],timetable:[],scheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,gradeStudentData:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null};
 var idleTimer=null,reload=null;
 
 function el(id){return document.getElementById(id)}
@@ -330,6 +330,13 @@ function closeM(id){modal(id,false)}
 function week(){var d=new Date(),n=d.getDay()||7;d.setDate(d.getDate()-n+1);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function startOfMonth(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-01"}
 function fmtDate(s){if(!s)return"";var p=s.split("-");return p.length===3?p[2]+"."+p[1]+".":s}
+function cap(v){v=String(v||"");return v?v.charAt(0).toUpperCase()+v.slice(1):v}
+function todayLong(){return cap(new Intl.DateTimeFormat("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(new Date()))}
+function todayShort(){return cap(new Intl.DateTimeFormat("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"}).format(new Date()))}
+function updateDateUI(){
+ var map={todayBadge:"📅 "+todayShort(),classToday:"📅 "+todayLong(),gradeDate:"📅 "+todayLong(),childDate:"📅 "+todayLong(),gradeStudentDate:todayShort(),quickRatingDate:"📅 "+todayLong()};
+ Object.keys(map).forEach(function(id){var x=el(id);if(x)x.textContent=map[id]})
+}
 function plan(sid){if(S.gradeActivePlan&&S.gradeActivePlan.student_id===sid)return S.gradeActivePlan;return S.plans.find(function(p){return p.student_id===sid})||null}
 function shells(sid){var p=S.progress.find(function(x){return x.student_id===sid});return p?p.shells||0:0}
 function rs(sid){return S.rewards.filter(function(r){return r.student_id===sid&&r.active}).sort(function(a,b){return a.shells_required-b.shells_required})}
@@ -353,7 +360,7 @@ async function bootstrap(){
  S.user=u.data.user;
  var p=await sb.from("profiles").select("*").eq("id",S.user.id).single();
  if(p.error||!p.data){toast("Profil fehlt");await logout();return}
- S.profile=p.data;S.role=p.data.role;el("session").style.display="flex";el("sessionLabel").textContent=(S.role==="teacher"?"👨‍🏫 ":"🧒 ")+(p.data.display_name||"");
+ S.profile=p.data;S.role=p.data.role;el("session").style.display="flex";el("sessionLabel").textContent=(S.role==="teacher"?"👨‍🏫 ":"🧒 ")+(p.data.display_name||"");updateDateUI();
  resetIdle();
  if(S.role==="teacher"){try{await sb.rpc("cleanup_archived_students")}catch(e){}}
  await load();
@@ -431,6 +438,7 @@ function renderTeacherShell(){
  var admins=adminSchools();
  var showAdmin=admins.length>0||S.schools.length===0;
  el("topAdminItem").style.display=showAdmin?"block":"none";
+ updateDateUI();
 }
 function openClassChooser(){
  if(!S.classes.length&&!S.gradeLinks.length){toast("Noch keine Klasse oder Stufe zugeordnet");return}
@@ -490,7 +498,8 @@ function leaveAdmin(){showTeacherArea("class")}
 async function openGradeOverview(grade){
  modal("classChooserModal",false);
  S.gradeLevel=Number(grade);
- S.gradeActivePlan=null;S.student=null;
+ S.gradeActivePlan=null;S.gradeStudentData=null;S.student=null;
+ el("gradeOverviewContent").style.display="block";el("gradeStudentDetail").style.display="none";
  showTeacherArea("grade");
  await loadGradeOverview()
 }
@@ -503,7 +512,7 @@ async function loadGradeOverview(){
  renderGradeOverview()
 }
 function renderGradeOverview(){
- el("gradeTitle").textContent="Stufe "+S.gradeLevel+" · Überblick";
+ el("gradeTitle").textContent="Stufe "+S.gradeLevel+" · Überblick";updateDateUI();
  var rows=S.gradeRows||[];
  var ci=rows.filter(function(x){return x.checkin_completed}).length;
  var co=rows.filter(function(x){return !!x.checkout_self}).length;
@@ -514,9 +523,37 @@ function renderGradeOverview(){
      var ciText=x.checkin_completed?"🎯 Check-in":"○ Check-in offen";
      var coText=x.checkout_self?"✅ Check-out":"○ Check-out offen";
      var idx=rows.indexOf(x);
-     return '<div class="grade-plan-card"><h3>'+esc(x.avatar_emoji||"🦦")+' '+esc(x.display_name)+'</h3><div class="goal">'+esc(x.goal||"Noch kein Ziel")+'</div><div class="student-status"><span class="status-chip">'+ciText+'</span><span class="status-chip">'+coText+'</span></div><div class="grade-plan-actions" style="margin-top:12px"><button class="btn small" onclick="APP.gradeCheckin('+idx+')">Check-in</button><button class="btn secondary small" onclick="APP.gradeCheckout('+idx+')">Check-out</button></div></div>';
+     return '<div class="grade-plan-card"><h3>'+esc(x.avatar_emoji||"🦦")+' '+esc(x.display_name)+'</h3><div class="goal">'+esc(x.goal||"Noch kein Ziel")+'</div><div class="student-status"><span class="status-chip">'+ciText+'</span><span class="status-chip">'+coText+'</span></div><div class="grade-plan-actions" style="margin-top:12px"><button class="btn small grade-plan-open" onclick="APP.gradeOpenStudent('+idx+')">Plan öffnen →</button><button class="btn secondary small" onclick="APP.gradeCheckin('+idx+')">Check-in</button><button class="btn secondary small" onclick="APP.gradeCheckout('+idx+')">Check-out</button></div></div>';
    }).join("")+'</div></section>';
  }).join("")||'<div class="card" style="text-align:center"><h3 style="margin:0 0 5px">Noch keine Wochenpläne</h3><p class="muted" style="margin:0">Sobald Kinder in Stufe '+S.gradeLevel+' einen Plan haben, erscheinen sie hier.</p></div>'
+}
+async function loadGradeStudent(studentId){
+ var r=await sb.rpc("grade_get_student_week",{p_student_id:studentId,p_week_start:week()});
+ if(r.error||!r.data){toast("Plan konnte nicht geladen werden");return false}
+ var d=r.data;S.gradeStudentData=d;
+ S.student={id:d.student.id,display_name:d.student.display_name,avatar_emoji:d.student.avatar_emoji};
+ S.gradeActivePlan=d.plan||null;
+ S.ratings=(d.ratings||[]).map(function(x){x.student_id=S.student.id;return x});
+ S.scheduleSlots=(d.schedule_slots||[]).map(function(x){x.student_id=S.student.id;return x});
+ renderGradeStudent();return true
+}
+async function gradeOpenStudent(i){
+ var x=S.gradeRows[Number(i)];if(!x)return;
+ el("gradeOverviewContent").style.display="none";el("gradeStudentDetail").style.display="block";
+ var ok=await loadGradeStudent(x.student_id);
+ if(!ok){el("gradeOverviewContent").style.display="block";el("gradeStudentDetail").style.display="none"}
+}
+function renderGradeStudent(){
+ if(!S.gradeStudentData||!S.student)return;
+ var d=S.gradeStudentData,p=S.gradeActivePlan;
+ el("gradeStudentName").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name;
+ el("gradeStudentMeta").textContent=(d.student.class_name||"")+" · Stufe "+(d.student.grade_level||S.gradeLevel);
+ el("gradeStudentGoal").innerHTML=p?'<strong>'+esc(p.goal)+'</strong>'+(p.help_text?'<div class="muted" style="margin-top:6px">💡 '+esc(p.help_text)+'</div>':''):"Noch kein Ziel";
+ updateDateUI();renderWeek("gradeStudentWeek",true)
+}
+function gradeBackToOverview(){
+ S.gradeStudentData=null;S.gradeActivePlan=null;S.student=null;S.ratings=[];S.scheduleSlots=[];
+ el("gradeStudentDetail").style.display="none";el("gradeOverviewContent").style.display="block";renderGradeOverview()
 }
 function gradeCheckin(i){
  var x=S.gradeRows[Number(i)];if(!x)return;
@@ -530,7 +567,7 @@ function gradeCheckout(i){
  S.student={id:x.student_id,display_name:x.display_name,avatar_emoji:x.avatar_emoji};
  checkout()
 }
-function backFromGrade(){S.gradeActivePlan=null;S.student=null;S.gradeRows=[];showTeacherArea("class");if(!S.classRow&&S.gradeLinks.length)setTimeout(openClassChooser,80)}
+function backFromGrade(){S.gradeActivePlan=null;S.gradeStudentData=null;S.student=null;S.gradeRows=[];S.ratings=[];S.scheduleSlots=[];showTeacherArea("class");if(!S.classRow&&S.gradeLinks.length)setTimeout(openClassChooser,80)}
 
 function renderHome(){
  el("teacherHome").style.display="block";el("teacherDetail").style.display="none";
@@ -560,17 +597,18 @@ function renderHome(){
 }
 function openStudent(id){S.student=S.students.find(function(s){return s.id===id});if(!S.student)return;el("teacherHome").style.display="none";el("teacherDetail").style.display="block";renderTeacher()}
 function back(){S.student=null;renderHome()}
-function renderTeacher(){var p=plan(S.student.id);el("teacherName").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name;el("teacherMeta").textContent="🐚 "+shells(S.student.id)+" Muscheln";if(p){var ci=p.checkin_completed?" · "+(FACE[p.checkin_feeling]||""):"";var co=p.checkout_self?" · "+(FACE[p.checkout_self]||""):"";el("teacherGoal").innerHTML="<strong>"+esc(p.goal)+"</strong>"+(p.help_text?'<div class="muted" style="margin-top:6px">💡 '+esc(p.help_text)+"</div>":"")+'<div class="muted" style="margin-top:7px;font-size:11px">'+esc(ci+co)+"</div>"}else el("teacherGoal").textContent="Noch kein Ziel";renderWeek("teacherWeek",true)}
+function renderTeacher(){var p=plan(S.student.id);el("teacherName").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name;el("teacherMeta").textContent="🐚 "+shells(S.student.id)+" Muscheln · "+todayLong();if(p){var ci=p.checkin_completed?" · "+(FACE[p.checkin_feeling]||""):"";var co=p.checkout_self?" · "+(FACE[p.checkout_self]||""):"";el("teacherGoal").innerHTML="<strong>"+esc(p.goal)+"</strong>"+(p.help_text?'<div class="muted" style="margin-top:6px">💡 '+esc(p.help_text)+"</div>":"")+'<div class="muted" style="margin-top:7px;font-size:11px">'+esc(ci+co)+"</div>"}else el("teacherGoal").textContent="Noch kein Ziel";renderWeek("teacherWeek",true)}
 
 function renderWeek(target,click){
- var out='<div class="head"></div>'+DAYS.map(function(d){return '<div class="head">'+d+'</div>'}).join("");
+ var today=new Date().getDay();
+ var out='<div class="head"></div>'+DAYS.map(function(d,i){return '<div class="head '+(today===i+1?'today-head':'')+'">'+d+'</div>'}).join("");
  for(var n=1;n<=6;n++){
    out+='<div class="time">'+n+'. Std.</div>';
    for(var d=1;d<=5;d++){
      var enabled=S.student?slotEnabled(S.student.id,d,n):true;
-     if(!enabled){out+='<div class="cell" style="opacity:.28"></div>';continue}
+     if(!enabled){out+='<div class="cell '+(today===d?'today-cell ':'')+'" style="opacity:.28"></div>';continue}
      var r=S.student?rating(S.student.id,d,n):null;
-     out+='<div class="cell slot-face '+(click?'click':'')+'" '+(click?'onclick="APP.openRating('+d+','+n+')"':'')+'><div class="face '+(r?'':'none')+'">'+(r?FACE[r.rating]:(click?'＋':'•'))+'</div></div>';
+     out+='<div class="cell slot-face '+(today===d?'today-cell ':'')+(click?'click':'')+'" '+(click?'onclick="APP.openRating('+d+','+n+')"':'')+'><div class="face '+(r?'':'none')+'">'+(r?FACE[r.rating]:(click?'＋':'•'))+'</div></div>';
    }
  }
  el(target).innerHTML=out
@@ -580,6 +618,12 @@ function offlineQueue(){try{return JSON.parse(localStorage.getItem("otterplan-ra
 function saveQueue(q){localStorage.setItem("otterplan-rating-queue",JSON.stringify(q))}
 async function saveRating(v){
  var row={student_id:S.student.id,week_start:week(),weekday:S.entry.weekday,lesson_no:S.entry.lesson_no,rating:v,updated_by:S.user.id};
+ if(S.teacherArea==="grade"&&S.gradeStudentData){
+   if(!navigator.onLine){toast("Im Stufenüberblick ist die Bewertung nur online möglich");return}
+   var gr=await sb.rpc("grade_save_rating",{p_student_id:S.student.id,p_week_start:week(),p_weekday:Number(S.entry.weekday),p_lesson_no:Number(S.entry.lesson_no),p_rating:v});
+   if(gr.error){toast("Bewertung konnte nicht gespeichert werden");return}
+   modal("ratingModal",false);await loadGradeStudent(S.student.id);toast("Bewertung gespeichert");return
+ }
  if(!navigator.onLine){queueRating(row);modal("ratingModal",false);applyLocalRating(row);toast("Offline gespeichert");return}
  var r=await sb.from("ratings").upsert(row,{onConflict:"student_id,week_start,weekday,lesson_no"});
  if(r.error){queueRating(row);modal("ratingModal",false);applyLocalRating(row);toast("Zwischengespeichert");return}
@@ -588,7 +632,15 @@ async function saveRating(v){
 function queueRating(row){var q=offlineQueue().filter(function(x){return !(x.student_id===row.student_id&&x.week_start===row.week_start&&Number(x.weekday)===Number(row.weekday)&&Number(x.lesson_no)===Number(row.lesson_no))});q.push(row);saveQueue(q)}
 function applyLocalRating(row){var old=S.ratings.find(function(x){return x.student_id===row.student_id&&Number(x.weekday)===Number(row.weekday)&&Number(x.lesson_no)===Number(row.lesson_no)});if(old)old.rating=row.rating;else S.ratings.push(row);renderTeacher()}
 async function syncOfflineRatings(){if(!navigator.onLine||S.role!=="teacher")return;var q=offlineQueue();if(!q.length)return;var r=await sb.from("ratings").upsert(q,{onConflict:"student_id,week_start,weekday,lesson_no"});if(!r.error){saveQueue([]);toast("Offline-Bewertungen synchronisiert");await load()}}
-async function clearRating(){var r=await sb.from("ratings").delete().eq("student_id",S.student.id).eq("week_start",week()).eq("weekday",S.entry.weekday).eq("lesson_no",S.entry.lesson_no);if(r.error){toast("Löschen fehlgeschlagen");return}modal("ratingModal",false);var sid=S.student.id;await load();openStudent(sid)}
+async function clearRating(){
+ if(S.teacherArea==="grade"&&S.gradeStudentData){
+   if(!navigator.onLine){toast("Im Stufenüberblick ist das Löschen nur online möglich");return}
+   var gr=await sb.rpc("grade_clear_rating",{p_student_id:S.student.id,p_week_start:week(),p_weekday:Number(S.entry.weekday),p_lesson_no:Number(S.entry.lesson_no)});
+   if(gr.error){toast("Löschen fehlgeschlagen");return}
+   modal("ratingModal",false);await loadGradeStudent(S.student.id);toast("Bewertung gelöscht");return
+ }
+ var r=await sb.from("ratings").delete().eq("student_id",S.student.id).eq("week_start",week()).eq("weekday",S.entry.weekday).eq("lesson_no",S.entry.lesson_no);if(r.error){toast("Löschen fehlgeschlagen");return}modal("ratingModal",false);var sid=S.student.id;await load();openStudent(sid)
+}
 
 function toggleTopMenu(){el("topMenu").classList.toggle("show")}
 function closeTopMenu(){var m=el("topMenu");if(m)m.classList.remove("show")}
@@ -609,7 +661,7 @@ function moreStudentManage(){modal("studentMoreModal",false);manageStudent()}
 function currentSchoolDay(){var d=new Date().getDay();return d>=1&&d<=5?d:1}
 function openQuickRating(){
  if(!S.students.length){toast("Noch keine Kinder angelegt");return}
- el("quickDay").value=String(currentSchoolDay());
+ updateDateUI();el("quickDay").value=String(currentSchoolDay());
  el("quickLesson").value="1";
  renderQuickRating();
  modal("quickRatingModal",true)
@@ -834,6 +886,7 @@ async function attachClass(){var cid=el("attachClass").value,g=Number(el("attach
 async function createSchoolClass(){var n=el("schoolClassName").value.trim(),g=Number(el("schoolClassGrade").value),y=el("schoolClassYear").value.trim()||"2026/27";if(!n||!g)return;var r=await sb.rpc("create_class_for_school",{p_school_id:S.schoolRow.id,p_name:n,p_grade_level:g,p_school_year:y});if(r.error){toast("Klasse konnte nicht angelegt werden");return}await load();S.teacherArea="admin";showTeacherArea("admin");toast("Klasse angelegt")}
 
 function renderChild(){
+ updateDateUI();
  var s=S.student,p=plan(s.id),sh=shells(s.id),x=stats(s.id),rewards=rs(s.id),next=rewards.find(function(r){return r.shells_required>sh});
  el("childTitle").textContent=(s.avatar_emoji||"🦦")+" "+s.display_name;
  if(S.lastChildShells!==null&&sh>S.lastChildShells){el("childShellBadge").classList.remove("shell-pop");void el("childShellBadge").offsetWidth;el("childShellBadge").classList.add("shell-pop")}S.lastChildShells=sh;
@@ -846,14 +899,21 @@ function renderChild(){
 }
 
 function startRealtime(){stopRealtime();var c=sb.channel("otterplan-live").on("postgres_changes",{event:"*",schema:"public",table:"ratings"},queue).on("postgres_changes",{event:"*",schema:"public",table:"weekly_plans"},queue).on("postgres_changes",{event:"*",schema:"public",table:"rewards"},queue).on("postgres_changes",{event:"*",schema:"public",table:"student_progress"},queue).on("postgres_changes",{event:"*",schema:"public",table:"students"},queue).on("postgres_changes",{event:"*",schema:"public",table:"student_schedule_slots"},queue).subscribe();S.channels=[c]}
-function queue(){clearTimeout(reload);reload=setTimeout(async function(){var sid=S.student&&S.student.id;await load();if(S.role==="teacher"&&sid){S.student=S.students.find(function(x){return x.id===sid});if(S.student)openStudent(sid)}},320)}
+function queue(){clearTimeout(reload);reload=setTimeout(async function(){
+ if(S.role==="teacher"&&S.teacherArea==="grade"&&S.gradeLevel){
+   var gradeSid=S.student&&S.student.id;
+   if(S.gradeStudentData&&gradeSid)await loadGradeStudent(gradeSid);else await loadGradeOverview();
+   return
+ }
+ var sid=S.student&&S.student.id;await load();if(S.role==="teacher"&&sid){S.student=S.students.find(function(x){return x.id===sid});if(S.student)openStudent(sid)}
+},320)}
 function stopRealtime(){S.channels.forEach(function(c){sb.removeChannel(c)});S.channels=[]}
 function updateNet(){var n=navigator.onLine;el("netState").textContent=n?"● Online":"● Offline";el("netState").classList.toggle("online",n);el("netState").classList.toggle("offline",!n);if(n)syncOfflineRatings()}
 window.addEventListener("online",updateNet);window.addEventListener("offline",updateNet);updateNet();
 
 window.APP={
  login:login,logout:logout,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,
- showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
+ showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
  openStudent:openStudent,back:back,openRating:openRating,saveRating:saveRating,clearRating:clearRating,
  checkin:checkin,fillCheckinTemplate:fillCheckinTemplate,pickCheckin:pickCheckin,saveCheckin:saveCheckin,
