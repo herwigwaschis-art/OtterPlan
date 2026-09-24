@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="./icon.svg">
 <title>OtterPlan</title>
 <style>
-:root{--bg:#f7f8fb;--glass:rgba(255,255,255,.72);--ink:#161719;--muted:#7b7f87;--accent:#3f8f84;--accent2:#7ed6c8;--soft:rgba(111,201,187,.14);--danger:#a64d4d;--shadow:0 12px 34px rgba(37,46,63,.08)}
+:root{--bg:#f7f8fb;--glass:rgba(255,255,255,.72);--ink:#161719;--muted:#686c73;--accent:#3f8f84;--accent2:#7ed6c8;--soft:rgba(111,201,187,.14);--danger:#a64d4d;--shadow:0 12px 34px rgba(37,46,63,.08)}
 *{box-sizing:border-box}html{background:var(--bg)}
 body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--ink);font-size:16px;background:radial-gradient(circle at 10% 8%,rgba(117,222,205,.21),transparent 30%),radial-gradient(circle at 90% 15%,rgba(174,190,255,.19),transparent 28%),linear-gradient(180deg,#fbfcff,#f3f5f9);background-attachment:fixed;-webkit-font-smoothing:antialiased}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.13),transparent 65%);z-index:-1}
@@ -385,7 +385,10 @@ function renderHome(){
  if(!S.classRow){
    el("homeTools").style.display="none";
    el("dashboard").innerHTML="";
-   el("studentGrid").innerHTML='<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse</h2><p class="muted" style="margin:0 0 13px">Richte zuerst deine Schule und Klasse ein.</p><button class="btn" onclick="APP.showTeacherArea(\'admin\')">Einrichtung öffnen</button></div>';
+   var canSetUp=adminSchools().length>0||S.schools.length===0;
+   el("studentGrid").innerHTML=canSetUp
+     ?'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse</h2><p class="muted" style="margin:0 0 13px">Richte zuerst deine Schule und Klasse ein.</p><button class="btn" onclick="APP.showTeacherArea(\'admin\')">Einrichtung öffnen</button></div>'
+     :'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse zugeordnet</h2><p class="muted" style="margin:0">Bitte den Schul-Admin, dir eine Klasse zuzuordnen.</p></div>';
    return
  }
  el("homeTools").style.display="flex";
@@ -506,7 +509,7 @@ async function carryGoals(){if(!S.classRow)return;var r=await sb.rpc("carry_forw
 function reward(){el("rewardName").textContent=S.student.display_name;el("manualShells").value=shells(S.student.id);fillRewardTemplates();renderRewardList();modal("rewardModal",true)}
 function fillRewardTemplates(){var o=['<option value="">Ohne Vorlage</option>'];BUILTIN_REWARDS.forEach(function(r,i){o.push('<option value="b:'+i+'">'+esc(r.title)+" · "+r.shells+" 🐚</option>")});S.rewardTemplates.forEach(function(r){o.push('<option value="c:'+r.id+'">'+esc(r.title)+" · "+r.shells_required+" 🐚</option>")});el("rewardTemplate").innerHTML=o.join("")}
 function fillRewardTemplate(){var v=el("rewardTemplate").value,r=null;if(v.indexOf("b:")===0)r=BUILTIN_REWARDS[Number(v.slice(2))];else if(v.indexOf("c:")===0)r=S.rewardTemplates.find(function(x){return x.id===v.slice(2)});if(r){el("rewardTitle").value=r.title;el("rewardShells").value=r.shells||r.shells_required}}
-function renderRewardList(){el("rewardList").innerHTML=rs(S.student.id).map(function(r){var can=shells(S.student.id)>=r.shells_required;return '<div class="list-row"><div class="list-main"><b>'+esc(r.title)+'</b><span>'+r.shells_required+' Muscheln'+(r.redeemed_count?" · "+r.redeemed_count+"× eingelöst":"")+'</span></div><div class="toolbar"><button class="btn small '+(can?'':'secondary')+'" onclick="APP.redeemReward(\''+r.id+'\')" '+(can?'':'disabled')+'>Einlösen</button><button class="btn secondary small" onclick="APP.removeReward(\''+r.id+'\')">×</button></div></div>'}).join("")||'<div class="muted">Noch keine Belohnungen.</div>'}
+function renderRewardList(){el("rewardList").innerHTML=rs(S.student.id).map(function(r){var can=shells(S.student.id)>=r.shells_required;return '<div class="list-row"><div class="list-main"><b>'+esc(r.title)+'</b><span>'+r.shells_required+' Muscheln'+(r.redeemed_count?" · "+r.redeemed_count+"× eingelöst":"")+'</span></div><div class="toolbar"><button class="btn small '+(can?'':'secondary')+'" onclick="APP.redeemReward(\''+r.id+'\')" '+(can?'':'disabled')+'>Einlösen</button><button class="btn secondary small" onclick="APP.removeReward(\''+r.id+'\')">Entfernen</button></div></div>'}).join("")||'<div class="muted">Noch keine Belohnungen.</div>'}
 async function setShells(){var n=Number(el("manualShells").value);if(!Number.isFinite(n)||n<0)return;var r=await sb.rpc("set_student_shells",{p_student_id:S.student.id,p_shells:Math.round(n)});if(r.error){toast("Muschelstand konnte nicht geändert werden");return}var id=S.student.id;await load();openStudent(id);reward();toast("Muschelstand gesetzt")}
 async function addReward(){var t=el("rewardTitle").value.trim(),n=Number(el("rewardShells").value);if(!t||!n)return;var r=await sb.from("rewards").insert({student_id:S.student.id,title:t,shells_required:n,sort_order:n});if(r.error){toast("Belohnung konnte nicht gespeichert werden");return}var id=S.student.id;await load();openStudent(id);reward();toast("Belohnung hinzugefügt")}
 async function saveRewardTemplate(){var t=el("rewardTitle").value.trim(),n=Number(el("rewardShells").value);if(!t||!n)return;var r=await sb.from("reward_templates").insert({teacher_id:S.user.id,title:t,shells_required:n});if(r.error){toast("Vorlage konnte nicht gespeichert werden");return}await load();reward();toast("Vorlage gespeichert")}
