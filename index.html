@@ -18,12 +18,13 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background-ima
 button,input,textarea,select{font:inherit}button{cursor:pointer}
 header{position:sticky;top:0;z-index:30;height:68px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(247,248,251,.65);backdrop-filter:blur(28px) saturate(140%);-webkit-backdrop-filter:blur(28px) saturate(140%);border-bottom:1px solid rgba(255,255,255,.72)}
 .brand{display:flex;align-items:center;gap:10px}.logo{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-size:23px;background:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.94);box-shadow:var(--shadow)}.brand b{font-size:17px;letter-spacing:-.025em}
-main{max-width:1180px;margin:auto;padding:34px 22px 58px}.screen{display:none}.screen.active{display:block}.muted{color:var(--muted)}
+.top-menu-wrap{position:relative}.menu-trigger{width:44px;height:44px;border:0;border-radius:15px;background:rgba(255,255,255,.78);box-shadow:var(--shadow);font-size:23px;line-height:1;color:var(--ink);display:grid;place-items:center}.menu-pop{display:none;position:absolute;right:0;top:52px;width:250px;padding:10px;border-radius:22px;background:rgba(255,255,255,.94);border:1px solid rgba(255,255,255,.98);box-shadow:0 24px 65px rgba(30,38,50,.18);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px)}.menu-pop.show{display:block}.menu-user{padding:10px 11px 11px;border-bottom:1px solid rgba(0,0,0,.06);margin-bottom:7px}.menu-user b{display:block;font-size:14px}.menu-user span{display:block;font-size:12px;color:var(--muted);margin-top:3px}.menu-item{width:100%;border:0;border-radius:14px;background:transparent;text-align:left;padding:11px 12px;color:var(--ink);font-weight:720}.menu-item:hover{background:rgba(242,245,248,.92)}.menu-status{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;font-size:12px;color:var(--muted)}
+main{max-width:1120px;margin:auto;padding:42px 28px 70px}.screen{display:none}.screen.active{display:block}.muted{color:var(--muted)}
 .card,.student,.kid-card,.mini-card,.dash-card,.school-card{background:linear-gradient(145deg,rgba(255,255,255,.87),rgba(255,255,255,.63));border:1px solid rgba(255,255,255,.93);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.9);backdrop-filter:blur(22px) saturate(135%);-webkit-backdrop-filter:blur(22px) saturate(135%)}
 .card{border-radius:29px;padding:23px}
 .btn{border:1px solid rgba(255,255,255,.72);border-radius:999px;padding:10px 16px;min-height:44px;background:linear-gradient(135deg,#438f84,#67b7a9);color:#fff;font-weight:760;box-shadow:0 9px 23px rgba(62,143,132,.18),inset 0 1px 0 rgba(255,255,255,.35);transition:.16s transform,.16s filter}
 .btn:hover{filter:brightness(1.025)}.btn:active{transform:scale(.97)}.btn.secondary,.btn.ghost{background:rgba(255,255,255,.75);color:var(--ink);box-shadow:var(--shadow)}.btn.danger{background:linear-gradient(135deg,#994747,#b85d5d)}.btn.small{padding:8px 12px;font-size:12px;min-height:38px}
-.toolbar,.home-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.home-tools{margin-bottom:16px}
+.toolbar,.home-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.home-tools{justify-content:center;margin:4px auto 24px;gap:10px}
 .pill{padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.72);font-size:12px;font-weight:760;border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow);white-space:nowrap}
 .pill.online{color:#326f66}.pill.offline{color:#7c5d22;background:rgba(255,239,213,.88)}
 .banner{max-width:1180px;margin:12px auto 0;padding:8px 14px;border-radius:999px;background:rgba(255,248,225,.84);color:#7a5b14;font-size:11px;font-weight:650;width:max-content;max-width:calc(100% - 32px);border:1px solid rgba(255,255,255,.8)}
@@ -31,12 +32,12 @@ main{max-width:1180px;margin:auto;padding:34px 22px 58px}.screen{display:none}.s
 label{display:block;font-size:12px;font-weight:780;color:var(--muted);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.055em}
 input,textarea,select{width:100%;border:1px solid rgba(255,255,255,.84);border-radius:16px;padding:12px 13px;background:rgba(244,246,249,.78);color:var(--ink);outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.75)}
 input:focus,textarea:focus,select:focus{background:rgba(255,255,255,.94);border-color:rgba(94,166,154,.34);box-shadow:0 0 0 5px rgba(89,165,152,.08)}textarea{min-height:82px;resize:vertical}
-.hero{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:20px}.hero h2{margin:0;font-size:35px;letter-spacing:-.05em}.hero p{margin:5px 0 0;font-size:13px}
-.class-select{border:0;background:transparent;box-shadow:none;font-size:34px;font-weight:810;letter-spacing:-.05em;padding:0 30px 0 0;max-width:100%}.view-tabs{display:inline-flex;padding:4px;border-radius:999px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.88);box-shadow:var(--shadow);margin-bottom:20px}.view-tab{border:0;background:transparent;border-radius:999px;padding:8px 14px;font-weight:760;color:var(--muted)}.view-tab.active{background:#fff;color:var(--ink);box-shadow:0 4px 14px rgba(30,40,50,.07)}
-.dashboard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.dash-card{border-radius:23px;padding:17px}.dash-value{font-size:28px;font-weight:830;letter-spacing:-.045em}.dash-label{font-size:12px;color:var(--muted);font-weight:750;margin-top:3px}
-.student-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.student{border-radius:25px;padding:18px;text-align:left;min-height:150px;transition:.18s transform,.18s box-shadow}.student:hover{transform:translateY(-3px);box-shadow:0 20px 42px rgba(37,46,63,.11)}.student-top{display:flex;align-items:center;gap:9px}.student-avatar{font-size:27px}.student .name{font-weight:800;font-size:19px;letter-spacing:-.025em}.student .goal{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.student .foot{display:flex;justify-content:space-between;margin-top:16px;font-size:12px;font-weight:760}.student-status{margin-top:7px}.status-chip{display:inline-block;border-radius:999px;padding:5px 8px;background:rgba(255,255,255,.72);font-size:11px;font-weight:780;color:var(--muted);margin-right:4px}
-.school-toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:16px}.school-toolbar select{max-width:320px}.grade-block{margin-bottom:22px}.grade-title{font-size:22px;font-weight:810;letter-spacing:-.035em;margin:0 0 10px}.school-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.school-card{border-radius:24px;padding:18px}.school-card h3{margin:0;font-size:20px}.school-card .meta{font-size:11px;color:var(--muted);margin:5px 0 14px}
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:15px}.s12{grid-column:span 12}.teacher-actions{display:flex;gap:7px;flex-wrap:wrap}.teacher-goal{font-size:22px;font-weight:790;letter-spacing:-.028em;line-height:1.25}.eyebrow{font-size:9px;font-weight:780;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.hero{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:24px}.hero.centered{justify-content:center;text-align:center}.hero.centered>div{width:100%}.hero.centered .class-select{text-align:center;text-align-last:center}.section-center{text-align:center;max-width:760px;margin:0 auto 24px}.hero h2{margin:0;font-size:35px;letter-spacing:-.05em}.hero p{margin:5px 0 0;font-size:13px}
+.class-select{border:0;background:transparent;box-shadow:none;font-size:34px;font-weight:810;letter-spacing:-.05em;padding:0 30px 0 0;max-width:100%}.view-tabs{display:flex;width:max-content;margin:0 auto 30px;padding:4px;border-radius:999px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.88);box-shadow:var(--shadow)}.view-tab{border:0;background:transparent;border-radius:999px;padding:8px 14px;font-weight:760;color:var(--muted)}.view-tab.active{background:#fff;color:var(--ink);box-shadow:0 4px 14px rgba(30,40,50,.07)}
+.dashboard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:920px;margin:0 auto 24px}.dash-card{border-radius:23px;padding:17px}.dash-value{font-size:28px;font-weight:830;letter-spacing:-.045em}.dash-label{font-size:12px;color:var(--muted);font-weight:750;margin-top:3px}
+.student-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:980px;margin:auto}.student{border-radius:27px;padding:21px;text-align:left;min-height:160px;transition:.18s transform,.18s box-shadow}.student:hover{transform:translateY(-3px);box-shadow:0 20px 42px rgba(37,46,63,.11)}.student-top{display:flex;align-items:center;gap:9px}.student-avatar{font-size:27px}.student .name{font-weight:800;font-size:19px;letter-spacing:-.025em}.student .goal{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.student .foot{display:flex;justify-content:space-between;margin-top:16px;font-size:12px;font-weight:760}.student-status{margin-top:7px}.status-chip{display:inline-block;border-radius:999px;padding:5px 8px;background:rgba(255,255,255,.72);font-size:11px;font-weight:780;color:var(--muted);margin-right:4px}
+.school-toolbar{display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap;margin:0 auto 22px}.school-toolbar select{max-width:360px}.grade-block{margin-bottom:22px}.grade-title{font-size:22px;font-weight:810;letter-spacing:-.035em;margin:0 0 10px}.school-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.school-card{border-radius:24px;padding:18px}.school-card h3{margin:0;font-size:20px}.school-card .meta{font-size:11px;color:var(--muted);margin:5px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;max-width:980px;margin:auto}.s12{grid-column:span 12}.teacher-actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}.detail-toolbar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;margin-bottom:24px}.detail-toolbar .teacher-actions{grid-column:2}.teacher-goal{font-size:22px;font-weight:790;letter-spacing:-.028em;line-height:1.25}.eyebrow{font-size:9px;font-weight:780;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
 .week{display:grid;grid-template-columns:52px repeat(5,1fr);gap:8px;overflow:auto;padding:2px 0}
 .schedule-matrix{display:grid;grid-template-columns:76px repeat(5,1fr);gap:8px;align-items:center}
 .schedule-head{text-align:center;font-size:10px;font-weight:760;color:var(--muted);padding:6px}
@@ -53,19 +54,22 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
 .qr{text-align:center;border-radius:22px;padding:17px;background:rgba(245,247,250,.82);border:1px solid rgba(255,255,255,.86)}.qr canvas,.qr img{margin:auto}
 .toast{position:fixed;right:17px;bottom:17px;z-index:100;background:rgba(29,29,31,.92);color:#fff;border-radius:999px;padding:10px 15px;opacity:0;transition:.2s;pointer-events:none;font-size:12px}.toast.show{opacity:1}
 .child-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}.child-name{font-size:45px;line-height:1.02;letter-spacing:-.06em;margin:0;font-weight:810}.child-shells{font-size:16px;font-weight:800;background:rgba(255,255,255,.74);border:1px solid rgba(255,255,255,.91);border-radius:999px;padding:10px 14px;box-shadow:var(--shadow)}.child-main{display:grid;grid-template-columns:1.45fr .85fr;gap:15px;margin-bottom:15px}.kid-card{border-radius:30px;padding:26px}.kid-label{font-size:10px;color:var(--muted);font-weight:780;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}.kid-goal{font-size:31px;line-height:1.13;font-weight:820;letter-spacing:-.045em}.kid-tip{margin-top:14px;font-size:12px;color:var(--muted)}.kid-reward{display:flex;flex-direction:column;justify-content:space-between;min-height:210px}.kid-reward-title{font-size:19px;font-weight:780}.kid-reward-count{font-size:34px;font-weight:830;letter-spacing:-.045em}.progress{height:8px;border-radius:999px;background:rgba(223,227,233,.72);overflow:hidden;margin-top:10px}.progress>div{height:100%;background:linear-gradient(90deg,#4a9c90,#84d8ca);border-radius:inherit}.child-mini{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}.mini-card{border-radius:26px;padding:21px}.mini-value{font-size:38px;font-weight:830;letter-spacing:-.05em}.mini-label{font-size:10px;color:var(--muted);font-weight:720}.today-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px}.today-tile{padding:13px;border-radius:18px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.9);text-align:center}.today-tile b{display:block;font-size:12px}.today-tile span{display:block;font-size:23px;margin-top:5px}.checkout-compact{display:flex;align-items:center;gap:13px}.checkout-face{font-size:33px}.checkout-copy{flex:1}.checkout-copy b{display:block}.checkout-copy span{font-size:11px;color:var(--muted)}.shell-pop{animation:shellPop .7s ease}@keyframes shellPop{0%{transform:scale(1)}35%{transform:scale(1.18) rotate(-3deg);box-shadow:0 0 35px rgba(126,214,200,.5)}100%{transform:scale(1)}}
-@media(max-width:900px){.student-grid{grid-template-columns:repeat(2,1fr)}.school-grid{grid-template-columns:repeat(2,1fr)}.dashboard-grid{grid-template-columns:1fr 1fr}.child-main{grid-template-columns:1fr}.login-grid{grid-template-columns:1fr}.week{grid-template-columns:46px repeat(5,minmax(96px,1fr))}}
-@media(max-width:560px){header{padding:0 13px}.banner{border-radius:13px;text-align:center;width:auto}main{padding:25px 13px 44px}.login{margin:29px auto}.login-title h1{font-size:38px}.hero{align-items:flex-start}.class-select{font-size:29px}.student-grid,.school-grid{grid-template-columns:1fr}.child-name{font-size:35px}.kid-goal{font-size:25px}.card,.kid-card,.mini-card{border-radius:25px}.choice-row,.decision-row,.compact-grid,.inline-grid,.check-list{grid-template-columns:1fr}.session-label-hide{display:none}}
+@media(max-width:900px){.student-grid{grid-template-columns:repeat(2,1fr)}.school-grid{grid-template-columns:repeat(2,1fr)}.dashboard-grid{grid-template-columns:1fr 1fr}.child-main{grid-template-columns:1fr}.login-grid{grid-template-columns:1fr}.week{grid-template-columns:46px repeat(5,minmax(96px,1fr))}.detail-toolbar{grid-template-columns:1fr}.detail-toolbar .teacher-actions{grid-column:1}.detail-toolbar>.btn{justify-self:start}}
+@media(max-width:560px){header{padding:0 13px}.banner{border-radius:13px;text-align:center;width:auto}main{padding:28px 14px 48px}.login{margin:29px auto}.login-title h1{font-size:38px}.hero{align-items:flex-start}.class-select{font-size:29px}.student-grid,.school-grid{grid-template-columns:1fr}.child-name{font-size:35px}.kid-goal{font-size:25px}.card,.kid-card,.mini-card{border-radius:25px}.choice-row,.decision-row,.compact-grid,.inline-grid,.check-list{grid-template-columns:1fr}.session-label-hide{display:none}}
 </style>
 </head>
 <body>
 <header>
   <div class="brand"><div class="logo">🦦</div><div><b>OtterPlan</b></div></div>
-  <div id="session" class="toolbar" style="display:none">
-    <span id="netState" class="pill online">● Online</span>
-    <span id="sessionLabel" class="pill session-label-hide"></span>
-    <button class="btn secondary small" onclick="APP.help()">Hilfe</button>
-    <button class="btn secondary small" onclick="APP.account()">Konto</button>
-    <button class="btn secondary small" onclick="APP.logout()">Abmelden</button>
+  <div id="session" class="top-menu-wrap" style="display:none" onclick="event.stopPropagation()">
+    <button class="menu-trigger" aria-label="Menü öffnen" onclick="APP.toggleTopMenu()">☰</button>
+    <div id="topMenu" class="menu-pop">
+      <div class="menu-user"><b id="sessionLabel"></b><span>OtterPlan</span></div>
+      <div class="menu-status"><span>Status</span><span id="netState" class="pill online">● Online</span></div>
+      <button class="menu-item" onclick="APP.help();APP.closeTopMenu()">Hilfe</button>
+      <button class="menu-item" onclick="APP.account();APP.closeTopMenu()">Konto & Passwort</button>
+      <button class="menu-item" onclick="APP.logout()">Abmelden</button>
+    </div>
   </div>
 </header>
 <div class="banner">🧪 Testbetrieb · noch keine echten Schülerdaten verwenden</div>
@@ -97,9 +101,8 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
 
   <div id="classArea">
     <div id="teacherHome">
-      <div class="hero">
+      <div class="hero centered">
         <div><select id="classSelect" class="class-select" onchange="APP.switchClass(this.value)"></select><div id="classMeta" class="muted"></div></div>
-        <span class="pill">● Live</span>
       </div>
       <div id="dashboard" class="dashboard-grid"></div>
       <div id="homeTools" class="home-tools">
@@ -112,11 +115,11 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
     </div>
 
     <div id="teacherDetail" style="display:none">
-      <div class="toolbar" style="justify-content:space-between;margin-bottom:18px">
+      <div class="detail-toolbar">
         <button class="btn secondary" onclick="APP.back()">← Klasse</button>
         <div class="teacher-actions"><button class="btn" onclick="APP.checkin()">🎯 Ziel</button><button class="btn ghost" onclick="APP.checkout()">✅ Woche abschließen</button><button class="btn ghost" onclick="APP.reward()">🐚 Belohnung</button><button class="btn ghost" onclick="APP.openStudentMore()">Mehr …</button></div>
       </div>
-      <div class="hero"><div><h2 id="teacherName"></h2><p id="teacherMeta" class="muted"></p></div><button class="btn ghost" onclick="APP.exportStudent()">⇩ PDF</button></div>
+      <div class="hero centered"><div><h2 id="teacherName"></h2><p id="teacherMeta" class="muted"></p></div></div>
       <div class="grid">
         <div class="card s12"><div class="eyebrow">Wochenziel</div><div id="teacherGoal" class="teacher-goal" style="margin-top:8px"></div></div>
         <div class="card s12"><h3 style="margin-top:0">Stunden</h3><div id="teacherWeek" class="week"></div></div>
@@ -125,13 +128,13 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
   </div>
 
   <div id="schoolArea" style="display:none">
-    <div class="hero"><div><h2>Schule</h2><p class="muted">Klassen nach Stufen</p></div><button id="schoolAdminShortcut" class="btn ghost" onclick="APP.showTeacherArea('admin')">⚙︎ Admin</button></div>
+    <div class="section-center"><h2 style="margin:0">Schule</h2><p class="muted" style="margin:6px 0 0">Klassen nach Stufen</p><button id="schoolAdminShortcut" class="btn ghost" style="margin-top:14px" onclick="APP.showTeacherArea('admin')">⚙︎ Admin</button></div>
     <div class="school-toolbar"><select id="schoolSelect" onchange="APP.switchSchool(this.value)"></select></div>
     <div id="schoolOverview"></div>
   </div>
 
   <div id="adminArea" style="display:none">
-    <div class="hero"><div><h2>Admin</h2><p class="muted">Schule, Lehrkräfte und Grundeinstellungen</p></div></div>
+    <div class="section-center"><h2 style="margin:0">Admin</h2><p class="muted" style="margin:6px 0 0">Schule, Lehrkräfte und Grundeinstellungen</p></div>
     <div class="school-toolbar"><select id="adminSchoolSelect" onchange="APP.switchAdminSchool(this.value)"></select></div>
     <div id="adminContent"></div>
   </div>
@@ -291,7 +294,7 @@ function norm(v){v=String(v||"").trim();if(v.indexOf("otterplan:")===0)v=v.slice
 async function scan(){if(!window.Html5Qrcode){toast("Kamera nicht verfügbar");return}await stopScan();try{S.scanner=new Html5Qrcode("qr-reader");await S.scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:220,height:220}},function(code){el("childToken").value=norm(code);stopScan().then(redeem)},function(){})}catch(e){toast("Kamera konnte nicht gestartet werden")}}
 async function stopScan(){if(S.scanner){try{await S.scanner.stop()}catch(e){}try{S.scanner.clear()}catch(e){}S.scanner=null}}
 async function redeem(){var token=norm(el("childToken").value);if(!token){toast("QR-Code fehlt");return}await stopScan();var ses=await sb.auth.getSession();if(ses.data.session&&S.role==="teacher"){toast("Kinderzugang bitte auf dem Kindergerät testen.");return}if(ses.data.session)await sb.auth.signOut();var a=await sb.auth.signInAnonymously();if(a.error){toast("Kinderzugang konnte nicht gestartet werden");return}var r=await sb.rpc("redeem_child_qr",{p_qr_token:token});if(r.error){await sb.auth.signOut();toast("QR-Code ungültig");return}el("childToken").value="";await bootstrap()}
-async function logout(){stopRealtime();await stopScan();await sb.auth.signOut();S.user=null;S.profile=null;S.role=null;el("session").style.display="none";show("login")}
+async function logout(){closeTopMenu();stopRealtime();await stopScan();await sb.auth.signOut();S.user=null;S.profile=null;S.role=null;el("session").style.display="none";show("login")}
 
 async function bootstrap(){
  var u=await sb.auth.getUser();if(!u.data.user){show("login");return}
@@ -433,6 +436,9 @@ function applyLocalRating(row){var old=S.ratings.find(function(x){return x.stude
 async function syncOfflineRatings(){if(!navigator.onLine||S.role!=="teacher")return;var q=offlineQueue();if(!q.length)return;var r=await sb.from("ratings").upsert(q,{onConflict:"student_id,week_start,weekday,lesson_no"});if(!r.error){saveQueue([]);toast("Offline-Bewertungen synchronisiert");await load()}}
 async function clearRating(){var r=await sb.from("ratings").delete().eq("student_id",S.student.id).eq("week_start",week()).eq("weekday",S.entry.weekday).eq("lesson_no",S.entry.lesson_no);if(r.error){toast("Löschen fehlgeschlagen");return}modal("ratingModal",false);var sid=S.student.id;await load();openStudent(sid)}
 
+function toggleTopMenu(){el("topMenu").classList.toggle("show")}
+function closeTopMenu(){var m=el("topMenu");if(m)m.classList.remove("show")}
+document.addEventListener("click",closeTopMenu);
 function help(){modal("helpModal",true)}
 function openClassMore(){el("moreClassSettingsBtn").style.display=canManageCurrentClass()?"block":"none";modal("classMoreModal",true)}
 function openStudentMore(){if(!S.student)return;el("studentMoreName").textContent=S.student.display_name+" · Mehr";modal("studentMoreModal",true)}
@@ -657,7 +663,7 @@ function updateNet(){var n=navigator.onLine;el("netState").textContent=n?"● On
 window.addEventListener("online",updateNet);window.addEventListener("offline",updateNet);updateNet();
 
 window.APP={
- login:login,logout:logout,help:help,account:account,saveOwnPassword:saveOwnPassword,copyCredentials:copyCredentials,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,
+ login:login,logout:logout,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,help:help,account:account,saveOwnPassword:saveOwnPassword,copyCredentials:copyCredentials,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,
  showTeacherArea:showTeacherArea,switchClass:switchClass,switchSchool:switchSchool,switchAdminSchool:switchAdminSchool,openSchoolClass:openSchoolClass,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
  openStudent:openStudent,back:back,openRating:openRating,saveRating:saveRating,clearRating:clearRating,
