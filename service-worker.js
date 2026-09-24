@@ -1,4 +1,4 @@
-const CACHE="otterplan-v10";
+const CACHE="otterplan-v11";
 const STATIC=["./","./index.html","./manifest.webmanifest","./icon.svg"];
 
 self.addEventListener("install",event=>{
