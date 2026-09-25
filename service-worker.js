@@ -1,4 +1,4 @@
-const CACHE="milo-v33";
+const CACHE="milo-v34";
 const STATIC=["./","./index.html","./manifest.webmanifest","./milo-icon.svg","./milo-wordmark.svg"];
 
 self.addEventListener("install",event=>{
