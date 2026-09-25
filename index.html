@@ -125,7 +125,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .week-ritual{max-width:980px;margin:0 auto 18px;padding:20px 24px;border:1px solid #cce4db;border-left:5px solid var(--accent);border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px}.week-ritual.friday{border-color:#e9dbb3;border-left-color:#d4a42f}.week-ritual h3{margin:0 0 6px;font-size:20px}.week-ritual p{margin:0;font-size:14px;color:var(--muted)}.week-ritual .btn{flex-shrink:0}.week-ritual .eyebrow{margin-bottom:5px}@media(max-width:600px){.week-ritual{padding:18px;align-items:stretch;flex-direction:column;gap:14px}.week-ritual .btn{width:100%}}
-.voice-btn{float:right;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--accent);min-width:40px;min-height:36px;margin-top:-2px}.teacher-launcher-card[draggable=true]{cursor:grab}.teacher-launcher-card[draggable=true]:active{cursor:grabbing}@media(max-width:600px){.teacher-launcher-card{touch-action:manipulation}}</style>
+.quick-lessons{grid-template-columns:repeat(4,minmax(0,1fr))}.quick-lesson{min-height:44px}.voice-btn{float:right;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--accent);min-width:40px;min-height:36px;margin-top:-2px}.teacher-launcher-card[draggable=true]{cursor:grab}.teacher-launcher-card[draggable=true]:active{cursor:grabbing}@media(max-width:600px){.teacher-launcher-card{touch-action:manipulation}}</style>
 </head>
 <body>
 <header>
@@ -1046,19 +1046,19 @@ function renderTeacher(){var p=plan(S.student.id);el("teacherName").textContent=
 function renderWeek(target,click){
  var today=isCurrentWeek()?new Date().getDay():0;
  var out='<div class="head"></div>'+DAYS.map(function(d,i){return '<div class="head '+(today===i+1?'today-head':'')+'">'+d+'</div>'}).join("");
- for(var n=1;n<=6;n++){
-   out+='<div class="time">'+n+'. Std.</div>';
+ for(var si=0;si<SEGMENTS.length;si++){var n=SEGMENTS[si];
+   out+='<div class="time">'+(n===7?'1. Pause':n===8?'2. Pause':n+'. Std.')+'</div>';
    for(var d=1;d<=5;d++){
      var enabled=S.student?slotEnabled(S.student.id,d,n):true;
      if(!enabled){out+='<div class="cell '+(today===d?'today-cell ':'')+'" style="opacity:.28"></div>';continue}
      var r=S.student?rating(S.student.id,d,n):null;
-     var label=DAYS[d-1]+", "+n+". Stunde: "+(r?({good:"Geschafft",partial:"Teilweise",difficult:"Noch nicht"}[r.rating]||"Bewertet"):"Noch keine Bewertung");
+     var label=DAYS[d-1]+", "+segmentLabel(n)+": "+(r?({good:"Geschafft",partial:"Teilweise",difficult:"Noch nicht"}[r.rating]||"Bewertet"):"Noch keine Bewertung");
      out+='<'+(click?'button type="button"':'div')+' class="cell slot-face '+(today===d?'today-cell ':'')+(click?'click':'')+'" aria-label="'+esc(label)+'" '+(click?'onclick="APP.openRating('+d+','+n+')"':'')+'><span aria-hidden="true" class="face '+(r?'':'none')+'">'+(r?FACE[r.rating]:(click?'＋':'•'))+'</span></'+(click?'button':'div')+'>';
    }
  }
  el(target).innerHTML=out
 }
-function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id);if(!p){toast("Lege zuerst ein Wochenziel an.");checkin();return}var isToday=isCurrentWeek()&&new Date().getDay()===S.entry.weekday;el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+S.entry.lesson_no+". Stunde"+(isToday?" · Heute":"");el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
+function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id);if(!p){toast("Lege zuerst ein Wochenziel an.");checkin();return}var isToday=isCurrentWeek()&&new Date().getDay()===S.entry.weekday;el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+segmentLabel(S.entry.lesson_no)+(isToday?" · Heute":"");el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
 function offlineQueue(){try{return JSON.parse(localStorage.getItem("otterplan-rating-queue")||"[]")}catch(e){return[]}}
 function saveQueue(q){localStorage.setItem("otterplan-rating-queue",JSON.stringify(q))}
 function offerRatingUndo(previous,mode,source){
@@ -1304,9 +1304,11 @@ async function exportDevelopmentPdf(){
  if(S.aiAnalysisText){y+=5;if(y>255){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.text("KI-Entwurf (pädagogisch zu prüfen)",14,y);y+=6;doc.setFont("helvetica","normal");var ai=doc.splitTextToSize(S.aiAnalysisText,180);ai.forEach(function(line){if(y>278){doc.addPage();y=18}doc.text(line,14,y);y+=4.4})}
  doc.save("MILO_Elternsprechtag_"+safeName(name)+".pdf")
 }
+var SEGMENTS=[1,2,7,3,4,8,5,6];
+function segmentLabel(n){return n===7?"1. Pause":n===8?"2. Pause":n+". Stunde"}
 function currentSchoolDay(){var d=new Date().getDay();return d>=1&&d<=5?d:1}
 function currentTeachingSlot(now){var d=now||new Date(),mins=d.getHours()*60+d.getMinutes();
- var windows=[[8*60+15,9*60,1],[9*60,9*60+45,2],[10*60+15,11*60,3],[11*60,11*60+45,4],[12*60,12*60+45,5],[12*60+45,13*60+30,6]];
+ var windows=[[8*60+15,9*60,1],[9*60,9*60+45,2],[9*60+45,10*60+5,7],[10*60+15,11*60,3],[11*60,11*60+45,4],[11*60+45,12*60,8],[12*60,12*60+45,5],[12*60+45,13*60+30,6]];
  for(var i=0;i<windows.length;i++)if(mins>=windows[i][0]&&mins<windows[i][1])return windows[i][2];
  return null
 }
@@ -1315,30 +1317,30 @@ function quickLessonKey(){return "milo_quick_lesson_"+(S.classRow?S.classRow.id:
 function openQuickRating(){
  if(!S.students.length){toast("Noch keine Kinder angelegt");return}
  updateDateUI();el("quickDay").value=String(isCurrentWeek()?currentSchoolDay():1);
- var current=currentTeachingSlot();var saved=Number(localStorage.getItem(quickLessonKey())||0);el("quickLesson").value=String(saved>=1&&saved<=6?saved:(current||1));
+ var current=currentTeachingSlot();var saved=Number(localStorage.getItem(quickLessonKey())||0);el("quickLesson").value=String(SEGMENTS.includes(saved)?saved:(current||1));
  renderQuickRating();
  modal("quickRatingModal",true)
 }
 function setQuickLesson(n){
- n=Math.max(1,Math.min(6,Number(n)||1));el("quickLesson").value=String(n);
+ n=Number(n);if(!SEGMENTS.includes(n))return;el("quickLesson").value=String(n);
  if(isCurrentWeek())localStorage.setItem(quickLessonKey(),String(n));
  renderQuickRating()
 }
-function quickNextLesson(){var n=Number(el("quickLesson").value||1);if(n>=6){toast("Das ist die letzte Stunde");return}setQuickLesson(n+1)}
-function quickPrevLesson(){var n=Number(el("quickLesson").value||1);if(n<=1){toast("Das ist die erste Stunde");return}setQuickLesson(n-1)}
+function quickNextLesson(){var n=SEGMENTS.indexOf(Number(el("quickLesson").value||1));if(n>=SEGMENTS.length-1){toast("Das ist der letzte Abschnitt");return}setQuickLesson(SEGMENTS[n+1])}
+function quickPrevLesson(){var n=SEGMENTS.indexOf(Number(el("quickLesson").value||1));if(n<=0){toast("Das ist der erste Abschnitt");return}setQuickLesson(SEGMENTS[n-1])}
 function quickGoal(sid){modal("quickRatingModal",false);openStudent(sid);checkin()}
 function renderQuickRating(){
  var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value);
- el("quickLessonChips").innerHTML=[1,2,3,4,5,6].map(function(n){return '<button class="quick-lesson '+(n===lesson?'active':'')+'" onclick="APP.setQuickLesson('+n+')">'+n+'. Std.</button>'}).join("");
+ el("quickLessonChips").innerHTML=SEGMENTS.map(function(n){return '<button class="quick-lesson '+(n===lesson?'active':'')+'" onclick="APP.setQuickLesson('+n+')">'+segmentLabel(n)+'</button>'}).join("");
  var kids=S.students.filter(function(s){return slotEnabled(s.id,day,lesson)});
  var withGoal=kids.filter(function(s){return !!plan(s.id)});
  var done=withGoal.filter(function(s){return !!rating(s.id,day,lesson)}).length;
  var noGoal=kids.length-withGoal.length,pct=withGoal.length?Math.round(done/withGoal.length*100):0;
  el("quickRatingProgress").textContent=done+" von "+withGoal.length+" bewertet"+(noGoal?" · "+noGoal+" ohne Ziel":"");
- el("quickRatingContext").textContent=DAYS[day-1]+" · "+lesson+". Stunde"+(day===new Date().getDay()&&isCurrentWeek()?" · "+currentSchoolPhase():"");
+ el("quickRatingContext").textContent=DAYS[day-1]+" · "+segmentLabel(lesson)+(day===new Date().getDay()&&isCurrentWeek()?" · "+currentSchoolPhase():"");
  el("quickRatingProgressBar").style.width=pct+"%";
- var success=el("quickRatingSuccess");success.style.display=withGoal.length&&done===withGoal.length?"block":"none";success.textContent=lesson<6?"✓ Stunde vollständig bewertet · du kannst direkt zur nächsten Stunde wechseln":"✓ Stunde vollständig bewertet";
- var next=el("quickNextBtn");next.style.display=lesson<6?"inline-flex":"none";
+ var success=el("quickRatingSuccess");success.style.display=withGoal.length&&done===withGoal.length?"block":"none";success.textContent=SEGMENTS.indexOf(lesson)<SEGMENTS.length-1?"✓ Abschnitt vollständig bewertet · weiter zum nächsten Abschnitt":"✓ Abschnitt vollständig bewertet";
+ var next=el("quickNextBtn");next.style.display=SEGMENTS.indexOf(lesson)<SEGMENTS.length-1?"inline-flex":"none";
  el("quickRatingList").innerHTML=kids.map(function(s){
    var r=rating(s.id,day,lesson),p=plan(s.id);
    function b(v,face,label){return '<button class="quick-face '+(r&&r.rating===v?'selected':'')+'" aria-label="'+label+'" title="'+label+'" onclick="APP.quickRate(\''+s.id+'\',\''+v+'\')">'+face+'</button>'}
@@ -1430,17 +1432,17 @@ function openStudentSchedule(){
  if(!S.student)return;
  el("scheduleName").textContent=S.student.display_name;
  var out='<div></div>'+DAYS.map(function(d){return '<div class="schedule-head">'+d.slice(0,2)+'</div>'}).join("");
- for(var n=1;n<=6;n++){
-   out+='<div class="schedule-row">'+n+'. Stunde</div>';
+ for(var si=0;si<SEGMENTS.length;si++){var n=SEGMENTS[si];
+   out+='<div class="schedule-row">'+segmentLabel(n)+'</div>';
    for(var d=1;d<=5;d++){
      var on=slotEnabled(S.student.id,d,n);
-     out+='<label class="schedule-slot"><input type="checkbox" class="scheduleCheck" data-day="'+d+'" data-lesson="'+n+'" '+(on?'checked':'')+'><span>'+n+'</span></label>';
+     out+='<label class="schedule-slot"><input type="checkbox" class="scheduleCheck" data-day="'+d+'" data-lesson="'+n+'" '+(on?'checked':'')+'><span>'+segmentLabel(n)+'</span></label>';
    }
  }
  el("scheduleMatrix").innerHTML=out;
  modal("scheduleModal",true)
 }
-function schedulePreset(maxLesson){document.querySelectorAll(".scheduleCheck").forEach(function(x){x.checked=Number(x.dataset.lesson)<=Number(maxLesson)})}
+function schedulePreset(maxLesson){document.querySelectorAll(".scheduleCheck").forEach(function(x){x.checked=Number(x.dataset.lesson)>6||Number(x.dataset.lesson)<=Number(maxLesson)})}
 async function saveStudentSchedule(){
  if(!S.student)return;
  var rows=Array.from(document.querySelectorAll(".scheduleCheck")).map(function(x){return {student_id:S.student.id,weekday:Number(x.dataset.day),lesson_no:Number(x.dataset.lesson),enabled:x.checked,updated_at:new Date().toISOString()}});
@@ -1619,8 +1621,8 @@ function renderChild(){
  if(S.lastChildShells!==null&&sh>S.lastChildShells){el("childShellBadge").classList.remove("shell-pop");void el("childShellBadge").offsetWidth;el("childShellBadge").classList.add("shell-pop")}S.lastChildShells=sh;
  el("childShells").textContent=sh;el("childGoal").textContent=p?p.goal:"Noch kein Ziel";el("childHelp").textContent=p&&p.help_text?"💡 "+p.help_text:"";el("childGood").textContent=x.good;el("childRated").textContent=x.total;
  if(next){el("childRewardTitle").textContent=next.title;el("childReward").textContent=sh+" / "+next.shells_required;el("childBar").style.width=Math.min(100,Math.round(sh/next.shells_required*100))+"%";var left=next.shells_required-sh;el("childRewardHint").textContent="Noch "+left+" "+(left===1?"Muschel":"Muscheln")}else if(rewards.length){el("childRewardTitle").textContent="Stark!";el("childReward").textContent="🐚 "+sh;el("childBar").style.width="100%";el("childRewardHint").textContent="Geschafft"}else{el("childRewardTitle").textContent="Noch offen";el("childReward").textContent="🐚 "+sh;el("childBar").style.width="0%";el("childRewardHint").textContent=""}
- var dow=new Date().getDay(),entries=[];if(dow>=1&&dow<=5){for(var ln=1;ln<=6;ln++)if(slotEnabled(s.id,dow,ln))entries.push(ln)}
- el("childToday").innerHTML=entries.length?entries.map(function(ln){var r=rating(s.id,dow,ln);return '<div class="today-tile"><b>'+ln+'. Stunde</b><span>'+(r?FACE[r.rating]:"•")+'</span></div>'}).join(""):'<div class="muted">Heute ist frei.</div>';
+ var dow=new Date().getDay(),entries=[];if(dow>=1&&dow<=5){SEGMENTS.forEach(function(ln){if(slotEnabled(s.id,dow,ln))entries.push(ln)})}
+ el("childToday").innerHTML=entries.length?entries.map(function(ln){var r=rating(s.id,dow,ln);return '<div class="today-tile"><b>'+segmentLabel(ln)+'</b><span>'+(r?FACE[r.rating]:"•")+'</span></div>'}).join(""):'<div class="muted">Heute ist frei.</div>';
  var box=el("childCheckoutCard");if(p&&p.checkout_self){box.style.display="block";el("childCheckoutFace").textContent=FACE[p.checkout_self]||"";el("childCheckoutSelf").textContent=({good:"Geschafft",partial:"Teilweise",difficult:"Noch schwierig"}[p.checkout_self]||"");el("childCheckoutDecision").textContent=({done:"Ziel beendet",continue:"Ziel bleibt",change:"Neues Ziel"}[p.checkout_decision]||"");el("childCheckoutNote").textContent=p.checkout_note||""}else box.style.display="none";
  renderWeek("childWeek",false)
 }
