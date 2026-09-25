@@ -380,6 +380,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
     <button class="btn ghost" onclick="APP.moreCarryGoals()">↻ Ziele aus der Vorwoche übernehmen</button>
     <button class="btn ghost" onclick="APP.moreQrCards()">▦ QR-Karten herunterladen</button>
     <button class="btn ghost" onclick="APP.moreExport()">⇩ Dokumentation exportieren</button>
+    <button class="btn ghost" onclick="APP.openClassSchedule()">Klassenstundenplan</button>
     <button class="btn ghost" onclick="APP.openArchive()">Archivierte Kinder ansehen</button>
     <button id="moreClassSettingsBtn" class="btn ghost" onclick="APP.moreClassSettings()">⚙︎ Klasse verwalten</button>
   </div>
@@ -470,6 +471,8 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
   <div class="toolbar" style="justify-content:flex-end;margin-top:16px"><button class="btn secondary" onclick="APP.close('scheduleModal')">Abbrechen</button><button class="btn" onclick="APP.saveStudentSchedule()">Speichern</button></div>
 </div></div>
 
+<div id="classScheduleModal" class="modal-bg"><div class="modal wide"><div class="eyebrow">Klassenstundenplan</div><h2 id="classScheduleTitle">Wochenplan</h2><p class="muted">Dieser Plan gilt als Vorgabe für alle Kinder der Klasse. Individuell angepasste Stunden behalten ihren eigenen Plan.</p><div id="classScheduleMatrix" class="schedule-matrix"></div><details class="clean"><summary>Aus einer anderen Klasse kopieren</summary><div class="inline-grid"><div><label for="classScheduleSource">Klasse</label><select id="classScheduleSource"></select></div><div><label for="classScheduleDay">Umfang</label><select id="classScheduleDay"><option value="all">Ganze Woche</option><option value="1">Montag</option><option value="2">Dienstag</option><option value="3">Mittwoch</option><option value="4">Donnerstag</option><option value="5">Freitag</option></select></div></div><button class="btn secondary small" style="margin-top:10px" onclick="APP.copyClassSchedule()">In diesen Plan übernehmen</button></details><div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('classScheduleModal')">Abbrechen</button><button id="classScheduleSave" class="btn" onclick="APP.saveClassSchedule()">Plan speichern</button></div></div></div>
+
 <div id="historyModal" class="modal-bg"><div class="modal"><div class="eyebrow">Verlauf</div><h2 id="historyName" style="margin:5px 0 12px"></h2><div id="historyList"></div><div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('historyModal')">Schließen</button></div></div></div>
 
 <div id="exportModal" class="modal-bg"><div class="modal"><div class="eyebrow">Export</div><h2 style="margin:5px 0 13px">Dokumentation</h2><div class="list"><button class="btn ghost" onclick="APP.exportWeekly()">Wochenübersicht als PDF</button><button class="btn ghost" onclick="APP.exportMonthly()">Monatsübersicht als PDF</button><button class="btn ghost" onclick="APP.openCsvExport('class')">Rohdaten als CSV</button></div><div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('exportModal')">Schließen</button></div></div></div>
@@ -539,7 +542,7 @@ var BUILTIN_GOALS=[
  {title:"Friedlich lösen",goal:"Ich löse Streit friedlich.",help:"Ich stoppe, spreche ruhig und hole Hilfe, wenn ich sie brauche."}
 ];
 var BUILTIN_REWARDS=[{title:"Sticker auswählen",shells:5},{title:"Spiel auswählen",shells:10},{title:"Wunschbelohnung",shells:20}];
-var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],absences:[],selfRatings:[],timetable:[],scheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,gradeStudentData:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null,weekOffset:0,gradeFilter:"all",gradeClassFilter:"all",gradeQuickMode:false,gradeQuickIndex:0,undoRating:null,undoTimer:null,adminTeacherEdit:null,studentTab:"plan",developmentData:null,developmentContext:"teacher",developmentStudentId:null,aiAnalysisText:"",initialStartResolved:false,pendingStartGrade:null};
+var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],absences:[],selfRatings:[],timetable:[],scheduleSlots:[],classScheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,gradeStudentData:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null,weekOffset:0,gradeFilter:"all",gradeClassFilter:"all",gradeQuickMode:false,gradeQuickIndex:0,undoRating:null,undoTimer:null,adminTeacherEdit:null,studentTab:"plan",developmentData:null,developmentContext:"teacher",developmentStudentId:null,aiAnalysisText:"",initialStartResolved:false,pendingStartGrade:null};
 var idleTimer=null,reload=null;
 
 function el(id){return document.getElementById(id)}
@@ -652,7 +655,9 @@ function shells(sid){var p=S.progress.find(function(x){return x.student_id===sid
 function rs(sid){return S.rewards.filter(function(r){return r.student_id===sid&&r.active}).sort(function(a,b){return a.shells_required-b.shells_required})}
 function selfRating(sid,day,lesson){return S.selfRatings.find(function(r){return r.student_id===sid&&Number(r.weekday)===Number(day)&&Number(r.lesson_no)===Number(lesson)})||null}
 function rating(sid,day,lesson){return S.ratings.find(function(r){return r.student_id===sid&&Number(r.weekday)===Number(day)&&Number(r.lesson_no)===Number(lesson)})||null}
-function slotEnabled(sid,day,lesson){var x=S.scheduleSlots.find(function(s){return s.student_id===sid&&Number(s.weekday)===Number(day)&&Number(s.lesson_no)===Number(lesson)});return x?x.enabled!==false:true}
+function slotEnabled(sid,day,lesson){var x=S.scheduleSlots.find(function(s){return s.student_id===sid&&Number(s.weekday)===Number(day)&&Number(s.lesson_no)===Number(lesson)});if(x)return x.enabled!==false;
+ var st=S.students.find(function(s){return s.id===sid})||S.student,classId=st&&st.class_id||S.gradeStudentData&&S.gradeStudentData.student&&S.gradeStudentData.student.class_id||S.classRow&&S.classRow.id;
+ var c=S.classScheduleSlots.find(function(s){return s.class_id===classId&&Number(s.weekday)===Number(day)&&Number(s.lesson_no)===Number(lesson)});return c?c.enabled!==false:true}
 function stats(sid){var a=S.ratings.filter(function(r){return r.student_id===sid});return {good:a.filter(function(r){return r.rating==="good"}).length,total:a.length}}
 function resetIdle(){clearTimeout(idleTimer);if(S.role==="teacher")idleTimer=setTimeout(function(){logout()},45*60*1000)}
 ["click","keydown","touchstart"].forEach(function(e){document.addEventListener(e,resetIdle,{passive:true})});
@@ -704,7 +709,7 @@ async function load(){
    }
    if(S.schoolRow){S.schoolRow=S.schools.find(function(x){return x.id===S.schoolRow.id})||S.schools[0]||null}else S.schoolRow=S.schools[0]||null;
    if(!S.classRow){
-     S.students=[];S.absences=[];S.selfRatings=[];S.timetable=[];S.scheduleSlots=[];S.plans=[];S.ratings=[];S.rewards=[];S.progress=[];renderTeacherShell();renderHome();show("teacher");
+     S.students=[];S.absences=[];S.selfRatings=[];S.timetable=[];S.scheduleSlots=[];S.classScheduleSlots=[];S.plans=[];S.ratings=[];S.rewards=[];S.progress=[];renderTeacherShell();renderHome();show("teacher");
      if(S.pendingStartGrade){var g=S.pendingStartGrade;S.pendingStartGrade=null;setTimeout(function(){openGradeOverview(g)},40)}
      return
    }
@@ -713,13 +718,14 @@ async function load(){
    var q=await Promise.all([
      ids.length?sb.from("weekly_plans").select("*").in("student_id",ids).eq("week_start",w):Promise.resolve({data:[]}),
      ids.length?sb.from("ratings").select("*").in("student_id",ids).eq("week_start",w):Promise.resolve({data:[]}),
-     ids.length?sb.from("rewards").select("*").in("student_id",ids).eq("active",true):Promise.resolve({data:[]}),
+     ids.length?sb.from("rewards").select("*").in("student_id",ids):Promise.resolve({data:[]}),
      ids.length?sb.from("student_progress").select("*").in("student_id",ids):Promise.resolve({data:[]}),
      ids.length?sb.from("student_schedule_slots").select("*").in("student_id",ids):Promise.resolve({data:[]}),
       ids.length?sb.from("student_absences").select("*").in("student_id",ids).gte("absent_on",w).lte("absent_on",weekDayISO(5)):Promise.resolve({data:[]}),
-     ids.length?sb.from("student_self_ratings").select("*").in("student_id",ids).eq("week_start",w):Promise.resolve({data:[]})
+     ids.length?sb.from("student_self_ratings").select("*").in("student_id",ids).eq("week_start",w):Promise.resolve({data:[]}),
+     sb.from("class_schedule_slots").select("*").eq("class_id",S.classRow.id)
    ]);
-   S.timetable=[];S.plans=q[0].data||[];S.ratings=q[1].data||[];S.rewards=q[2].data||[];S.progress=q[3].data||[];S.scheduleSlots=q[4].data||[];S.absences=q[5].data||[];S.selfRatings=q[6].data||[];
+   S.timetable=[];S.plans=q[0].data||[];S.ratings=q[1].data||[];S.rewards=q[2].data||[];S.progress=q[3].data||[];S.scheduleSlots=q[4].data||[];S.absences=q[5].data||[];S.selfRatings=q[6].data||[];S.classScheduleSlots=q[7].data||[];
    renderTeacherShell();renderHome();show("teacher");
  }else if(S.role==="student"){
    var link=await sb.from("student_device_links").select("student_id").eq("user_id",S.user.id).maybeSingle();var sid=link.data&&link.data.student_id;
@@ -743,12 +749,13 @@ async function loadStudent(withRatings){
  var w=week(),s=S.student;
  var q=await Promise.all([
    sb.from("weekly_plans").select("*").eq("student_id",s.id).eq("week_start",w),
-   sb.from("rewards").select("*").eq("student_id",s.id).eq("active",true),
+   sb.from("rewards").select("*").eq("student_id",s.id),
    sb.from("student_progress").select("*").eq("student_id",s.id),
    sb.from("student_schedule_slots").select("*").eq("student_id",s.id),
-   sb.from("student_self_ratings").select("*").eq("student_id",s.id).eq("week_start",w)
+   sb.from("student_self_ratings").select("*").eq("student_id",s.id).eq("week_start",w),
+   sb.from("class_schedule_slots").select("*").eq("class_id",s.class_id)
  ]);
- S.timetable=[];S.plans=q[0].data||[];S.rewards=q[1].data||[];S.progress=q[2].data||[];S.scheduleSlots=q[3].data||[];S.selfRatings=q[4].data||[];
+ S.timetable=[];S.plans=q[0].data||[];S.rewards=q[1].data||[];S.progress=q[2].data||[];S.scheduleSlots=q[3].data||[];S.selfRatings=q[4].data||[];S.classScheduleSlots=q[5].data||[];
  S.ratings=withRatings?(await sb.from("ratings").select("*").eq("student_id",s.id).eq("week_start",w)).data||[]:[];
 }
 
@@ -919,6 +926,7 @@ async function loadGradeStudent(studentId){
  S.gradeActivePlan=d.plan||null;
  S.ratings=(d.ratings||[]).map(function(x){x.student_id=S.student.id;return x});
  S.scheduleSlots=(d.schedule_slots||[]).map(function(x){x.student_id=S.student.id;return x});
+ S.classScheduleSlots=d.class_schedule_slots||[];
  renderGradeStudent();return true
 }
 async function openGradeStudentById(studentId){
@@ -1599,6 +1607,37 @@ function qrImage(text){return new Promise(function(resolve,reject){var host=docu
 async function downloadSingleQr(){var token=el("teacherQr").dataset.token;if(!token){toast("QR-Code zuerst anzeigen");return}var data=await qrImage(childAccessUrl(token)),doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});doc.setFont("helvetica","bold");doc.setFontSize(22);doc.text(S.student.display_name,105,35,{align:"center"});doc.addImage(data,"PNG",65,50,80,80);doc.setFont("helvetica","normal");doc.setFontSize(11);doc.text("MILO · QR-Code scannen",105,145,{align:"center"});doc.save("MILO_QR_"+safeName(S.student.display_name)+".pdf")}
 async function downloadCodes(){if(!S.students.length){toast("Noch keine Kinder");return}toast("QR-Karten werden erstellt …");var r=await sb.rpc("get_or_create_class_child_qr_codes",{p_class_id:S.classRow.id});if(r.error){toast("QR-Karten konnten nicht erstellt werden");return}var rows=r.data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"}),xs=[14,110],ys=[14,104,194];for(var i=0;i<rows.length;i++){if(i>0&&i%6===0)doc.addPage();var p=i%6,x=xs[p%2],y=ys[Math.floor(p/2)],data=await qrImage(childAccessUrl(rows[i].qr_token));doc.setDrawColor(225,228,233);doc.roundedRect(x,y,86,82,5,5,"S");doc.setFont("helvetica","bold");doc.setFontSize(14);doc.text(String(rows[i].display_name),57+x-14,y+10,{align:"center",maxWidth:76});doc.addImage(data,"PNG",x+19,y+16,48,48);doc.setFont("helvetica","normal");doc.setFontSize(8);doc.text("MILO · scannen",x+43,y+74,{align:"center"})}doc.save("MILO_QR_"+safeName(S.classRow.name)+".pdf");toast("PDF erstellt")}
 
+function openClassSchedule(){
+ if(!S.classRow)return;
+ modal("classMoreModal",false);
+ el("classScheduleTitle").textContent=S.classRow.name+" · Stundenplan";
+ var out='<div></div>'+DAYS.map(function(d){return '<div class="schedule-head">'+d.slice(0,2)+'</div>'}).join('');
+ SEGMENTS.forEach(function(n){out+='<div class="schedule-row">'+segmentLabel(n)+'</div>';for(var d=1;d<=5;d++){
+  var row=S.classScheduleSlots.find(function(x){return x.class_id===S.classRow.id&&Number(x.weekday)===d&&Number(x.lesson_no)===n});
+  out+='<label class="schedule-slot"><input type="checkbox" class="classScheduleCheck" data-day="'+d+'" data-lesson="'+n+'" '+(!row||row.enabled!==false?'checked':'')+'><span>'+segmentLabel(n)+'</span></label>'
+ }});
+ el("classScheduleMatrix").innerHTML=out;
+ el("classScheduleSource").innerHTML=S.classes.filter(function(c){return c.id!==S.classRow.id}).map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+'</option>'}).join('')||'<option value="">Keine andere Klasse</option>';
+ modal("classScheduleModal",true)
+}
+async function copyClassSchedule(){var cid=el("classScheduleSource").value,day=el("classScheduleDay").value;
+ if(!S.classes.some(function(c){return c.id===cid&&c.id!==S.classRow.id}))return;
+ var r=await sb.from("class_schedule_slots").select("weekday,lesson_no,enabled").eq("class_id",cid);
+ if(r.error){toast("Klassenplan konnte nicht geladen werden");return}
+ document.querySelectorAll(".classScheduleCheck").forEach(function(x){if(day!=="all"&&Number(day)!==Number(x.dataset.day))return;
+  var source=(r.data||[]).find(function(s){return Number(s.weekday)===Number(x.dataset.day)&&Number(s.lesson_no)===Number(x.dataset.lesson)});
+  x.checked=source?source.enabled!==false:true
+ });toast("Plan übernommen · bitte speichern")
+}
+async function saveClassSchedule(){if(!S.classRow)return;
+ var cid=S.classRow.id,button=el("classScheduleSave"),rows=Array.from(document.querySelectorAll(".classScheduleCheck")).map(function(x){return {class_id:cid,weekday:Number(x.dataset.day),lesson_no:Number(x.dataset.lesson),enabled:x.checked,updated_at:new Date().toISOString()}});
+ if(rows.length!==SEGMENTS.length*5){toast("Stundenplan ist nicht vollständig geladen");return}
+ button.disabled=true;
+ try{var r=await sb.from("class_schedule_slots").upsert(rows,{onConflict:"class_id,weekday,lesson_no"});if(r.error){toast("Klassenplan konnte nicht gespeichert werden");return}
+  S.classScheduleSlots=S.classScheduleSlots.filter(function(s){return s.class_id!==cid}).concat(rows);
+  modal("classScheduleModal",false);renderHome();toast("Klassenstundenplan gespeichert")
+ }finally{button.disabled=false}
+}
 function openStudentSchedule(){
  if(!S.student)return;
  el("scheduleName").textContent=S.student.display_name;
@@ -1619,8 +1658,8 @@ async function loadScheduleCopyStudents(){var cid=el("scheduleCopyClass").value;
  el("scheduleCopyStudent").innerHTML=r.error?'<option value="">Nicht verfügbar</option>':(r.data||[]).filter(function(s){return s.id!==S.student.id}).map(function(s){return '<option value="'+s.id+'">'+esc(s.display_name)+'</option>'}).join("")||'<option value="">Keine andere Vorlage</option>'
 }
 async function copyStudentSchedule(){var sid=el("scheduleCopyStudent").value,cid=el("scheduleCopyClass").value,day=el("scheduleCopyDay").value;if(!sid||!S.classes.some(function(c){return c.id===cid}))return;
- var r=await sb.from("student_schedule_slots").select("weekday,lesson_no,enabled").eq("student_id",sid);if(r.error){toast("Plan konnte nicht geladen werden");return}
- var slots=r.data||[];document.querySelectorAll(".scheduleCheck").forEach(function(x){if(day!=="all"&&Number(day)!==Number(x.dataset.day))return;var source=slots.find(function(s){return Number(s.weekday)===Number(x.dataset.day)&&Number(s.lesson_no)===Number(x.dataset.lesson)});x.checked=source?source.enabled!==false:true});toast("Plan übernommen · zum Speichern unten bestätigen")
+ var q=await Promise.all([sb.from("student_schedule_slots").select("weekday,lesson_no,enabled").eq("student_id",sid),sb.from("class_schedule_slots").select("weekday,lesson_no,enabled").eq("class_id",cid)]);if(q.some(function(r){return r.error})){toast("Plan konnte nicht geladen werden");return}
+ var slots=q[0].data||[],defaults=q[1].data||[];document.querySelectorAll(".scheduleCheck").forEach(function(x){if(day!=="all"&&Number(day)!==Number(x.dataset.day))return;var source=slots.find(function(s){return Number(s.weekday)===Number(x.dataset.day)&&Number(s.lesson_no)===Number(x.dataset.lesson)})||defaults.find(function(s){return Number(s.weekday)===Number(x.dataset.day)&&Number(s.lesson_no)===Number(x.dataset.lesson)});x.checked=source?source.enabled!==false:true});toast("Plan übernommen · zum Speichern unten bestätigen")
 }
 function schedulePreset(maxLesson){document.querySelectorAll(".scheduleCheck").forEach(function(x){x.checked=Number(x.dataset.lesson)>6||Number(x.dataset.lesson)<=Number(maxLesson)})}
 async function saveStudentSchedule(){
@@ -1892,7 +1931,7 @@ window.APP={
  openBatchGoals:openBatchGoals,fillBatchTemplate:fillBatchTemplate,applyBatchGoal:applyBatchGoal,saveGoalTemplate:saveGoalTemplate,deleteGoalTemplate:deleteGoalTemplate,openGoalTemplateArchive:openGoalTemplateArchive,restoreGoalTemplate:restoreGoalTemplate,carryGoals:carryGoals,
  reward:reward,fillRewardTemplate:fillRewardTemplate,setShells:setShells,addReward:addReward,saveRewardTemplate:saveRewardTemplate,redeemReward:redeemReward,removeReward:removeReward,restoreReward:restoreReward,
  previewChild:previewChild,backFromChildPreview:backFromChildPreview,speakGoal:speakGoal,saveSelfRating:saveSelfRating,setChildSelfSlot:setChildSelfSlot,qr:qr,createQr:createQr,resetQr:resetQr,revoke:revoke,downloadSingleQr:downloadSingleQr,downloadCodes:downloadCodes,
- openStudentSchedule:openStudentSchedule,loadScheduleCopyStudents:loadScheduleCopyStudents,copyStudentSchedule:copyStudentSchedule,schedulePreset:schedulePreset,saveStudentSchedule:saveStudentSchedule,
+ openClassSchedule:openClassSchedule,copyClassSchedule:copyClassSchedule,saveClassSchedule:saveClassSchedule,openStudentSchedule:openStudentSchedule,loadScheduleCopyStudents:loadScheduleCopyStudents,copyStudentSchedule:copyStudentSchedule,schedulePreset:schedulePreset,saveStudentSchedule:saveStudentSchedule,
  history:history,openExport:openExport,openCsvExport:openCsvExport,exportCsv:exportCsv,exportWeekly:exportWeekly,exportMonthly:exportMonthly,exportStudent:exportStudent,
  openClassAdmin:openClassAdmin,saveClassSettings:saveClassSettings,assignTeacher:assignTeacher,removeTeacher:removeTeacher,saveRetention:saveRetention,archiveClass:archiveClass,
  attachClass:attachClass,createSchoolClass:createSchoolClass,openTeacherEditIndex:openTeacherEditIndex,saveTeacherEdit:saveTeacherEdit,openAdminClassEditIndex:openAdminClassEditIndex,saveAdminClassEdit:saveAdminClassEdit,archiveAdminClass:archiveAdminClass,renderAdminArea:renderAdminArea,createSchoolFromAdmin:createSchoolFromAdmin,saveAdminSettings:saveAdminSettings,createDemoStudent:createDemoStudent,deleteDemoStudents:deleteDemoStudents,createTeacherAccount:createTeacherAccount,resetTeacherPassword:resetTeacherPassword,removeSchoolMember:removeSchoolMember,resetTeacherPasswordIndex:resetTeacherPasswordIndex,removeSchoolMemberIndex:removeSchoolMemberIndex
