@@ -353,6 +353,19 @@ body:has(#childView.active) #todayBadge{display:none}
 #childView .child-support-cards #childRewardHint{display:none}
 #childView .child-friday h3{display:none}
 @media(max-width:600px){#childView .child-goal-card{grid-template-columns:minmax(0,1fr);gap:4px;margin-bottom:8px;padding:8px 10px}#childView .child-goal-card .kid-label{grid-column:auto}#childView .child-goal-card .kid-tip{grid-column:auto;padding-left:37px}#childView .child-goal-card .kid-goal{font-size:15px}#childView .child-support-cards{grid-template-columns:1fr}#childView .child-support-cards .kid-reward{grid-template-columns:1fr 1fr;padding:10px 12px}}
+
+/* Centered, quiet goal card for the child view. */
+#childView .child-goal-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;margin:0 0 11px;padding:12px 46px 13px;border:1px solid #e7eeeb;border-radius:16px;background:linear-gradient(145deg,#f8fbf9 0%,#f4f9f6 100%);box-shadow:none;text-align:center}
+#childView .child-goal-card .kid-label{margin:0;color:#7b9188;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+#childView .child-goal-card .toolbar{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:100%}
+#childView .child-goal-card .goal-symbol{display:flex;align-items:center;justify-content:center;width:30px;height:30px;flex:0 0 30px;border:1px solid #dce9e2;border-radius:50%;background:#fff;color:#668878}
+#childView .child-goal-card .goal-symbol svg{width:17px;height:17px}
+#childView .child-goal-card .kid-goal{flex:0 1 auto!important;color:#314b40;font-size:18px;font-weight:650;line-height:1.3;letter-spacing:-.02em;text-align:center}
+#childView .child-goal-card .child-goal-speak{position:absolute;top:9px;right:9px;display:grid;place-items:center;width:30px;min-height:30px;padding:5px;border:0;border-radius:50%;background:transparent;box-shadow:none;color:#81938b}
+#childView .child-goal-card .child-goal-speak svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#childView .child-goal-card .child-goal-speak:hover{background:#e9f1ec;color:#496a58}
+#childView .child-goal-card .kid-tip{max-width:560px;margin:0;color:#788980;font-size:11px;line-height:1.4;text-align:center}
+@media(max-width:600px){#childView .child-goal-card{gap:4px;margin-bottom:9px;padding:10px 36px 11px}#childView .child-goal-card .kid-goal{font-size:16px}#childView .child-goal-card .child-goal-speak{top:6px;right:6px;width:28px;min-height:28px}}
 </style>
 </head>
 <body>
@@ -539,7 +552,7 @@ body:has(#childView.active) #todayBadge{display:none}
 <section id="childView" class="screen"><button id="previewBack" class="btn secondary" style="display:none;margin-bottom:14px" onclick="APP.backFromChildPreview()">← Zur Lehrkraftansicht</button>
   <div id="parentSwitch" style="display:none;margin-bottom:12px"><label for="parentStudentSelect">Mein Kind</label><select id="parentStudentSelect" onchange="APP.selectParentStudent()"></select></div>
   <div class="child-top"><h2 id="childTitle" class="child-name"></h2><div id="childShellBadge" class="child-shells">🐚 <span id="childShells"></span></div></div>
-  <div class="kid-card child-goal-card"><div class="kid-label">Mein Ziel</div><div class="toolbar" style="align-items:center"><span id="childGoalIcon" class="goal-symbol" aria-hidden="true"></span><div id="childGoal" class="kid-goal" style="flex:1"></div><button class="btn secondary" aria-label="Ziel vorlesen" title="Ziel vorlesen" onclick="APP.speakGoal()">🔊</button></div><div id="childHelp" class="kid-tip"></div></div>\n  <section class="child-week-card" aria-labelledby="childWeekTitle"><h2 id="childWeekTitle">Meine Woche</h2><div id="childWeek" class="week"></div></section>
+  <div class="kid-card child-goal-card"><div class="kid-label">Mein Ziel</div><div class="toolbar" style="align-items:center"><span id="childGoalIcon" class="goal-symbol" aria-hidden="true"></span><div id="childGoal" class="kid-goal" style="flex:1"></div><button class="btn secondary child-goal-speak" aria-label="Ziel vorlesen" title="Ziel vorlesen" onclick="APP.speakGoal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button></div><div id="childHelp" class="kid-tip"></div></div>\n  <section class="child-week-card" aria-labelledby="childWeekTitle"><h2 id="childWeekTitle">Meine Woche</h2><div id="childWeek" class="week"></div></section>
   <div id="childSelfCard" class="card child-self-card" style="display:none;margin-bottom:12px"><div class="kid-label" id="childSelfTitle">Wie war es für dich?</div><label for="childSelfSlot">Stunde oder Pause</label><select id="childSelfSlot" onchange="APP.setChildSelfSlot(this.value)"></select><div class="choice-row" style="margin-top:10px;margin-bottom:0"><button id="self-good" class="choice" aria-label="Gut geschafft" onclick="APP.saveSelfRating('good')"><span class="emoji">😊</span>Gut</button><button id="self-partial" class="choice" aria-label="Teilweise geschafft" onclick="APP.saveSelfRating('partial')"><span class="emoji">😐</span>So mittel</button><button id="self-difficult" class="choice" aria-label="Schwierig" onclick="APP.saveSelfRating('difficult')"><span class="emoji">🙁</span>Schwer</button></div></div>
   <div class="child-main child-support-cards">
     
