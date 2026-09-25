@@ -240,8 +240,8 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
           <h3>📝 Beobachtung festhalten</h3><p class="muted" style="font-size:11px;margin:0 0 8px">Kurz notieren, was du konkret beobachtet hast. MILO verknüpft die Notiz mit dem Wochenziel.</p>
           <div class="quick-note-grid">
             <div><label for="planObsDate">Datum</label><input id="planObsDate" type="date"></div>
-            <div><label for="planObsCategory">Art</label><select id="planObsCategory"><option value="observation">Beobachtung</option><option value="progress">Fortschritt</option><option value="challenge">Herausforderung</option><option value="strategy">Hilfreiche Strategie</option></select></div>
-            <div><label for="planObsText">Notiz</label><button type="button" class="voice-btn" title="Beobachtung diktieren" aria-label="Beobachtung diktieren" onclick="APP.dictateObservation('planObsText')">🎙</button><input id="planObsText" maxlength="2000" placeholder="z. B. sagt häufiger Stopp und fragt selbstständig um Hilfe"></div>
+            <div><label for="planObsCategory">Art</label><select id="planObsCategory"><option value="observation">Beobachtung</option><option value="progress">Fortschritt</option><option value="challenge">Herausforderung</option><option value="strategy">Hilfreiche Strategie</option></select><label for="planObsSegment">Abschnitt</label><select id="planObsSegment"><option value="">Ohne Zuordnung</option><option value="1">1. Stunde</option><option value="2">2. Stunde</option><option value="7">1. Pause</option><option value="3">3. Stunde</option><option value="4">4. Stunde</option><option value="8">2. Pause</option><option value="5">5. Stunde</option><option value="6">6. Stunde</option></select></div>
+            <div><label for="planObsTemplate">Vorlage</label><select id="planObsTemplate" onchange="APP.useNoteTemplate('plan')"></select><button type="button" class="btn secondary small" onclick="APP.saveNoteTemplate('plan')">Als Vorlage speichern</button><label for="planObsText">Notiz</label><button type="button" class="voice-btn" title="Beobachtung diktieren" aria-label="Beobachtung diktieren" onclick="APP.dictateObservation('planObsText')">🎙</button><input id="planObsText" maxlength="2000" placeholder="z. B. sagt häufiger Stopp und fragt selbstständig um Hilfe"></div>
             <button class="btn small" onclick="APP.saveObservation('plan')">Speichern</button>
           </div>
         </div>
@@ -269,8 +269,8 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
             <h3>Neue Beobachtung</h3>
             <div class="dev-controls" style="margin-bottom:8px">
               <div><label for="notesObsDate">Datum</label><input id="notesObsDate" type="date"></div>
-              <div><label for="notesObsCategory">Art</label><select id="notesObsCategory"><option value="observation">Beobachtung</option><option value="progress">Fortschritt</option><option value="challenge">Herausforderung</option><option value="strategy">Hilfreiche Strategie</option></select></div>
-              <div style="grid-column:span 2"><label for="notesObsText">Notiz</label><button type="button" class="voice-btn" title="Beobachtung diktieren" aria-label="Beobachtung diktieren" onclick="APP.dictateObservation('notesObsText')">🎙</button><textarea id="notesObsText" maxlength="2000" placeholder="Beschreibe möglichst konkret, was passiert ist."></textarea></div>
+              <div><label for="notesObsCategory">Art</label><select id="notesObsCategory"><option value="observation">Beobachtung</option><option value="progress">Fortschritt</option><option value="challenge">Herausforderung</option><option value="strategy">Hilfreiche Strategie</option></select><label for="notesObsSegment">Abschnitt</label><select id="notesObsSegment"><option value="">Ohne Zuordnung</option><option value="1">1. Stunde</option><option value="2">2. Stunde</option><option value="7">1. Pause</option><option value="3">3. Stunde</option><option value="4">4. Stunde</option><option value="8">2. Pause</option><option value="5">5. Stunde</option><option value="6">6. Stunde</option></select></div>
+              <div style="grid-column:span 2"><label for="notesObsTemplate">Vorlage</label><select id="notesObsTemplate" onchange="APP.useNoteTemplate('notes')"></select><button type="button" class="btn secondary small" onclick="APP.saveNoteTemplate('notes')">Als Vorlage speichern</button><label for="notesObsText">Notiz</label><button type="button" class="voice-btn" title="Beobachtung diktieren" aria-label="Beobachtung diktieren" onclick="APP.dictateObservation('notesObsText')">🎙</button><textarea id="notesObsText" maxlength="2000" placeholder="Beschreibe möglichst konkret, was passiert ist."></textarea></div>
             </div>
             <button class="btn small" onclick="APP.saveObservation('notes')">Notiz speichern</button>
           </div>
@@ -404,8 +404,8 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
 
 <div id="gradeNoteModal" class="modal-bg"><div class="modal">
   <div class="eyebrow">Beobachtung</div><h2 id="gradeNoteTitle" style="margin:5px 0 8px">Notiz festhalten</h2>
-  <div class="inline-grid"><div><label for="gradeObsDate">Datum</label><input id="gradeObsDate" type="date"></div><div><label for="gradeObsCategory">Art</label><select id="gradeObsCategory"><option value="observation">Beobachtung</option><option value="progress">Fortschritt</option><option value="challenge">Herausforderung</option><option value="strategy">Hilfreiche Strategie</option></select></div></div>
-  <label for="gradeObsText">Notiz</label><textarea id="gradeObsText" maxlength="2000" placeholder="Beschreibe möglichst konkret, was passiert ist."></textarea>
+  <div class="inline-grid"><div><label for="gradeObsDate">Datum</label><input id="gradeObsDate" type="date"></div><div><label for="gradeObsCategory">Art</label><select id="gradeObsCategory"><option value="observation">Beobachtung</option><option value="progress">Fortschritt</option><option value="challenge">Herausforderung</option><option value="strategy">Hilfreiche Strategie</option></select><label for="gradeObsSegment">Abschnitt</label><select id="gradeObsSegment"><option value="">Ohne Zuordnung</option><option value="1">1. Stunde</option><option value="2">2. Stunde</option><option value="7">1. Pause</option><option value="3">3. Stunde</option><option value="4">4. Stunde</option><option value="8">2. Pause</option><option value="5">5. Stunde</option><option value="6">6. Stunde</option></select></div></div>
+  <label for="gradeObsTemplate">Vorlage</label><select id="gradeObsTemplate" onchange="APP.useNoteTemplate('grade')"></select><button type="button" class="btn secondary small" onclick="APP.saveNoteTemplate('grade')">Als Vorlage speichern</button><label for="gradeObsText">Notiz</label><textarea id="gradeObsText" maxlength="2000" placeholder="Beschreibe möglichst konkret, was passiert ist."></textarea>
   <div class="toolbar" style="justify-content:flex-end;margin-top:12px"><button class="btn secondary" onclick="APP.close('gradeNoteModal')">Abbrechen</button><button class="btn" onclick="APP.saveObservation('grade')">Speichern</button></div>
 </div></div>
 
@@ -1050,7 +1050,7 @@ function openWeekClose(){
 function openWeekCloseStudent(id){
  modal("weekCloseModal",false);openStudent(id);if(plan(id))checkout();else checkin()
 }
-function openStudent(id){S.student=S.students.find(function(s){return s.id===id});if(!S.student)return;S.studentTab="plan";S.developmentData=null;S.developmentStudentId=null;el("teacherHome").style.display="none";el("teacherDetail").style.display="block";renderTeacher();openStudentTab("plan")}
+function openStudent(id){S.student=S.students.find(function(s){return s.id===id});if(!S.student)return;S.studentTab="plan";S.developmentData=null;S.developmentStudentId=null;el("teacherHome").style.display="none";el("teacherDetail").style.display="block";renderTeacher();initObservation("plan");openStudentTab("plan")}
 function back(){S.student=null;S.developmentData=null;S.developmentStudentId=null;renderHome()}
 function renderTeacher(){var p=plan(S.student.id);el("teacherName").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name;el("teacherMeta").textContent="🐚 "+shells(S.student.id)+" Muscheln · "+(isCurrentWeek()?todayLong():"Woche "+weekRangeLabel());if(p){var ci=p.checkin_completed?" · "+(FACE[p.checkin_feeling]||""):"";var co=p.checkout_self?" · "+(FACE[p.checkout_self]||""):"";el("teacherGoal").innerHTML="<strong>"+esc(p.goal)+"</strong>"+(p.help_text?'<div class="muted" style="margin-top:6px">💡 '+esc(p.help_text)+"</div>":"")+'<div class="muted" style="margin-top:7px;font-size:11px">'+esc(ci+co)+"</div>"}else el("teacherGoal").textContent="Noch kein Ziel";var od=el("planObsDate");if(od&&!od.value)od.value=defaultObservationDate();renderWeek("teacherWeek",true)}
 
@@ -1199,10 +1199,16 @@ function openStudentTab(tab){
    refreshTeacherDevelopment()
  }
  if(S.studentTab==="notes"){
-   if(!el("notesObsDate").value)el("notesObsDate").value=defaultObservationDate();
+   if(!el("notesObsDate").value)el("notesObsDate").value=defaultObservationDate();initObservation("notes");
    loadNotesTab()
  }
 }
+var NOTE_TEMPLATES=["hat selbstständig Stopp gesagt","hat Hilfe geholt","hat Konflikt friedlich gelöst","hat zügig mit der Arbeit begonnen"];
+function noteTemplateKey(){return "milo_note_templates_"+(S.user?S.user.id:"device")}
+function renderNoteTemplates(prefix){var own=[];try{own=JSON.parse(localStorage.getItem(noteTemplateKey())||"[]")}catch(e){};el(prefix+"ObsTemplate").innerHTML='<option value="">Formulierung auswählen</option>'+NOTE_TEMPLATES.concat(own).map(function(x,i){return '<option value="'+i+'">'+esc(x)+'</option>'}).join("")}
+function useNoteTemplate(prefix){var own=[];try{own=JSON.parse(localStorage.getItem(noteTemplateKey())||"[]")}catch(e){};var i=Number(el(prefix+"ObsTemplate").value);if(el(prefix+"ObsTemplate").value==="")return;el(prefix+"ObsText").value=NOTE_TEMPLATES.concat(own)[i]||""}
+function saveNoteTemplate(prefix){var note=el(prefix+"ObsText").value.trim();if(!note){toast("Schreibe zuerst eine Formulierung");return}var own=[];try{own=JSON.parse(localStorage.getItem(noteTemplateKey())||"[]")}catch(e){};if(!NOTE_TEMPLATES.includes(note)&&!own.includes(note))own.push(note);localStorage.setItem(noteTemplateKey(),JSON.stringify(own));renderNoteTemplates(prefix);toast("Vorlage gespeichert")}
+function initObservation(prefix){el(prefix+"ObsSegment").value=String(currentTeachingSlot()||"");renderNoteTemplates(prefix)}
 function dictateObservation(id){var SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
  if(!SpeechRecognition){toast("Spracheingabe wird hier nicht unterstützt. Du kannst die Notiz schreiben.");el(id).focus();return}
  var recognition=new SpeechRecognition();recognition.lang="de-DE";recognition.continuous=false;recognition.interimResults=false;
@@ -1214,7 +1220,7 @@ async function saveObservation(source){
  var prefix=source==="grade"?"grade":source==="notes"?"notes":"plan";
  var dateEl=el(prefix+"ObsDate"),catEl=el(prefix+"ObsCategory"),textEl=el(prefix+"ObsText");
  var note=(textEl&&textEl.value||"").trim();if(!note){toast("Bitte eine Beobachtung eintragen");return}
- var r=await sb.rpc("save_student_observation",{p_student_id:S.student.id,p_observed_on:dateEl.value||defaultObservationDate(),p_category:catEl.value||"observation",p_note:note});
+ var r=await sb.rpc("save_student_observation_v2",{p_student_id:S.student.id,p_observed_on:dateEl.value||defaultObservationDate(),p_category:catEl.value||"observation",p_note:note,p_segment_no:Number(el(prefix+"ObsSegment").value)||null});
  if(r.error){toast("Notiz konnte nicht gespeichert werden");return}
  textEl.value="";toast("Beobachtung gespeichert");
  if(source==="grade")modal("gradeNoteModal",false);
@@ -1232,7 +1238,7 @@ async function deleteObservation(id){
 function renderObservationList(list){
  if(!list||!list.length)return '<div class="dev-empty">Noch keine Beobachtungen in diesem Zeitraum.</div>';
  return list.map(function(o){
-   return '<div class="dev-note"><div class="dev-note-head"><div><span class="dev-note-category">'+esc(observationCategoryLabel(o.category))+'</span> <b>'+esc(fmtDate(o.observed_on))+'</b></div>'+(o.can_delete?'<button class="btn secondary small" onclick="APP.deleteObservation(\''+o.id+'\')">Löschen</button>':'')+'</div><p>'+esc(o.note)+'</p>'+(o.goal_snapshot?'<div class="dev-note-goal">🎯 '+esc(o.goal_snapshot)+'</div>':'')+'</div>'
+   return '<div class="dev-note"><div class="dev-note-head"><div><span class="dev-note-category">'+esc(observationCategoryLabel(o.category))+'</span> <b>'+esc(fmtDate(o.observed_on))+'</b></div>'+(o.can_delete?'<button class="btn secondary small" onclick="APP.deleteObservation(\''+o.id+'\')">Löschen</button>':'')+'</div><p>'+esc(o.note)+'</p>'+(o.goal_snapshot?'<div class="dev-note-goal">🎯 '+esc(o.goal_snapshot)+'</div>':'')+(o.segment_no?'<div class="dev-note-goal">'+esc(segmentLabel(Number(o.segment_no)))+'</div>':'')+'</div>'
  }).join("")
 }
 async function loadNotesTab(){
@@ -1291,7 +1297,7 @@ async function openGradeDevelopment(){
  if(!S.student)return;S.developmentContext="grade";S.developmentStudentId=S.student.id;el("gradeDevTitle").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name+" · Entwicklung";setDevelopmentPreset("grade");modal("gradeDevelopmentModal",true);await refreshGradeDevelopment()
 }
 async function refreshGradeDevelopment(){if(!S.developmentStudentId)return;S.developmentContext="grade";await loadDevelopment("gradeDev",S.developmentStudentId)}
-function openGradeNote(){if(!S.student)return;el("gradeNoteTitle").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name+" · Notiz";el("gradeObsDate").value=defaultObservationDate();el("gradeObsText").value="";modal("gradeNoteModal",true)}
+function openGradeNote(){if(!S.student)return;el("gradeNoteTitle").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name+" · Notiz";el("gradeObsDate").value=defaultObservationDate();el("gradeObsText").value="";initObservation("grade");modal("gradeNoteModal",true)}
 async function runAiDevelopment(){
  if(!S.developmentData||!S.developmentStudentId){toast("Bitte zuerst die Entwicklung laden");return}
  var prefix=S.developmentContext==="grade"?"grade":"teacher",status=el(prefix+"AiStatus"),box=el(prefix+"AiResult");
@@ -1659,7 +1665,7 @@ window.APP={
  login:login,logout:logout,openGlobalSearch:openGlobalSearch,filterGlobalSearch:filterGlobalSearch,selectGlobalStudent:selectGlobalStudent,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
  showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,setQuickLesson:setQuickLesson,quickNextLesson:quickNextLesson,quickPrevLesson:quickPrevLesson,quickGoal:quickGoal,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
- dragClass:dragClass,dropClass:dropClass,toggleAbsence:toggleAbsence,markStudentAbsentToday:markStudentAbsentToday,filterStudents:filterStudents,resetStudentFilters:resetStudentFilters,dictateObservation:dictateObservation,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekStart:openWeekStart,openWeekStartStudent:openWeekStartStudent,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
+ dragClass:dragClass,dropClass:dropClass,toggleAbsence:toggleAbsence,markStudentAbsentToday:markStudentAbsentToday,filterStudents:filterStudents,resetStudentFilters:resetStudentFilters,dictateObservation:dictateObservation,renderNoteTemplates:renderNoteTemplates,useNoteTemplate:useNoteTemplate,saveNoteTemplate:saveNoteTemplate,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekStart:openWeekStart,openWeekStartStudent:openWeekStartStudent,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
  checkin:checkin,fillCheckinTemplate:fillCheckinTemplate,pickCheckin:pickCheckin,saveCheckin:saveCheckin,
  checkout:checkout,pickCheckoutSelf:pickCheckoutSelf,pickCheckoutDecision:pickCheckoutDecision,saveCheckout:saveCheckout,
  openBatchGoals:openBatchGoals,fillBatchTemplate:fillBatchTemplate,applyBatchGoal:applyBatchGoal,saveGoalTemplate:saveGoalTemplate,deleteGoalTemplate:deleteGoalTemplate,carryGoals:carryGoals,
