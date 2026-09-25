@@ -866,7 +866,7 @@ function showTeacherArea(area){
  if(S.role!=="teacher")return;
  if(area==="admin"&&adminSchools().length===0&&S.schools.length>0){toast("Dafür brauchst du Admin-Rechte");return}
  S.teacherArea=area;
- document.body.classList.toggle("teacher-start-view",area==="class"&&!S.classRow);
+ if(document.body.classList)document.body.classList.toggle("teacher-start-view",area==="class"&&!S.classRow);
  el("classArea").style.display=area==="class"?"block":"none";
  el("gradeArea").style.display=area==="grade"?"block":"none";
  el("adminArea").style.display=area==="admin"?"block":"none";
@@ -1028,7 +1028,7 @@ function dropClass(event){event.preventDefault();var tile=event.target.closest("
  var ids=S.classes.slice().sort(function(a,b){return classOrder(a.id)-classOrder(b.id)}).map(function(c){return c.id}),old=ids.indexOf(from);ids.splice(old,1);ids.splice(ids.indexOf(to),0,from);localStorage.setItem(classOrderKey(),JSON.stringify(ids));renderHome()
 }
 function renderHome(){
- document.body.classList.toggle("teacher-start-view",!S.classRow&&S.teacherArea==="class");
+ if(document.body.classList)document.body.classList.toggle("teacher-start-view",!S.classRow&&S.teacherArea==="class");
  el("teacherHome").style.display="block";el("teacherDetail").style.display="none";updateDateUI();
  if(!S.classRow){
    el("classOverview").open=true;el("classOverview").classList.add("launcher-mode");el("classTodayPanel").style.display="none";S.todayClassId=null;
