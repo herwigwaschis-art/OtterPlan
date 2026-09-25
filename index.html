@@ -83,6 +83,7 @@ button:disabled{cursor:wait;opacity:.6}
 .card,.student,.kid-card,.mini-card,.dash-card,.school-card,.grade-plan-card,.dev-card,.dev-stat{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:20px}
 .card{padding:24px}.eyebrow{font-size:12px;letter-spacing:.07em;color:var(--accent)}
 label{font-size:14px;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:700}
+.child-access-status{margin:12px 0 2px;padding:12px 14px;border-radius:12px;background:#eef4f6;color:#294153;font-size:14px;line-height:1.45}.child-access-status[hidden]{display:none}.child-access-status.error{background:#fff0ee;color:#8b342c}.child-access-status.success{background:#eaf6ef;color:#24634b}
 input,textarea,select{border:1px solid #cbd8e0;background:#fff;border-radius:11px;box-shadow:none;font-size:16px;min-height:46px}
 input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #087f7914}
 input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--accent)}
@@ -188,6 +189,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
   <div class="card" style="max-width:700px;margin:30px auto">
     <div class="toolbar" style="justify-content:space-between"><button class="btn secondary" onclick="APP.showLogin()">← Zurück</button><span class="pill">🧒 Kinderzugang</span></div>
     <h2>QR-Code scannen</h2>
+    <div id="childAccessStatus" class="child-access-status" role="status" aria-live="polite" hidden></div>
     <div id="qr-reader" style="min-height:240px;border:1px dashed rgba(255,255,255,.85);border-radius:22px;padding:10px"></div>
     <button id="scanBtn" class="btn" style="width:100%;margin-top:11px" onclick="APP.scan()">📷 Kamera starten</button>
     <details class="clean"><summary>Code manuell eingeben</summary><input id="childToken" autocomplete="off" style="margin-top:10px"><button class="btn secondary" style="width:100%;margin-top:10px" onclick="APP.redeem()">Öffnen</button></details>
@@ -542,12 +544,13 @@ var BUILTIN_GOALS=[
  {title:"Friedlich lösen",goal:"Ich löse Streit friedlich.",help:"Ich stoppe, spreche ruhig und hole Hilfe, wenn ich sie brauche."}
 ];
 var BUILTIN_REWARDS=[{title:"Sticker auswählen",shells:5},{title:"Spiel auswählen",shells:10},{title:"Wunschbelohnung",shells:20}];
-var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],absences:[],selfRatings:[],timetable:[],scheduleSlots:[],classScheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,gradeStudentData:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null,weekOffset:0,gradeFilter:"all",gradeClassFilter:"all",gradeQuickMode:false,gradeQuickIndex:0,undoRating:null,undoTimer:null,adminTeacherEdit:null,studentTab:"plan",developmentData:null,developmentContext:"teacher",developmentStudentId:null,aiAnalysisText:"",initialStartResolved:false,pendingStartGrade:null};
+var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],absences:[],selfRatings:[],timetable:[],scheduleSlots:[],classScheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,gradeStudentData:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,childRedeeming:false,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null,weekOffset:0,gradeFilter:"all",gradeClassFilter:"all",gradeQuickMode:false,gradeQuickIndex:0,undoRating:null,undoTimer:null,adminTeacherEdit:null,studentTab:"plan",developmentData:null,developmentContext:"teacher",developmentStudentId:null,aiAnalysisText:"",initialStartResolved:false,pendingStartGrade:null};
 var idleTimer=null,reload=null;
 
 function el(id){return document.getElementById(id)}
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]})}
 function toast(m){var t=el("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show")},2200)}
+function childStatus(message,kind){var n=el("childAccessStatus");n.textContent=message;n.className="child-access-status"+(kind?" "+kind:"");n.hidden=!message}
 function show(id){document.querySelectorAll(".screen").forEach(function(x){x.classList.remove("active")});el(id).classList.add("active")}
 var modalFocus=new Map();
 function modal(id,on){
@@ -664,13 +667,13 @@ function resetIdle(){clearTimeout(idleTimer);if(S.role==="teacher")idleTimer=set
 
 async function login(){var email=el("email").value.trim(),password=el("password").value;if(!email||!password){toast("E-Mail und Passwort eingeben");return}var r=await sb.auth.signInWithPassword({email:email,password:password});if(r.error){toast("Anmeldung fehlgeschlagen");return}await bootstrap()}
 async function resumeSession(){var r=await sb.auth.getSession();if(r.data&&r.data.session){el("resumeSessionBtn").style.display="none";await bootstrap()}else{el("resumeSessionBtn").style.display="none";toast("Bitte neu anmelden")}}
-function openChild(){show("childLogin");setTimeout(scan,180)}
+function openChild(){childStatus("","");show("childLogin");setTimeout(scan,180)}
 function showLogin(){stopScan();show("login")}
 function childAccessUrl(token){var u=new URL(window.location.href);u.search="";u.hash="";u.searchParams.set("child",token);return u.href}
 function norm(v){v=String(v||"").trim();if(v.indexOf("otterplan:")===0)return v.slice(10);try{var u=new URL(v,window.location.href);if(u.origin===window.location.origin&&u.pathname===window.location.pathname&&u.searchParams.has("child"))return u.searchParams.get("child")||""}catch(e){}return v}
-async function scan(){if(!window.Html5Qrcode){toast("Kamera nicht verfügbar");return}await stopScan();try{S.scanner=new Html5Qrcode("qr-reader");await S.scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:220,height:220}},function(code){el("childToken").value=norm(code);stopScan().then(redeem)},function(){})}catch(e){toast("Kamera konnte nicht gestartet werden")}}
+async function scan(){if(!window.Html5Qrcode){childStatus("Der QR-Scanner ist gerade nicht verfügbar. Öffne den QR-Link mit der Kamera-App oder gib den Code manuell ein.","error");return}await stopScan();try{S.scanner=new Html5Qrcode("qr-reader");await S.scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:220,height:220}},function(code){if(S.childRedeeming)return;el("childToken").value=norm(code);childStatus("QR-Code erkannt. Anmeldung läuft …","");stopScan().then(redeem)},function(){})}catch(e){childStatus("Kamera konnte nicht gestartet werden. Öffne den QR-Link mit der Kamera-App oder gib den Code manuell ein.","error")}}
 async function stopScan(){if(S.scanner){try{await S.scanner.stop()}catch(e){}try{S.scanner.clear()}catch(e){}S.scanner=null}}
-async function redeem(){var token=norm(el("childToken").value);if(!token){toast("QR-Code fehlt");return}await stopScan();var ses=await sb.auth.getSession();if(ses.data.session&&S.role==="teacher"){toast("Kinderzugang bitte auf dem Kindergerät testen.");return}if(ses.data.session)await sb.auth.signOut();var a=await sb.auth.signInAnonymously();if(a.error){toast("Kinderzugang konnte nicht gestartet werden");return}var r=await sb.rpc("redeem_child_qr",{p_qr_token:token});if(r.error){await sb.auth.signOut();toast("QR-Code ungültig");return}el("childToken").value="";if(new URL(location.href).searchParams.has("child"))history.replaceState({},"",location.pathname);await bootstrap()}
+async function redeem(){if(S.childRedeeming)return;var token=norm(el("childToken").value);if(!token){childStatus("QR-Code fehlt. Bitte scanne den QR-Code erneut.","error");return}S.childRedeeming=true;childStatus("QR-Code erkannt. Anmeldung läuft …","");try{await stopScan();var ses=await sb.auth.getSession();if(ses.data.session&&S.role==="teacher"){childStatus("Bitte öffne den QR-Code auf dem Kindergerät.","error");return}if(ses.data.session)await sb.auth.signOut();var a=await sb.auth.signInAnonymously();if(a.error){childStatus("Kinderanmeldung konnte nicht gestartet werden. Bitte Internetverbindung prüfen und erneut versuchen.","error");return}var r=await sb.rpc("redeem_child_qr",{p_qr_token:token});if(r.error){await sb.auth.signOut();childStatus("Der QR-Code ist ungültig oder wurde zurückgesetzt. Bitte lass dir einen aktuellen Code geben.","error");return}el("childToken").value="";if(new URL(location.href).searchParams.has("child"))history.replaceState({},"",location.pathname);childStatus("Anmeldung erfolgreich. Dein Plan wird geöffnet …","success");await bootstrap()}catch(e){childStatus("Die Anmeldung ist unterbrochen worden. Bitte scanne den QR-Code erneut.","error")}finally{S.childRedeeming=false}}
 async function logout(){closeTopMenu();Object.keys(sessionStorage).filter(function(k){return k.indexOf("otter_admin_")===0}).forEach(function(k){sessionStorage.removeItem(k)});stopRealtime();await stopScan();await sb.auth.signOut();S.user=null;S.profile=null;S.role=null;S.weekOffset=0;S.gradeQuickMode=false;S.undoRating=null;S.classRow=null;S.student=null;S.initialStartResolved=false;S.pendingStartGrade=null;el("session").style.display="none";el("globalSearchButton").style.display="none";show("login")}
 
 async function bootstrap(){
@@ -1938,7 +1941,7 @@ window.APP={
 };
 
 sb.auth.onAuthStateChange(function(event,session){if(event==="SIGNED_OUT"&&!session){S.user=null;S.profile=null;S.role=null;el("session").style.display="none";el("globalSearchButton").style.display="none";show("login")}});
-sb.auth.getSession().then(function(r){var params=new URL(location.href).searchParams,token=params.get("child");if(token){el("childToken").value=norm(token);redeem();return}if(params.get("menu")==="1"){el("resumeSessionBtn").style.display=r.data.session?"inline-flex":"none";show("login");return}if(r.data.session)bootstrap()});
+sb.auth.getSession().then(function(r){var params=new URL(location.href).searchParams,token=params.get("child");if(token){el("childToken").value=norm(token);show("childLogin");redeem();return}if(params.get("menu")==="1"){el("resumeSessionBtn").style.display=r.data.session?"inline-flex":"none";show("login");return}if(r.data.session)bootstrap()});
 if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js").then(function(r){r.update()}).catch(function(){})});
 })();
 </script>
