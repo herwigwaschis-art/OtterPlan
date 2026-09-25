@@ -127,6 +127,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
 .week-ritual{max-width:980px;margin:0 auto 18px;padding:20px 24px;border:1px solid #cce4db;border-left:5px solid var(--accent);border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px}.week-ritual.friday{border-color:#e9dbb3;border-left-color:#d4a42f}.week-ritual h3{margin:0 0 6px;font-size:20px}.week-ritual p{margin:0;font-size:14px;color:var(--muted)}.week-ritual .btn{flex-shrink:0}.week-ritual .eyebrow{margin-bottom:5px}@media(max-width:600px){.week-ritual{padding:18px;align-items:stretch;flex-direction:column;gap:14px}.week-ritual .btn{width:100%}}
 .self-face{font-size:14px;line-height:1;position:absolute;right:4px;bottom:4px;background:#fff;border-radius:50%;padding:2px}.slot-face{position:relative}.child-reward-dots{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.child-reward-dots span{width:16px;height:16px;border-radius:5px;border:2px solid #bdd6d0;background:#edf4f2}.child-reward-dots span.filled{background:#0f9182;border-color:#0f9182}.quick-lessons{grid-template-columns:repeat(4,minmax(0,1fr))}.quick-lesson{min-height:44px}.voice-btn{float:right;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--accent);min-width:40px;min-height:36px;margin-top:-2px}.teacher-launcher-card[draggable=true]{cursor:grab}.teacher-launcher-card[draggable=true]:active{cursor:grabbing}@media(max-width:600px){.teacher-launcher-card{touch-action:manipulation}}
 .today-panel{max-width:980px;margin:0 auto 18px;padding:24px;border:1px solid var(--line);border-radius:22px;background:#fff;box-shadow:0 10px 28px rgba(21,45,54,.045)}.today-panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px}.today-panel-head h2{margin:3px 0 2px;font-size:26px;letter-spacing:-.035em}.today-panel-head p{margin:0;font-size:13px}.today-day-chips,.today-slot-chips{display:flex;gap:7px;overflow-x:auto;padding:12px 0 2px;scrollbar-width:thin}.today-slot-chips{padding-top:8px;padding-bottom:14px}.today-chip{border:1px solid var(--line);border-radius:12px;background:#f6f9f9;color:var(--ink);font-size:13px;font-weight:700;min-height:42px;padding:8px 13px;white-space:nowrap}.today-chip.active{background:#146c67;color:#fff;border-color:#146c67}.today-children{display:grid;gap:0}.today-child{display:flex;align-items:center;gap:12px;min-height:69px;padding:10px 2px;border-top:1px solid var(--line)}.today-child-name{display:flex;align-items:center;gap:10px;min-width:0;flex:1;text-align:left;background:none;border:0;color:var(--ink);padding:0}.today-child-name b{display:block;font-size:15px}.today-child-name small{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:470px}.today-child-name>span:last-child{min-width:0}.today-faces{display:flex;gap:5px}.today-note{width:40px;height:40px;border:1px solid var(--line);border-radius:12px;background:#f7faf9;color:var(--accent);font-size:20px;flex:0 0 auto}.today-self{font-size:15px}.class-overview{max-width:980px;margin:0 auto}.class-overview>summary{list-style:none;cursor:pointer;text-align:center;padding:14px;color:var(--ink);font-weight:700;border:1px solid var(--line);background:#fff;border-radius:14px;margin-bottom:15px}.class-overview>summary::-webkit-details-marker{display:none}.class-overview>summary span{display:inline-block;margin-left:8px;transition:transform .2s}.class-overview[open]>summary span{transform:rotate(180deg)}.class-overview.launcher-mode>summary{display:none}.class-overview.launcher-mode{max-width:none}@media(max-width:650px){.today-panel{padding:16px}.today-panel-head{align-items:flex-start}.today-panel-head h2{font-size:22px}.today-child{flex-wrap:wrap;gap:8px}.today-child-name{flex-basis:calc(100% - 52px)}.today-child-name small{max-width:70vw}.today-faces{flex:1}.today-faces .quick-face{min-width:0}.today-note{margin-left:auto}}
+.note-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}.note-filters label{margin:0;font-size:11px}.note-filters input,.note-filters select{width:auto;max-width:100%;min-width:130px;font-size:13px;padding:9px 10px}.child-friday{background:#e9f5ee!important;border-color:#d0e8d7!important}.child-friday h3{margin:3px 0 14px;font-size:23px}.child-friday-days{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:11px}.child-friday-day{text-align:center;background:#fff;border-radius:12px;padding:10px 4px}.child-friday-day span{display:block;font-size:11px;color:var(--muted)}.child-friday-day strong{font-size:26px}.child-friday #childFridayReward{font-size:13px}@media(max-width:600px){.note-filters input,.note-filters select{flex:1}.child-friday-day span{font-size:10px}.child-friday-day strong{font-size:20px}}
 </style>
 </head>
 <body>
@@ -268,8 +269,8 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
           <div class="dev-grid">
             <div class="dev-card"><h3>Entwicklung über die Wochen</h3><div id="teacherDevChart" class="dev-chart"></div><div class="dev-legend"><span>Linie = Anteil 😊 an allen Bewertungen je Woche</span></div></div>
             <div class="dev-card"><h3>Wochenziele</h3><div id="teacherDevGoals" class="dev-goals"></div></div>
-            <div class="dev-card"><h3>Gesprächsübersicht</h3><div id="teacherDevText" class="dev-summary-text"></div><div class="toolbar" style="margin-top:12px"><button class="btn small" onclick="APP.exportDevelopmentPdf()">PDF für Elternsprechtag</button><button class="btn secondary small" onclick="APP.runAiDevelopment()">✨ KI-Auswertung</button></div><div id="teacherAiStatus" class="ai-status"></div><div id="teacherAiResult" class="analysis-box" style="display:none"></div></div>
-            <div class="dev-card"><h3>Beobachtungen im Zeitraum</h3><div id="teacherDevNotes" class="dev-note-list"></div></div>
+            <div class="dev-card"><h3>Gesprächsübersicht</h3><div id="teacherDevText" class="dev-summary-text"></div><div class="toolbar" style="margin-top:12px"><button class="btn small" onclick="APP.exportDevelopmentPdf()">PDF für Elternsprechtag</button></div><div id="teacherAiStatus" class="ai-status"></div><div id="teacherAiResult" class="analysis-box" style="display:none"></div></div>
+            <div class="dev-card"><h3>Beobachtungen im Zeitraum</h3><div id="teacherDevFilters" class="note-filters"></div><div id="teacherDevNotes" class="dev-note-list"></div></div>
           </div>
         </div>
       </div>
@@ -284,7 +285,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
             </div>
             <button class="btn small" onclick="APP.saveObservation('notes')">Notiz speichern</button>
           </div>
-          <div class="dev-card" style="margin-top:12px"><div class="toolbar" style="justify-content:space-between"><h3 style="margin:0">Letzte Beobachtungen</h3><button class="btn secondary small" onclick="APP.loadNotesTab()">Aktualisieren</button></div><div id="teacherNotesList" class="dev-note-list" style="margin-top:10px"></div></div>
+          <div class="dev-card" style="margin-top:12px"><div class="toolbar" style="justify-content:space-between"><h3 style="margin:0">Beobachtungen</h3><button class="btn secondary small" onclick="APP.loadNotesTab()">Aktualisieren</button></div><div class="note-filters"><label for="notesFrom">Von</label><input id="notesFrom" type="date" onchange="APP.loadNotesTab()"><label for="notesTo">Bis</label><input id="notesTo" type="date" onchange="APP.loadNotesTab()"></div><div id="teacherNotesFilters" class="note-filters"></div><div id="teacherNotesList" class="dev-note-list" style="margin-top:10px"></div></div>
         </div>
       </div>
     </div>
@@ -336,6 +337,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
   <div class="card" style="margin-bottom:15px"><div class="kid-label">Heute</div><div id="childToday" class="today-grid"></div></div>
   <div id="childSelfCard" class="card" style="display:none;margin-bottom:15px"><div class="kid-label" id="childSelfTitle">Wie war es für dich?</div><div class="choice-row" style="margin-bottom:0"><button id="self-good" class="choice" aria-label="Gut geschafft" onclick="APP.saveSelfRating('good')"><span class="emoji">😊</span>Gut</button><button id="self-partial" class="choice" aria-label="Teilweise geschafft" onclick="APP.saveSelfRating('partial')"><span class="emoji">😐</span>So mittel</button><button id="self-difficult" class="choice" aria-label="Schwierig" onclick="APP.saveSelfRating('difficult')"><span class="emoji">🙁</span>Schwer</button></div></div>
   <div id="childCheckoutCard" class="card" style="display:none;margin-bottom:15px"><div class="checkout-compact"><div id="childCheckoutFace" class="checkout-face"></div><div class="checkout-copy"><b id="childCheckoutSelf"></b><span id="childCheckoutDecision"></span><div id="childCheckoutNote" style="margin-top:4px;font-size:11px"></div></div></div></div>
+  <div id="childFridayCard" class="card child-friday" style="display:none;margin-bottom:15px"><div class="kid-label">Meine Woche</div><h3>Das hast du geschafft!</h3><div id="childFridayDays" class="child-friday-days"></div><div id="childFridayReward" class="muted"></div></div>
   <div class="card"><h3 style="margin-top:0">Meine Woche</h3><div id="childWeek" class="week"></div></div>
 </section>
 </main>
@@ -409,8 +411,8 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
   <div class="dev-grid">
     <div class="dev-card"><h3>Entwicklung über die Wochen</h3><div id="gradeDevChart" class="dev-chart"></div></div>
     <div class="dev-card"><h3>Wochenziele</h3><div id="gradeDevGoals" class="dev-goals"></div></div>
-    <div class="dev-card"><h3>Gesprächsübersicht</h3><div id="gradeDevText" class="dev-summary-text"></div><div class="toolbar" style="margin-top:12px"><button class="btn small" onclick="APP.exportDevelopmentPdf()">PDF</button><button class="btn secondary small" onclick="APP.runAiDevelopment()">✨ KI-Auswertung</button></div><div id="gradeAiStatus" class="ai-status"></div><div id="gradeAiResult" class="analysis-box" style="display:none"></div></div>
-    <div class="dev-card"><h3>Beobachtungen</h3><div id="gradeDevNotes" class="dev-note-list"></div></div>
+    <div class="dev-card"><h3>Gesprächsübersicht</h3><div id="gradeDevText" class="dev-summary-text"></div><div class="toolbar" style="margin-top:12px"><button class="btn small" onclick="APP.exportDevelopmentPdf()">PDF</button></div><div id="gradeAiStatus" class="ai-status"></div><div id="gradeAiResult" class="analysis-box" style="display:none"></div></div>
+    <div class="dev-card"><h3>Beobachtungen</h3><div id="gradeDevFilters" class="note-filters"></div><div id="gradeDevNotes" class="dev-note-list"></div></div>
   </div>
 </div></div>
 
@@ -1278,11 +1280,24 @@ function renderObservationList(list){
    return '<div class="dev-note"><div class="dev-note-head"><div><span class="dev-note-category">'+esc(observationCategoryLabel(o.category))+'</span> <b>'+esc(fmtDate(o.observed_on))+'</b></div>'+(o.can_delete?'<button class="btn secondary small" onclick="APP.deleteObservation(\''+o.id+'\')">Löschen</button>':'')+'</div><p>'+esc(o.note)+'</p>'+(o.goal_snapshot?'<div class="dev-note-goal">🎯 '+esc(o.goal_snapshot)+'</div>':'')+(o.segment_no?'<div class="dev-note-goal">'+esc(segmentLabel(Number(o.segment_no)))+'</div>':'')+'</div>'
  }).join("")
 }
+function renderObservationFilters(prefix,list){
+ if(!["teacherNotes","teacherDev","gradeDev"].includes(prefix))return;
+ var filter=el(prefix+"Filters"),goals=Array.from(new Set(list.map(function(o){return o.goal_snapshot||""}).filter(Boolean))).sort();
+ filter.innerHTML='<label for="'+prefix+'GoalFilter">Ziel</label><select id="'+prefix+'GoalFilter" onchange="APP.filterObservations(\''+prefix+'\')"><option value="">Alle Ziele</option>'+goals.map(function(g){return '<option value="'+esc(g)+'">'+esc(g)+'</option>'}).join("")+'</select><label for="'+prefix+'SegmentFilter">Abschnitt</label><select id="'+prefix+'SegmentFilter" onchange="APP.filterObservations(\''+prefix+'\')"><option value="">Alle Abschnitte</option>'+SEGMENTS.map(function(n){return '<option value="'+n+'">'+segmentLabel(n)+'</option>'}).join("")+'</select>';
+ filterObservations(prefix)
+}
+function filterObservations(prefix){
+ if(!["teacherNotes","teacherDev","gradeDev"].includes(prefix))return;
+ var list=prefix==="teacherNotes"?S.noteData||[]:S.developmentData&&S.developmentData.observations||[],goal=el(prefix+"GoalFilter").value,segment=el(prefix+"SegmentFilter").value;
+ el(prefix+(prefix==="teacherNotes"?"List":"Notes")).innerHTML=renderObservationList(list.filter(function(o){return (!goal||o.goal_snapshot===goal)&&(!segment||Number(o.segment_no)===Number(segment))}))
+}
 async function loadNotesTab(){
  if(!S.student)return;
- var range=devDateRange(26),r=await sb.rpc("get_student_development",{p_student_id:S.student.id,p_from:range.from,p_to:range.to});
+ var range=devDateRange(26);if(!el("notesFrom").value)el("notesFrom").value=range.from;if(!el("notesTo").value)el("notesTo").value=range.to;
+ var from=el("notesFrom").value,to=el("notesTo").value;if(from>to){toast("Bitte einen gültigen Zeitraum auswählen");return}
+ var r=await sb.rpc("get_student_development",{p_student_id:S.student.id,p_from:from,p_to:to});
  if(r.error){el("teacherNotesList").innerHTML='<div class="dev-empty">Notizen konnten nicht geladen werden.</div>';return}
- el("teacherNotesList").innerHTML=renderObservationList(r.data.observations||[])
+ S.noteData=r.data.observations||[];renderObservationFilters("teacherNotes",S.noteData)
 }
 function developmentChart(data){
  var weeks=(data.weeks||[]).filter(function(w){return Number(w.rated_count||0)>0});
@@ -1319,8 +1334,8 @@ function renderDevelopment(prefix,d){
  el(prefix+"Chart").innerHTML=developmentChart(d);
  el(prefix+"Goals").innerHTML=(d.goal_summary||[]).map(function(g){return '<span class="dev-goal"><b>'+esc(g.goal)+'</b><br>'+Number(g.weeks||0)+' '+(Number(g.weeks||0)===1?"Woche":"Wochen")+'</span>'}).join("")||'<div class="dev-empty">Noch keine Wochenziele.</div>';
  el(prefix+"Text").textContent=developmentSummaryText(d);
- el(prefix+"Notes").innerHTML=renderObservationList(d.observations||[]);
- var status=el(prefix==="teacherDev"?"teacherAiStatus":"gradeAiStatus");if(status)status.textContent="KI-Auswertung ist optional und wird nur nach schulischer Freigabe sowie technischer Einrichtung des KI-Dienstes verwendet.";
+ renderObservationFilters(prefix,d.observations||[]);
+ var status=el(prefix==="teacherDev"?"teacherAiStatus":"gradeAiStatus");if(status)status.textContent="Diese Zusammenfassung wird direkt aus den MILO-Daten erstellt.";
  var result=el(prefix==="teacherDev"?"teacherAiResult":"gradeAiResult");if(result){result.style.display="none";result.textContent=""}
 }
 async function loadDevelopment(prefix,studentId){
@@ -1336,15 +1351,7 @@ async function openGradeDevelopment(){
 async function refreshGradeDevelopment(){if(!S.developmentStudentId)return;S.developmentContext="grade";await loadDevelopment("gradeDev",S.developmentStudentId)}
 function openGradeNote(){if(!S.student)return;el("gradeNoteTitle").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name+" · Notiz";el("gradeObsDate").value=defaultObservationDate();el("gradeObsText").value="";initObservation("grade");modal("gradeNoteModal",true)}
 async function runAiDevelopment(){
- if(!S.developmentData||!S.developmentStudentId){toast("Bitte zuerst die Entwicklung laden");return}
- var prefix=S.developmentContext==="grade"?"grade":"teacher",status=el(prefix+"AiStatus"),box=el(prefix+"AiResult");
- status.textContent="KI-Auswertung wird vorbereitet …";box.style.display="none";
- var r=await sb.functions.invoke("analyze-student-development",{body:{student_id:S.developmentStudentId,from:S.developmentData.from,to:S.developmentData.to}});
- if(r.error||!r.data||!r.data.ok){
-   var msg=(r.data&&r.data.error)||"KI-Auswertung ist noch nicht verfügbar.";
-   status.textContent=msg;return
- }
- S.aiAnalysisText=r.data.text||"";status.textContent="KI-Entwurf erstellt · bitte pädagogisch prüfen und bearbeiten.";box.style.display="block";box.innerHTML='<div class="eyebrow">✨ KI-Entwurf</div><div class="dev-summary-text">'+esc(S.aiAnalysisText)+'</div>'
+ toast("Die Zusammenfassung wird lokal erstellt und steht oben im Bericht.")
 }
 async function exportDevelopmentPdf(){
  var d=S.developmentData;if(!d){toast("Bitte zuerst eine Auswertung laden");return}
@@ -1728,6 +1735,11 @@ function renderChild(){
  el("childToday").innerHTML=entries.length?entries.map(function(ln){var r=rating(s.id,dow,ln);return '<div class="today-tile"><b>'+segmentLabel(ln)+'</b><span>'+(r?FACE[r.rating]:"•")+'</span></div>'}).join(""):'<div class="muted">Heute ist frei.</div>';
  var selfBox=el("childSelfCard"),active=currentTeachingSlot();selfBox.style.display=S.role==="student"&&dow>=1&&dow<=5&&active&&p?"block":"none";if(selfBox.style.display==="block"){el("childSelfTitle").textContent="Wie lief "+segmentLabel(active)+"?";var sr=selfRating(s.id,dow,active);["good","partial","difficult"].forEach(function(v){el("self-"+v).classList.toggle("selected",!!(sr&&sr.rating===v))})}
  var box=el("childCheckoutCard");if(p&&p.checkout_self){box.style.display="block";el("childCheckoutFace").textContent=FACE[p.checkout_self]||"";el("childCheckoutSelf").textContent=({good:"Geschafft",partial:"Teilweise",difficult:"Noch schwierig"}[p.checkout_self]||"");el("childCheckoutDecision").textContent=({done:"Ziel beendet",continue:"Ziel bleibt",change:"Neues Ziel"}[p.checkout_decision]||"");el("childCheckoutNote").textContent=p.checkout_note||""}else box.style.display="none";
+ var friday=el("childFridayCard");friday.style.display=isCurrentWeek()&&dow===5?"block":"none";
+ if(friday.style.display==="block"){
+  el("childFridayDays").innerHTML=DAYS.map(function(name,i){var rr=S.ratings.filter(function(r){return r.student_id===s.id&&Number(r.weekday)===i+1}),positive=rr.filter(function(r){return r.rating==="good"}).length;return '<div class="child-friday-day"><span>'+name+'</span><strong>'+(!rr.length?'•':positive>=Math.ceil(rr.length/2)?'😊':'🌱')+'</strong></div>'}).join("");
+  el("childFridayReward").textContent=rewards.some(function(r){return r.shells_required<=sh})?"🐚 Belohnung erreicht":"🐚 Du sammelst weiter Muscheln";
+ }
  renderWeek("childWeek",false)
 }
 
@@ -1748,7 +1760,7 @@ window.APP={
  login:login,logout:logout,openGlobalSearch:openGlobalSearch,filterGlobalSearch:filterGlobalSearch,selectGlobalStudent:selectGlobalStudent,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
  showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,setQuickLesson:setQuickLesson,quickNextLesson:quickNextLesson,quickPrevLesson:quickPrevLesson,quickGoal:quickGoal,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
- dragClass:dragClass,dropClass:dropClass,setTodayDay:setTodayDay,setTodaySlot:setTodaySlot,todayRate:todayRate,todayNote:todayNote,toggleAbsence:toggleAbsence,markStudentAbsentToday:markStudentAbsentToday,filterStudents:filterStudents,resetStudentFilters:resetStudentFilters,dictateObservation:dictateObservation,renderNoteTemplates:renderNoteTemplates,useNoteTemplate:useNoteTemplate,saveNoteTemplate:saveNoteTemplate,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekStart:openWeekStart,openWeekStartStudent:openWeekStartStudent,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
+ dragClass:dragClass,dropClass:dropClass,setTodayDay:setTodayDay,setTodaySlot:setTodaySlot,todayRate:todayRate,todayNote:todayNote,toggleAbsence:toggleAbsence,markStudentAbsentToday:markStudentAbsentToday,filterStudents:filterStudents,resetStudentFilters:resetStudentFilters,dictateObservation:dictateObservation,renderNoteTemplates:renderNoteTemplates,useNoteTemplate:useNoteTemplate,saveNoteTemplate:saveNoteTemplate,filterObservations:filterObservations,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekStart:openWeekStart,openWeekStartStudent:openWeekStartStudent,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
  checkin:checkin,fillCheckinTemplate:fillCheckinTemplate,pickCheckin:pickCheckin,saveCheckin:saveCheckin,
  checkout:checkout,pickCheckoutSelf:pickCheckoutSelf,pickCheckoutDecision:pickCheckoutDecision,saveCheckout:saveCheckout,
  openBatchGoals:openBatchGoals,fillBatchTemplate:fillBatchTemplate,applyBatchGoal:applyBatchGoal,saveGoalTemplate:saveGoalTemplate,deleteGoalTemplate:deleteGoalTemplate,carryGoals:carryGoals,
