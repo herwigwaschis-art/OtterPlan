@@ -545,7 +545,6 @@ body:has(#childView.active) #todayBadge{display:none}
     
     <div class="kid-card kid-reward"><div><div class="kid-label">Belohnung</div><div id="childRewardTitle" class="kid-reward-title"></div></div><div><div id="childReward" class="kid-reward-count"></div><div class="progress"><div id="childBar"></div></div><div id="childRewardDots" class="child-reward-dots" aria-hidden="true"></div><div id="childRewardHint" class="kid-tip"></div></div></div>
   </div>
-  <div id="childCheckoutCard" class="card child-checkout-card" style="display:none;margin-bottom:12px"><div class="checkout-compact"><div id="childCheckoutFace" class="checkout-face"></div><div class="checkout-copy"><b id="childCheckoutSelf"></b><span id="childCheckoutDecision"></span><div id="childCheckoutNote" style="margin-top:4px;font-size:11px"></div></div></div></div>
 </section>
 </main>
 
@@ -2068,7 +2067,6 @@ function renderChild(){
   el("childSelfTitle").textContent="Wie lief es für dich?";el("childSelfSlot").innerHTML=eligible.map(function(n){return '<option value="'+n+'">'+segmentLabel(n)+'</option>'}).join("");el("childSelfSlot").value=String(selected);
   var sr=selfRating(s.id,dow,selected);["good","partial","difficult"].forEach(function(v){el("self-"+v).classList.toggle("selected",!!(sr&&sr.rating===v))})
  }
- var box=el("childCheckoutCard");if(p&&p.checkout_self){box.style.display="block";el("childCheckoutFace").textContent=FACE[p.checkout_self]||"";el("childCheckoutSelf").textContent=({good:"Gut",partial:"Teilweise",difficult:"Noch schwierig"}[p.checkout_self]||"");el("childCheckoutDecision").textContent=({done:"Ziel beendet",continue:"Ziel bleibt",change:"Neues Ziel"}[p.checkout_decision]||"");el("childCheckoutNote").textContent=p.checkout_note||""}else box.style.display="none";
  renderWeek("childWeek",false)
 }
 
