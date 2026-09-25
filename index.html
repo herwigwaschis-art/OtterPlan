@@ -546,7 +546,6 @@ body:has(#childView.active) #todayBadge{display:none}
     <div class="kid-card kid-reward"><div><div class="kid-label">Belohnung</div><div id="childRewardTitle" class="kid-reward-title"></div></div><div><div id="childReward" class="kid-reward-count"></div><div class="progress"><div id="childBar"></div></div><div id="childRewardDots" class="child-reward-dots" aria-hidden="true"></div><div id="childRewardHint" class="kid-tip"></div></div></div>
   </div>
   <div id="childCheckoutCard" class="card child-checkout-card" style="display:none;margin-bottom:12px"><div class="checkout-compact"><div id="childCheckoutFace" class="checkout-face"></div><div class="checkout-copy"><b id="childCheckoutSelf"></b><span id="childCheckoutDecision"></span><div id="childCheckoutNote" style="margin-top:4px;font-size:11px"></div></div></div></div>
-  <div id="childFridayCard" class="card child-friday" style="display:none;margin-bottom:12px"><div class="kid-label">Deine Woche</div><div id="childFridayDays" class="child-friday-days"></div><div id="childFridayReward" class="muted"></div></div>
 </section>
 </main>
 
@@ -2070,11 +2069,6 @@ function renderChild(){
   var sr=selfRating(s.id,dow,selected);["good","partial","difficult"].forEach(function(v){el("self-"+v).classList.toggle("selected",!!(sr&&sr.rating===v))})
  }
  var box=el("childCheckoutCard");if(p&&p.checkout_self){box.style.display="block";el("childCheckoutFace").textContent=FACE[p.checkout_self]||"";el("childCheckoutSelf").textContent=({good:"Geschafft",partial:"Teilweise",difficult:"Noch schwierig"}[p.checkout_self]||"");el("childCheckoutDecision").textContent=({done:"Ziel beendet",continue:"Ziel bleibt",change:"Neues Ziel"}[p.checkout_decision]||"");el("childCheckoutNote").textContent=p.checkout_note||""}else box.style.display="none";
- var friday=el("childFridayCard");friday.style.display=isCurrentWeek()&&dow===5?"block":"none";
- if(friday.style.display==="block"){
-  el("childFridayDays").innerHTML=DAYS.map(function(name,i){var rr=S.ratings.filter(function(r){return r.student_id===s.id&&Number(r.weekday)===i+1}),positive=rr.filter(function(r){return r.rating==="good"}).length;return '<div class="child-friday-day"><span>'+name+'</span><strong>'+(!rr.length?'•':positive>=Math.ceil(rr.length/2)?'😊':'🌱')+'</strong></div>'}).join("");
-  el("childFridayReward").textContent=rewards.some(function(r){return r.shells_required<=sh})?"🐚 Belohnung erreicht":"🐚 Du sammelst weiter Muscheln";
- }
  renderWeek("childWeek",false)
 }
 
