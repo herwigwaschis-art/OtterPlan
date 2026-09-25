@@ -128,6 +128,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
 .self-face{font-size:14px;line-height:1;position:absolute;right:4px;bottom:4px;background:#fff;border-radius:50%;padding:2px}.slot-face{position:relative}.child-reward-dots{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.child-reward-dots span{width:16px;height:16px;border-radius:5px;border:2px solid #bdd6d0;background:#edf4f2}.child-reward-dots span.filled{background:#0f9182;border-color:#0f9182}.quick-lessons{grid-template-columns:repeat(4,minmax(0,1fr))}.quick-lesson{min-height:44px}.voice-btn{float:right;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--accent);min-width:40px;min-height:36px;margin-top:-2px}.teacher-launcher-card[draggable=true]{cursor:grab}.teacher-launcher-card[draggable=true]:active{cursor:grabbing}@media(max-width:600px){.teacher-launcher-card{touch-action:manipulation}}
 .today-panel{max-width:980px;margin:0 auto 18px;padding:24px;border:1px solid var(--line);border-radius:22px;background:#fff;box-shadow:0 10px 28px rgba(21,45,54,.045)}.today-panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px}.today-panel-head h2{margin:3px 0 2px;font-size:26px;letter-spacing:-.035em}.today-panel-head p{margin:0;font-size:13px}.today-day-chips,.today-slot-chips{display:flex;gap:7px;overflow-x:auto;padding:12px 0 2px;scrollbar-width:thin}.today-slot-chips{padding-top:8px;padding-bottom:14px}.today-chip{border:1px solid var(--line);border-radius:12px;background:#f6f9f9;color:var(--ink);font-size:13px;font-weight:700;min-height:42px;padding:8px 13px;white-space:nowrap}.today-chip.active{background:#146c67;color:#fff;border-color:#146c67}.today-children{display:grid;gap:0}.today-child{display:flex;align-items:center;gap:12px;min-height:69px;padding:10px 2px;border-top:1px solid var(--line)}.today-child-name{display:flex;align-items:center;gap:10px;min-width:0;flex:1;text-align:left;background:none;border:0;color:var(--ink);padding:0}.today-child-name b{display:block;font-size:15px}.today-child-name small{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:470px}.today-child-name>span:last-child{min-width:0}.today-faces{display:flex;gap:5px}.today-note{width:40px;height:40px;border:1px solid var(--line);border-radius:12px;background:#f7faf9;color:var(--accent);font-size:20px;flex:0 0 auto}.today-self{font-size:15px}.class-overview{max-width:980px;margin:0 auto}.class-overview>summary{list-style:none;cursor:pointer;text-align:center;padding:14px;color:var(--ink);font-weight:700;border:1px solid var(--line);background:#fff;border-radius:14px;margin-bottom:15px}.class-overview>summary::-webkit-details-marker{display:none}.class-overview>summary span{display:inline-block;margin-left:8px;transition:transform .2s}.class-overview[open]>summary span{transform:rotate(180deg)}.class-overview.launcher-mode>summary{display:none}.class-overview.launcher-mode{max-width:none}@media(max-width:650px){.today-panel{padding:16px}.today-panel-head{align-items:flex-start}.today-panel-head h2{font-size:22px}.today-child{flex-wrap:wrap;gap:8px}.today-child-name{flex-basis:calc(100% - 52px)}.today-child-name small{max-width:70vw}.today-faces{flex:1}.today-faces .quick-face{min-width:0}.today-note{margin-left:auto}}
 .note-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}.note-filters label{margin:0;font-size:11px}.note-filters input,.note-filters select{width:auto;max-width:100%;min-width:130px;font-size:13px;padding:9px 10px}.child-friday{background:#e9f5ee!important;border-color:#d0e8d7!important}.child-friday h3{margin:3px 0 14px;font-size:23px}.child-friday-days{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:11px}.child-friday-day{text-align:center;background:#fff;border-radius:12px;padding:10px 4px}.child-friday-day span{display:block;font-size:11px;color:var(--muted)}.child-friday-day strong{font-size:26px}.child-friday #childFridayReward{font-size:13px}@media(max-width:600px){.note-filters input,.note-filters select{flex:1}.child-friday-day span{font-size:10px}.child-friday-day strong{font-size:20px}}
+.note-pdf-choice{display:inline-flex;align-items:center;gap:4px;margin:0 7px 0 0!important;font-size:11px!important;text-transform:none;letter-spacing:0;cursor:pointer}.note-pdf-choice input{width:17px;height:17px;margin:0;accent-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -669,7 +670,7 @@ async function bootstrap(){
  
  await load();
  startRealtime();
- if(S.role==="teacher"){syncOfflineRatings();if(S.profile&&S.profile.must_change_password)setTimeout(account,120)}
+ if(S.role==="teacher"){syncOfflineRatings();syncOfflineObservations();if(S.profile&&S.profile.must_change_password)setTimeout(account,120)}
 }
 
 async function load(){
@@ -1114,8 +1115,13 @@ function renderWeek(target,click){
  el(target).innerHTML=out
 }
 function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id);if(!p){toast("Lege zuerst ein Wochenziel an.");checkin();return}var isToday=isCurrentWeek()&&new Date().getDay()===S.entry.weekday;el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+segmentLabel(S.entry.lesson_no)+(isToday?" · Heute":"");el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
-function offlineQueue(){try{return JSON.parse(localStorage.getItem("otterplan-rating-queue")||"[]")}catch(e){return[]}}
-function saveQueue(q){localStorage.setItem("otterplan-rating-queue",JSON.stringify(q))}
+function ratingQueueKey(){return "otterplan-rating-queue-"+(S.user?S.user.id:"signed-out")}
+function offlineQueue(){try{
+ var scoped=JSON.parse(localStorage.getItem(ratingQueueKey())||"[]"),legacy=JSON.parse(localStorage.getItem("otterplan-rating-queue")||"[]");
+ if(S.user&&legacy.length){var mine=legacy.filter(function(x){return x.updated_by===S.user.id});if(mine.length){scoped=scoped.concat(mine);saveQueue(scoped);localStorage.setItem("otterplan-rating-queue",JSON.stringify(legacy.filter(function(x){return x.updated_by!==S.user.id})))}}
+ return scoped
+ }catch(e){return[]}}
+function saveQueue(q){localStorage.setItem(ratingQueueKey(),JSON.stringify(q))}
 function offerRatingUndo(previous,mode,source){
  clearTimeout(S.undoTimer);
  S.undoRating={student_id:S.student?S.student.id:null,week_start:week(),weekday:Number(S.entry&&S.entry.weekday),lesson_no:Number(S.entry&&S.entry.lesson_no),previous:previous?previous.rating:null,mode:mode||"class",source:source||"detail"};
@@ -1264,12 +1270,22 @@ async function saveObservation(source){
  var prefix=source==="grade"?"grade":source==="notes"?"notes":"plan";
  var dateEl=el(prefix+"ObsDate"),catEl=el(prefix+"ObsCategory"),textEl=el(prefix+"ObsText");
  var note=(textEl&&textEl.value||"").trim();if(!note){toast("Bitte eine Beobachtung eintragen");return}
- var r=await sb.rpc("save_student_observation_v2",{p_student_id:S.student.id,p_observed_on:dateEl.value||defaultObservationDate(),p_category:catEl.value||"observation",p_note:note,p_segment_no:Number(el(prefix+"ObsSegment").value)||null});
- if(r.error){toast("Notiz konnte nicht gespeichert werden");return}
+ var row={p_student_id:S.student.id,p_observed_on:dateEl.value||defaultObservationDate(),p_category:catEl.value||"observation",p_note:note,p_segment_no:Number(el(prefix+"ObsSegment").value)||null,p_client_ref:crypto.randomUUID()};
+ if(!navigator.onLine){queueObservation(row);textEl.value="";toast("Notiz offline vorgemerkt");if(source==="grade")modal("gradeNoteModal",false);return}
+ var r=await sb.rpc("save_student_observation_v3",row);
+ if(r.error){if(r.error.code){toast("Notiz konnte nicht gespeichert werden · bitte Angaben prüfen");return}queueObservation(row);textEl.value="";toast("Notiz vorgemerkt · wird später synchronisiert");if(source==="grade")modal("gradeNoteModal",false);return}
  textEl.value="";toast("Beobachtung gespeichert");
  if(source==="grade")modal("gradeNoteModal",false);
  if(S.studentTab==="development")await refreshTeacherDevelopment();
  if(S.studentTab==="notes")await loadNotesTab()
+}
+function noteQueueKey(){return "milo_observation_queue_"+(S.user?S.user.id:"signed-out")}
+function pendingObservations(){try{return JSON.parse(localStorage.getItem(noteQueueKey())||"[]")}catch(e){return[]}}
+function queueObservation(row){var q=pendingObservations();q.push(row);localStorage.setItem(noteQueueKey(),JSON.stringify(q));updateNet()}
+async function syncOfflineObservations(){if(!navigator.onLine||S.role!=="teacher"||S.syncingNotes)return;var q=pendingObservations();if(!q.length)return;S.syncingNotes=true;
+ try{while(q.length&&navigator.onLine){var r=await sb.rpc("save_student_observation_v3",q[0]);if(r.error)break;q.shift();localStorage.setItem(noteQueueKey(),JSON.stringify(q))}}
+ finally{S.syncingNotes=false;var state=el("netState");if(state)state.textContent=q.length?"● "+q.length+" Notiz ausstehend":"● Synchronisiert"}
+ if(!q.length){toast("Notizen synchronisiert");if(S.studentTab==="notes")await loadNotesTab()}
 }
 async function deleteObservation(id){
  if(!confirm("Diese Beobachtung löschen?"))return;
@@ -1279,10 +1295,10 @@ async function deleteObservation(id){
  else if(S.studentTab==="development")await refreshTeacherDevelopment();
  else await loadNotesTab()
 }
-function renderObservationList(list){
+function renderObservationList(list,selectable){
  if(!list||!list.length)return '<div class="dev-empty">Noch keine Beobachtungen in diesem Zeitraum.</div>';
  return list.map(function(o){
-   return '<div class="dev-note"><div class="dev-note-head"><div><span class="dev-note-category">'+esc(observationCategoryLabel(o.category))+'</span> <b>'+esc(fmtDate(o.observed_on))+'</b></div>'+(o.can_delete?'<button class="btn secondary small" onclick="APP.deleteObservation(\''+o.id+'\')">Löschen</button>':'')+'</div><p>'+esc(o.note)+'</p>'+(o.goal_snapshot?'<div class="dev-note-goal">🎯 '+esc(o.goal_snapshot)+'</div>':'')+(o.segment_no?'<div class="dev-note-goal">'+esc(segmentLabel(Number(o.segment_no)))+'</div>':'')+'</div>'
+   return '<div class="dev-note"><div class="dev-note-head"><div>'+(selectable?'<label class="note-pdf-choice"><input type="checkbox" class="pdfNote" value="'+esc(o.id)+'" checked> Für PDF</label> ':'')+'<span class="dev-note-category">'+esc(observationCategoryLabel(o.category))+'</span> <b>'+esc(fmtDate(o.observed_on))+'</b></div>'+(o.can_delete?'<button class="btn secondary small" onclick="APP.deleteObservation(\''+o.id+'\')">Löschen</button>':'')+'</div><p>'+esc(o.note)+'</p>'+(o.goal_snapshot?'<div class="dev-note-goal">🎯 '+esc(o.goal_snapshot)+'</div>':'')+(o.segment_no?'<div class="dev-note-goal">'+esc(segmentLabel(Number(o.segment_no)))+'</div>':'')+'</div>'
  }).join("")
 }
 function renderObservationFilters(prefix,list){
@@ -1294,7 +1310,7 @@ function renderObservationFilters(prefix,list){
 function filterObservations(prefix){
  if(!["teacherNotes","teacherDev","gradeDev"].includes(prefix))return;
  var list=prefix==="teacherNotes"?S.noteData||[]:S.developmentData&&S.developmentData.observations||[],goal=el(prefix+"GoalFilter").value,segment=el(prefix+"SegmentFilter").value;
- el(prefix+(prefix==="teacherNotes"?"List":"Notes")).innerHTML=renderObservationList(list.filter(function(o){return (!goal||o.goal_snapshot===goal)&&(!segment||Number(o.segment_no)===Number(segment))}))
+ el(prefix+(prefix==="teacherNotes"?"List":"Notes")).innerHTML=renderObservationList(list.filter(function(o){return (!goal||o.goal_snapshot===goal)&&(!segment||Number(o.segment_no)===Number(segment))}),prefix!=="teacherNotes")
 }
 async function loadNotesTab(){
  if(!S.student)return;
@@ -1372,10 +1388,21 @@ async function exportDevelopmentPdf(){
  pdfHeader(doc,"MILO · Gesprächsübersicht",name+" · "+fmtDate(d.from)+" bis "+fmtDate(d.to));
  var t=d.totals||{},rated=Number(t.rated_count||0),good=Number(t.good_count||0),pct=rated?Math.round(good/rated*100):0,y=35;
  doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Dokumentation",14,y);doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text(rated+" Rückmeldungen · "+pct+" % positiv · "+Number(t.weeks_with_plan||0)+" Wochen mit Plan · "+Number(t.observations||0)+" Beobachtungen",14,y+6);y+=16;
- var summary=developmentSummaryText(d),parts=doc.splitTextToSize(summary,180);doc.setFontSize(9);
+ var weeks=(d.weeks||[]).filter(function(w){return Number(w.rated_count||0)>0});
+ if(weeks.length){doc.setFont("helvetica","bold");doc.setFontSize(10);doc.text("Anteil positiver Rückmeldungen",14,y);y+=8;
+  doc.setDrawColor(205,218,222);doc.line(19,y+32,190,y+32);doc.line(19,y+16,190,y+16);doc.line(19,y,190,y);
+  doc.setDrawColor(14,145,130);doc.setFillColor(14,145,130);
+  weeks.forEach(function(w,i){var n=Number(w.rated_count),v=Number(w.good_count)/n,x=19+(weeks.length===1?85:i*171/(weeks.length-1)),cy=y+32-v*32;
+   if(i){var previous=weeks[i-1],last=Number(previous.good_count)/Number(previous.rated_count),px=19+(weeks.length===1?85:(i-1)*171/(weeks.length-1));doc.line(px,y+32-last*32,x,cy)}
+   doc.circle(x,cy,1.3,"F")
+  });y+=42;
+ }
+ var source=S.developmentContext==="grade"?"gradeDevNotes":"teacherDevNotes",selected=Array.from(document.querySelectorAll("#"+source+" .pdfNote:checked")).map(function(x){return x.value}),selectedData=(d.observations||[]).filter(function(o){return selected.includes(String(o.id))}),report=Object.assign({},d,{observations:selectedData});
+ var summary=developmentSummaryText(report),parts=doc.splitTextToSize(summary,180);doc.setFontSize(9);
  parts.forEach(function(line){if(y>278){doc.addPage();y=18}doc.text(line,14,y);y+=4.4});
  y+=5;doc.setFont("helvetica","bold");doc.text("Wochenverlauf",14,y);y+=6;doc.setFont("helvetica","normal");
  (d.weeks||[]).forEach(function(w){var total=Number(w.rated_count||0),g=Number(w.good_count||0),p=total?Math.round(g/total*100):0;if(y>278){doc.addPage();y=18}doc.text(fmtDate(w.week_start)+" · "+p+" % positiv · "+String(w.goal||"").slice(0,95),14,y);y+=5});
+ if(selectedData.length){y+=7;if(y>267){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.text("Ausgewählte Beobachtungen",14,y);y+=7;doc.setFont("helvetica","normal");selectedData.forEach(function(o){var label=fmtDate(o.observed_on)+(o.segment_no?" · "+segmentLabel(Number(o.segment_no)):"")+" · "+o.note,lines=doc.splitTextToSize(label,180);lines.forEach(function(line){if(y>278){doc.addPage();y=18}doc.text(line,14,y);y+=4.4});y+=3})}
  if(S.aiAnalysisText){y+=5;if(y>255){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.text("KI-Entwurf (pädagogisch zu prüfen)",14,y);y+=6;doc.setFont("helvetica","normal");var ai=doc.splitTextToSize(S.aiAnalysisText,180);ai.forEach(function(line){if(y>278){doc.addPage();y=18}doc.text(line,14,y);y+=4.4})}
  doc.save("MILO_Elternsprechtag_"+safeName(name)+".pdf")
 }
@@ -1786,7 +1813,7 @@ function queue(){clearTimeout(reload);reload=setTimeout(async function(){
  var sid=S.student&&S.student.id;await load();if(S.role==="teacher"&&sid){S.student=S.students.find(function(x){return x.id===sid});if(S.student)openStudent(sid)}
 },320)}
 function stopRealtime(){S.channels.forEach(function(c){sb.removeChannel(c)});S.channels=[]}
-function updateNet(){var n=navigator.onLine;el("netState").textContent=n?"● Online":"● Offline";el("netState").classList.toggle("online",n);el("netState").classList.toggle("offline",!n);if(n)syncOfflineRatings()}
+function updateNet(){var n=navigator.onLine,p=S.user?pendingObservations().length:0;el("netState").textContent=n?p?"● "+p+" Notiz ausstehend":"● Synchronisiert":p?"● Offline · "+p+" Notiz vorgemerkt":"● Offline";el("netState").classList.toggle("online",n);el("netState").classList.toggle("offline",!n);if(n){syncOfflineRatings();syncOfflineObservations()}}
 window.addEventListener("online",updateNet);window.addEventListener("offline",updateNet);updateNet();updateDateUI();setInterval(updateDateUI,60000);
 
 window.APP={
