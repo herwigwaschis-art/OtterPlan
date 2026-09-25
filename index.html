@@ -223,7 +223,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
     <div id="teacherDetail" style="display:none">
       <div class="detail-toolbar">
         <button class="btn secondary" onclick="APP.back()">← Klasse</button>
-        <div class="teacher-actions"><button class="btn" onclick="APP.checkin()">🎯 Ziel</button><button class="btn ghost" onclick="APP.checkout()">✅ Woche abschließen</button><button class="btn ghost" onclick="APP.reward()">🐚 Belohnung</button><button class="btn ghost" onclick="APP.previewChild()">Schüleransicht</button><button class="btn ghost" onclick="APP.openStudentMore()">Mehr …</button></div>
+        <div class="teacher-actions"><button class="btn" onclick="APP.checkin()">🎯 Ziel</button><button class="btn ghost" onclick="APP.checkout()">✅ Woche abschließen</button><button class="btn ghost" onclick="APP.reward()">🐚 Belohnung</button><button class="btn ghost" onclick="APP.markStudentAbsentToday()">Abwesend heute</button><button class="btn ghost" onclick="APP.previewChild()">Schüleransicht</button><button class="btn ghost" onclick="APP.openStudentMore()">Mehr …</button></div>
       </div>
       <div class="hero centered"><div><h2 id="teacherName"></h2><p id="teacherMeta" class="muted"></p></div></div>
       <div class="student-tabs">
@@ -511,7 +511,7 @@ var BUILTIN_GOALS=[
  {title:"Friedlich lösen",goal:"Ich löse Streit friedlich.",help:"Ich stoppe, spreche ruhig und hole Hilfe, wenn ich sie brauche."}
 ];
 var BUILTIN_REWARDS=[{title:"Sticker auswählen",shells:5},{title:"Spiel auswählen",shells:10},{title:"Wunschbelohnung",shells:20}];
-var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],timetable:[],scheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,gradeStudentData:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null,weekOffset:0,gradeFilter:"all",gradeClassFilter:"all",gradeQuickMode:false,gradeQuickIndex:0,undoRating:null,undoTimer:null,adminTeacherEdit:null,studentTab:"plan",developmentData:null,developmentContext:"teacher",developmentStudentId:null,aiAnalysisText:"",initialStartResolved:false,pendingStartGrade:null};
+var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],absences:[],timetable:[],scheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,gradeStudentData:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null,weekOffset:0,gradeFilter:"all",gradeClassFilter:"all",gradeQuickMode:false,gradeQuickIndex:0,undoRating:null,undoTimer:null,adminTeacherEdit:null,studentTab:"plan",developmentData:null,developmentContext:"teacher",developmentStudentId:null,aiAnalysisText:"",initialStartResolved:false,pendingStartGrade:null};
 var idleTimer=null,reload=null;
 
 function el(id){return document.getElementById(id)}
@@ -548,6 +548,16 @@ function currentWeekDate(){var d=new Date(),n=d.getDay()||7;d.setHours(12,0,0,0)
 function selectedWeekDate(){var d=currentWeekDate();d.setDate(d.getDate()+Number(S.weekOffset||0)*7);return d}
 function dateISO(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function week(){return dateISO(selectedWeekDate())}
+function weekDayISO(day){var d=selectedWeekDate();d.setDate(d.getDate()+day-1);return dateISO(d)}
+function isAbsent(sid,day,lesson){var date=weekDayISO(day);return (S.absences||[]).some(function(x){return x.student_id===sid&&x.absent_on===date&&(Number(x.segment_no)===0||Number(x.segment_no)===Number(lesson))})}
+async function toggleAbsence(sid,day,lesson,allDay){var date=weekDayISO(day),segment=allDay?0:Number(lesson),existing=(S.absences||[]).find(function(x){return x.student_id===sid&&x.absent_on===date&&Number(x.segment_no)===segment});
+ if(!existing&&S.ratings.some(function(r){return r.student_id===sid&&Number(r.weekday)===Number(day)&&(allDay||Number(r.lesson_no)===segment)})){toast("Es gibt bereits eine Bewertung. Kläre sie vor der Abwesenheitsmarkierung.");return}
+ var req=existing?sb.from("student_absences").delete().eq("student_id",sid).eq("absent_on",date).eq("segment_no",segment):sb.from("student_absences").insert({student_id:sid,absent_on:date,segment_no:segment,created_by:S.user.id});
+ var r=await req;if(r.error){toast("Abwesenheit konnte nicht gespeichert werden");return}
+ if(existing)S.absences=S.absences.filter(function(x){return x!==existing});else S.absences.push({student_id:sid,absent_on:date,segment_no:segment});
+ renderHome();if(el("quickRatingModal").classList.contains("show"))renderQuickRating();toast(existing?"Abwesenheit entfernt":"Abwesenheit gespeichert")
+}
+function markStudentAbsentToday(){if(!S.student)return;var day=isCurrentWeek()?new Date().getDay():0;if(day<1||day>5){toast("Wähle zunächst eine Unterrichtswoche");return}toggleAbsence(S.student.id,day,0,true)}
 function isCurrentWeek(){return Number(S.weekOffset||0)===0}
 function weekRangeLabel(){
  var a=selectedWeekDate(),b=new Date(a);b.setDate(b.getDate()+4);
@@ -664,7 +674,7 @@ async function load(){
    }
    if(S.schoolRow){S.schoolRow=S.schools.find(function(x){return x.id===S.schoolRow.id})||S.schools[0]||null}else S.schoolRow=S.schools[0]||null;
    if(!S.classRow){
-     S.students=[];S.timetable=[];S.scheduleSlots=[];S.plans=[];S.ratings=[];S.rewards=[];S.progress=[];renderTeacherShell();renderHome();show("teacher");
+     S.students=[];S.absences=[];S.timetable=[];S.scheduleSlots=[];S.plans=[];S.ratings=[];S.rewards=[];S.progress=[];renderTeacherShell();renderHome();show("teacher");
      if(S.pendingStartGrade){var g=S.pendingStartGrade;S.pendingStartGrade=null;setTimeout(function(){openGradeOverview(g)},40)}
      return
    }
@@ -675,9 +685,10 @@ async function load(){
      ids.length?sb.from("ratings").select("*").in("student_id",ids).eq("week_start",w):Promise.resolve({data:[]}),
      ids.length?sb.from("rewards").select("*").in("student_id",ids).eq("active",true):Promise.resolve({data:[]}),
      ids.length?sb.from("student_progress").select("*").in("student_id",ids):Promise.resolve({data:[]}),
-     ids.length?sb.from("student_schedule_slots").select("*").in("student_id",ids):Promise.resolve({data:[]})
+     ids.length?sb.from("student_schedule_slots").select("*").in("student_id",ids):Promise.resolve({data:[]}),
+      ids.length?sb.from("student_absences").select("*").in("student_id",ids).gte("absent_on",w).lte("absent_on",weekDayISO(5)):Promise.resolve({data:[]})
    ]);
-   S.timetable=[];S.plans=q[0].data||[];S.ratings=q[1].data||[];S.rewards=q[2].data||[];S.progress=q[3].data||[];S.scheduleSlots=q[4].data||[];
+   S.timetable=[];S.plans=q[0].data||[];S.ratings=q[1].data||[];S.rewards=q[2].data||[];S.progress=q[3].data||[];S.scheduleSlots=q[4].data||[];S.absences=q[5].data||[];
    renderTeacherShell();renderHome();show("teacher");
  }else if(S.role==="student"){
    var link=await sb.from("student_device_links").select("student_id").eq("user_id",S.user.id).maybeSingle();var sid=link.data&&link.data.student_id;
@@ -1084,6 +1095,7 @@ async function undoLastRating(){
  var sid=S.student&&S.student.id;await load();if(sid&&S.students.some(function(x){return x.id===sid}))openStudent(sid);if(u.source==="quick"&&el("quickRatingModal").classList.contains("show"))renderQuickRating();toast("Bewertung zurückgenommen")
 }
 async function saveRating(v){
+ if(isAbsent(S.student.id,S.entry.weekday,S.entry.lesson_no)){toast("Kind ist als abwesend markiert");return}
  var previous=rating(S.student.id,S.entry.weekday,S.entry.lesson_no);
  var row={student_id:S.student.id,week_start:week(),weekday:S.entry.weekday,lesson_no:S.entry.lesson_no,rating:v,updated_by:S.user.id};
  if(S.teacherArea==="grade"&&S.gradeStudentData){
@@ -1333,9 +1345,9 @@ function renderQuickRating(){
  var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value);
  el("quickLessonChips").innerHTML=SEGMENTS.map(function(n){return '<button class="quick-lesson '+(n===lesson?'active':'')+'" onclick="APP.setQuickLesson('+n+')">'+segmentLabel(n)+'</button>'}).join("");
  var kids=S.students.filter(function(s){return slotEnabled(s.id,day,lesson)});
- var withGoal=kids.filter(function(s){return !!plan(s.id)});
+ var withGoal=kids.filter(function(s){return !!plan(s.id)&&!isAbsent(s.id,day,lesson)});
  var done=withGoal.filter(function(s){return !!rating(s.id,day,lesson)}).length;
- var noGoal=kids.length-withGoal.length,pct=withGoal.length?Math.round(done/withGoal.length*100):0;
+ var noGoal=kids.filter(function(s){return !plan(s.id)}).length,pct=withGoal.length?Math.round(done/withGoal.length*100):0;
  el("quickRatingProgress").textContent=done+" von "+withGoal.length+" bewertet"+(noGoal?" · "+noGoal+" ohne Ziel":"");
  el("quickRatingContext").textContent=DAYS[day-1]+" · "+segmentLabel(lesson)+(day===new Date().getDay()&&isCurrentWeek()?" · "+currentSchoolPhase():"");
  el("quickRatingProgressBar").style.width=pct+"%";
@@ -1344,11 +1356,14 @@ function renderQuickRating(){
  el("quickRatingList").innerHTML=kids.map(function(s){
    var r=rating(s.id,day,lesson),p=plan(s.id);
    function b(v,face,label){return '<button class="quick-face '+(r&&r.rating===v?'selected':'')+'" aria-label="'+label+'" title="'+label+'" onclick="APP.quickRate(\''+s.id+'\',\''+v+'\')">'+face+'</button>'}
-   var actions=p?'<div class="quick-rating-actions">'+b("good","😊","Geschafft")+b("partial","😐","Teilweise")+b("difficult","🙁","Noch nicht")+'</div>':'<button class="quick-missing-goal" onclick="APP.quickGoal(\''+s.id+'\')">🎯 Ziel fehlt</button>';
+   var absent=isAbsent(s.id,day,lesson),whole=(S.absences||[]).some(function(x){return x.student_id===s.id&&x.absent_on===weekDayISO(day)&&Number(x.segment_no)===0});
+   var actions=absent?'<span class="status-chip">Abwesend'+(whole?' heute':'')+'</span>':p?'<div class="quick-rating-actions">'+b("good","😊","Geschafft")+b("partial","😐","Teilweise")+b("difficult","🙁","Noch nicht")+'</div>':'<button class="quick-missing-goal" onclick="APP.quickGoal(\''+s.id+'\')">🎯 Ziel fehlt</button>';
+   actions+='<button type="button" class="btn secondary small" title="Abwesenheit umschalten" onclick="APP.toggleAbsence(\''+s.id+'\','+day+','+(whole?0:lesson)+','+(whole?'true':'false')+')">'+(absent?'Anwesend':'Abwesend')+'</button>';
    return '<div class="quick-rating-row '+(r?'done':'')+'"><div class="quick-rating-person"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div style="min-width:0"><div class="quick-rating-name">'+esc(s.display_name)+'</div><div class="quick-rating-goal">'+esc(p?p.goal:"Noch kein Wochenziel")+'</div></div></div>'+actions+'</div>'
  }).join("")||'<div class="dev-empty">Für diese Stunde sind keine Kinder eingetragen.</div>';
 }
 async function quickRate(sid,value){
+ if(isAbsent(sid,Number(el("quickDay").value),Number(el("quickLesson").value))){toast("Kind ist als abwesend markiert");return}
  if(!plan(sid)){toast("Bitte zuerst ein Wochenziel vergeben");return}
  var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value),old=rating(sid,day,lesson),previous=old?{rating:old.rating}:null;
  var row={student_id:sid,week_start:week(),weekday:day,lesson_no:lesson,rating:value,updated_by:S.user.id};
@@ -1644,7 +1659,7 @@ window.APP={
  login:login,logout:logout,openGlobalSearch:openGlobalSearch,filterGlobalSearch:filterGlobalSearch,selectGlobalStudent:selectGlobalStudent,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
  showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,setQuickLesson:setQuickLesson,quickNextLesson:quickNextLesson,quickPrevLesson:quickPrevLesson,quickGoal:quickGoal,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
- dragClass:dragClass,dropClass:dropClass,filterStudents:filterStudents,resetStudentFilters:resetStudentFilters,dictateObservation:dictateObservation,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekStart:openWeekStart,openWeekStartStudent:openWeekStartStudent,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
+ dragClass:dragClass,dropClass:dropClass,toggleAbsence:toggleAbsence,markStudentAbsentToday:markStudentAbsentToday,filterStudents:filterStudents,resetStudentFilters:resetStudentFilters,dictateObservation:dictateObservation,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekStart:openWeekStart,openWeekStartStudent:openWeekStartStudent,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
  checkin:checkin,fillCheckinTemplate:fillCheckinTemplate,pickCheckin:pickCheckin,saveCheckin:saveCheckin,
  checkout:checkout,pickCheckoutSelf:pickCheckoutSelf,pickCheckoutDecision:pickCheckoutDecision,saveCheckout:saveCheckout,
  openBatchGoals:openBatchGoals,fillBatchTemplate:fillBatchTemplate,applyBatchGoal:applyBatchGoal,saveGoalTemplate:saveGoalTemplate,deleteGoalTemplate:deleteGoalTemplate,carryGoals:carryGoals,
