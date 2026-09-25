@@ -468,6 +468,40 @@ function fmtDate(s){if(!s)return"";var p=s.split("-");return p.length===3?p[2]+"
 function cap(v){v=String(v||"");return v?v.charAt(0).toUpperCase()+v.slice(1):v}
 function todayLong(){return cap(new Intl.DateTimeFormat("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(new Date()))}
 function todayShort(){return cap(new Intl.DateTimeFormat("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"}).format(new Date()))}
+function startPrefKey(){return "milo_start_pref_"+(S.user?S.user.id:"device")}
+function getStartPreference(){
+ try{
+   var raw=localStorage.getItem(startPrefKey()),p=raw?JSON.parse(raw):{};
+   return {
+     mode:p.mode||"last",
+     fixedType:p.fixedType||null,
+     fixedClassId:p.fixedClassId||null,
+     fixedGrade:p.fixedGrade||null,
+     lastType:p.lastType||null,
+     lastClassId:p.lastClassId||null,
+     lastGrade:p.lastGrade||null
+   }
+ }catch(e){return {mode:"last"}}
+}
+function writeStartPreference(p){localStorage.setItem(startPrefKey(),JSON.stringify(p||{}))}
+function rememberLastView(type,value){
+ if(!S.user)return;var p=getStartPreference();
+ if(type==="class"){p.lastType="class";p.lastClassId=value;p.lastGrade=null}
+ if(type==="grade"){p.lastType="grade";p.lastGrade=Number(value);p.lastClassId=null}
+ writeStartPreference(p)
+}
+function resolveInitialStart(){
+ var p=getStartPreference(),classId=null,grade=null;
+ if(p.mode==="class")classId=p.fixedClassId;
+ else if(p.mode==="grade")grade=Number(p.fixedGrade||0)||null;
+ else if(p.mode==="last"){
+   if(p.lastType==="class")classId=p.lastClassId;
+   if(p.lastType==="grade")grade=Number(p.lastGrade||0)||null
+ }
+ if(classId&&!S.classes.some(function(x){return x.id===classId}))classId=null;
+ if(grade&&!S.gradeLinks.some(function(x){return Number(x.grade_level)===grade}))grade=null;
+ return {classId:classId,grade:grade}
+}
 function updateDateUI(){
  var map={todayBadge:"📅 "+todayShort(),classToday:"📅 "+todayLong(),gradeDate:"📅 "+todayLong(),childDate:"📅 "+todayLong(),gradeStudentDate:isCurrentWeek()?todayShort():"Woche "+weekRangeLabel(),quickRatingDate:isCurrentWeek()?"📅 "+todayLong():"📅 Woche "+weekRangeLabel()};
  Object.keys(map).forEach(function(id){var x=el(id);if(x)x.textContent=map[id]});
@@ -518,9 +552,20 @@ async function load(){
      sb.from("grade_teacher_links").select("*").eq("user_id",S.user.id)
    ]);
    S.classes=all[0].data||[];S.goalTemplates=all[1].data||[];S.rewardTemplates=all[2].data||[];S.schools=all[3].data||[];S.schoolMemberships=all[4].data||[];S.schoolSettings=all[5].data||[];S.gradeLinks=all[6].data||[];
-   if(S.classRow){S.classRow=S.classes.find(function(x){return x.id===S.classRow.id})||S.classes[0]||null}else S.classRow=S.classes[0]||null;
+   if(!S.initialStartResolved){
+     var start=resolveInitialStart();
+     S.classRow=start.classId?S.classes.find(function(x){return x.id===start.classId})||null:null;
+     S.pendingStartGrade=start.grade||null;
+     S.initialStartResolved=true;
+   }else if(S.classRow){
+     S.classRow=S.classes.find(function(x){return x.id===S.classRow.id})||null;
+   }
    if(S.schoolRow){S.schoolRow=S.schools.find(function(x){return x.id===S.schoolRow.id})||S.schools[0]||null}else S.schoolRow=S.schools[0]||null;
-   if(!S.classRow){S.students=[];S.timetable=[];S.scheduleSlots=[];S.plans=[];S.ratings=[];S.rewards=[];S.progress=[];renderTeacherShell();renderHome();show("teacher");return}
+   if(!S.classRow){
+     S.students=[];S.timetable=[];S.scheduleSlots=[];S.plans=[];S.ratings=[];S.rewards=[];S.progress=[];renderTeacherShell();renderHome();show("teacher");
+     if(S.pendingStartGrade){var g=S.pendingStartGrade;S.pendingStartGrade=null;setTimeout(function(){openGradeOverview(g)},40)}
+     return
+   }
    var st=await sb.from("students").select("*").eq("class_id",S.classRow.id).is("archived_at",null).order("sort_order").order("display_name");
    S.students=st.data||[];var ids=S.students.map(function(x){return x.id});
    var q=await Promise.all([
@@ -576,8 +621,8 @@ function renderTeacherShell(){
    }
  }else{
    switchBtn.disabled=false;
-   switchName.textContent=S.classRow?S.classRow.name:"Klasse wählen";
-   el("classMeta").textContent=S.classRow?(S.classRow.grade_level?"Stufe "+S.classRow.grade_level+" · ":"")+(S.classRow.school_year||""):"";
+   switchName.textContent=S.classRow?S.classRow.name:"MILO Start";
+   el("classMeta").textContent=S.classRow?(S.classRow.grade_level?"Stufe "+S.classRow.grade_level+" · ":"")+(S.classRow.school_year||""):"Klasse oder Gesamtüberblick auswählen";
  }
  var admins=adminSchools();
  var showAdmin=admins.length>0||S.schools.length===0;
@@ -599,13 +644,13 @@ function openClassChooser(){
  modal("classChooserModal",true)
 }
 async function chooseClass(id){
- if(S.classRow&&S.classRow.id===id){modal("classChooserModal",false);return}
+ if(S.classRow&&S.classRow.id===id){modal("classChooserModal",false);rememberLastView("class",id);return}
  var next=S.classes.find(function(x){return x.id===id});
  if(!next)return;
  modal("classChooserModal",false);
  el("teacherHome").classList.add("class-loading");
  el("classSwitchName").textContent=next.name;
- S.classRow=next;S.student=null;
+ S.classRow=next;S.student=null;rememberLastView("class",id);
  try{await load();showTeacherArea("class")}finally{el("teacherHome").classList.remove("class-loading")}
 }
 async function switchClass(id){return chooseClass(id)}
@@ -642,7 +687,7 @@ function leaveAdmin(){showTeacherArea("class")}
 
 async function openGradeOverview(grade){
  modal("classChooserModal",false);
- S.gradeLevel=Number(grade);
+ S.gradeLevel=Number(grade);rememberLastView("grade",S.gradeLevel);
  S.gradeActivePlan=null;S.gradeStudentData=null;S.student=null;S.gradeQuickMode=false;S.gradeFilter="all";S.gradeClassFilter="all";
  el("gradeOverviewContent").style.display="block";el("gradeStudentDetail").style.display="none";
  showTeacherArea("grade");
@@ -761,7 +806,7 @@ function gradeCheckout(i){
  S.student={id:x.student_id,display_name:x.display_name,avatar_emoji:x.avatar_emoji};
  checkout()
 }
-function backFromGrade(){S.gradeQuickMode=false;S.gradeActivePlan=null;S.gradeStudentData=null;S.student=null;S.gradeRows=[];S.ratings=[];S.scheduleSlots=[];showTeacherArea("class");if(!S.classRow&&S.gradeLinks.length)setTimeout(openClassChooser,80)}
+function backFromGrade(){S.gradeQuickMode=false;S.gradeActivePlan=null;S.gradeStudentData=null;S.student=null;S.gradeRows=[];S.ratings=[];S.scheduleSlots=[];showTeacherArea("class");renderHome()}
 
 function renderHome(){
  el("teacherHome").style.display="block";el("teacherDetail").style.display="none";updateDateUI();
