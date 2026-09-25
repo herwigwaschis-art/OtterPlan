@@ -132,6 +132,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
   <a class="brand" href="./" aria-label="MILO Auswahlmenü öffnen" title="Zum Auswahlmenü"><img class="brand-logo-img" src="./milo-wordmark.svg" alt="MILO"></a>
   <div id="session" class="top-menu-wrap" style="display:none" onclick="event.stopPropagation()">
     <span id="todayBadge" class="today-badge"></span>
+     <button id="globalSearchButton" class="menu-trigger" style="display:none;font-size:21px" aria-label="Kind suchen" title="Kind suchen" onclick="APP.openGlobalSearch()">⌕</button>
     <button class="menu-trigger" aria-label="Menü öffnen" onclick="APP.toggleTopMenu()">☰</button>
     <div id="topMenu" class="menu-pop">
       <div class="menu-user"><b id="sessionLabel"></b><span>MILO</span></div>
@@ -328,6 +329,11 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
 </section>
 </main>
 
+<div id="globalSearchModal" class="modal-bg"><div class="modal">
+  <div class="toolbar" style="justify-content:space-between"><h2 style="margin:0">Kind finden</h2><button class="modal-close-x" aria-label="Suche schließen" onclick="APP.close('globalSearchModal')">×</button></div>
+  <label for="globalSearchInput">Name</label><input id="globalSearchInput" type="search" placeholder="Name eingeben …" autocomplete="off" oninput="APP.filterGlobalSearch()">
+  <div id="globalSearchResults" class="list" style="margin-top:16px" role="status" aria-live="polite"></div>
+</div></div>
 <div id="classChooserModal" class="modal-bg"><div class="modal">
   <div class="eyebrow">Klassen</div>
   <h2 style="margin:5px 0 4px">Klasse wechseln</h2>
@@ -620,14 +626,14 @@ function norm(v){v=String(v||"").trim();if(v.indexOf("otterplan:")===0)v=v.slice
 async function scan(){if(!window.Html5Qrcode){toast("Kamera nicht verfügbar");return}await stopScan();try{S.scanner=new Html5Qrcode("qr-reader");await S.scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:220,height:220}},function(code){el("childToken").value=norm(code);stopScan().then(redeem)},function(){})}catch(e){toast("Kamera konnte nicht gestartet werden")}}
 async function stopScan(){if(S.scanner){try{await S.scanner.stop()}catch(e){}try{S.scanner.clear()}catch(e){}S.scanner=null}}
 async function redeem(){var token=norm(el("childToken").value);if(!token){toast("QR-Code fehlt");return}await stopScan();var ses=await sb.auth.getSession();if(ses.data.session&&S.role==="teacher"){toast("Kinderzugang bitte auf dem Kindergerät testen.");return}if(ses.data.session)await sb.auth.signOut();var a=await sb.auth.signInAnonymously();if(a.error){toast("Kinderzugang konnte nicht gestartet werden");return}var r=await sb.rpc("redeem_child_qr",{p_qr_token:token});if(r.error){await sb.auth.signOut();toast("QR-Code ungültig");return}el("childToken").value="";if(new URL(location.href).searchParams.has("child"))history.replaceState({},"",location.pathname);await bootstrap()}
-async function logout(){closeTopMenu();Object.keys(sessionStorage).filter(function(k){return k.indexOf("otter_admin_")===0}).forEach(function(k){sessionStorage.removeItem(k)});stopRealtime();await stopScan();await sb.auth.signOut();S.user=null;S.profile=null;S.role=null;S.weekOffset=0;S.gradeQuickMode=false;S.undoRating=null;S.classRow=null;S.student=null;S.initialStartResolved=false;S.pendingStartGrade=null;el("session").style.display="none";show("login")}
+async function logout(){closeTopMenu();Object.keys(sessionStorage).filter(function(k){return k.indexOf("otter_admin_")===0}).forEach(function(k){sessionStorage.removeItem(k)});stopRealtime();await stopScan();await sb.auth.signOut();S.user=null;S.profile=null;S.role=null;S.weekOffset=0;S.gradeQuickMode=false;S.undoRating=null;S.classRow=null;S.student=null;S.initialStartResolved=false;S.pendingStartGrade=null;el("session").style.display="none";el("globalSearchButton").style.display="none";show("login")}
 
 async function bootstrap(){
  var u=await sb.auth.getUser();if(!u.data.user){show("login");return}
  S.user=u.data.user;
  var p=await sb.from("profiles").select("*").eq("id",S.user.id).single();
  if(p.error||!p.data){toast("Profil fehlt");await logout();return}
- S.profile=p.data;S.role=p.data.role;el("session").style.display="flex";el("sessionLabel").textContent=(S.role==="teacher"?"👨‍🏫 ":"🧒 ")+(p.data.display_name||"");updateDateUI();
+ S.profile=p.data;S.role=p.data.role;el("session").style.display="flex";el("globalSearchButton").style.display=S.role==="teacher"?"grid":"none";el("sessionLabel").textContent=(S.role==="teacher"?"👨‍🏫 ":"🧒 ")+(p.data.display_name||"");updateDateUI();
  resetIdle();
  if(S.role==="teacher"){try{await sb.rpc("cleanup_archived_students")}catch(e){}}
  await load();
@@ -703,8 +709,22 @@ function renderPilotMode(){
  if(b){b.style.display="block";b.textContent=pilot?"🧪 Pilotmodus · nur Test- und Fantasiedaten verwenden":"MILO Schulmodus · schulische Freigaben bitte weiterhin eigenständig prüfen";b.style.background=pilot?"rgba(255,248,225,.84)":"rgba(238,246,244,.88)";b.style.color=pilot?"#7a5b14":"#48635d"}
  if(s){s.textContent=pilot?"🧪 Pilotmodus · nur Test- und Fantasiedaten verwenden":"Schulmodus · Freigaben bitte weiterhin eigenständig prüfen"}
 }
+async function openGlobalSearch(){if(S.role!=="teacher")return;el("globalSearchInput").value="";el("globalSearchResults").innerHTML='<p class="muted">Kinder werden geladen …</p>';modal("globalSearchModal",true);el("globalSearchInput").focus();
+ var list=[];
+ if(S.classes.length){var classIds=S.classes.map(function(x){return x.id});var own=await sb.from("students").select("id,display_name,avatar_emoji,class_id").in("class_id",classIds).is("archived_at",null).order("display_name");if(!own.error)(own.data||[]).forEach(function(x){var c=S.classes.find(function(k){return k.id===x.class_id});list.push({id:x.id,name:x.display_name,avatar:x.avatar_emoji,classId:x.class_id,className:c?c.name:"Klasse"})})}
+ var gradeResults=await Promise.all(S.gradeLinks.map(function(g){return sb.rpc("list_grade_plan_students_v2",{p_school_id:g.school_id,p_grade_level:Number(g.grade_level),p_week_start:week(),p_weekday:0})}));
+ gradeResults.forEach(function(result,i){if(result.error)return;(result.data||[]).forEach(function(x){if(!list.some(function(k){return k.id===x.student_id}))list.push({id:x.student_id,name:x.display_name,avatar:x.avatar_emoji,className:x.class_name,grade:S.gradeLinks[i].grade_level})})});
+ S.searchStudents=list.sort(function(a,b){return a.name.localeCompare(b.name,"de")});filterGlobalSearch()
+}
+function filterGlobalSearch(){var v=el("globalSearchInput").value.trim().toLocaleLowerCase("de"),rows=(S.searchStudents||[]).filter(function(x){return x.name.toLocaleLowerCase("de").indexOf(v)>=0}).slice(0,40);
+ el("globalSearchResults").innerHTML=rows.map(function(x){return '<button class="class-choice" onclick="APP.selectGlobalStudent(\''+x.id+'\')"><span><b>'+esc(x.avatar||"🦦")+' '+esc(x.name)+'</b><small style="display:block;color:var(--muted);font-size:13px">'+esc(x.className)+'</small></span><strong>→</strong></button>'}).join("")||'<p class="muted">Kein Kind gefunden.</p>'
+}
+async function selectGlobalStudent(id){var x=(S.searchStudents||[]).find(function(r){return r.id===id});if(!x)return;modal("globalSearchModal",false);
+ if(x.classId){await chooseClass(x.classId);openStudent(id)}else if(x.grade){await openGradeOverview(x.grade);await openGradeStudentById(id)}
+}
 function renderTeacherShell(){
  var switchName=el("classSwitchName"),switchBtn=el("classSwitchBtn");
+ el("globalSearchButton").style.display=S.role==="teacher"?"grid":"none";
  switchBtn.closest(".hero").style.display=S.classRow?"":"none";
  if(!S.classes.length){
    if(S.gradeLinks.length){
@@ -1619,7 +1639,7 @@ function updateNet(){var n=navigator.onLine;el("netState").textContent=n?"● On
 window.addEventListener("online",updateNet);window.addEventListener("offline",updateNet);updateNet();updateDateUI();setInterval(updateDateUI,60000);
 
 window.APP={
- login:login,logout:logout,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
+ login:login,logout:logout,openGlobalSearch:openGlobalSearch,filterGlobalSearch:filterGlobalSearch,selectGlobalStudent:selectGlobalStudent,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
  showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,setQuickLesson:setQuickLesson,quickNextLesson:quickNextLesson,quickPrevLesson:quickPrevLesson,quickGoal:quickGoal,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
  dragClass:dragClass,dropClass:dropClass,filterStudents:filterStudents,resetStudentFilters:resetStudentFilters,dictateObservation:dictateObservation,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekStart:openWeekStart,openWeekStartStudent:openWeekStartStudent,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
@@ -1634,7 +1654,7 @@ window.APP={
  attachClass:attachClass,createSchoolClass:createSchoolClass,openTeacherEditIndex:openTeacherEditIndex,saveTeacherEdit:saveTeacherEdit,openAdminClassEditIndex:openAdminClassEditIndex,saveAdminClassEdit:saveAdminClassEdit,archiveAdminClass:archiveAdminClass,renderAdminArea:renderAdminArea,createSchoolFromAdmin:createSchoolFromAdmin,saveAdminSettings:saveAdminSettings,createDemoStudent:createDemoStudent,deleteDemoStudents:deleteDemoStudents,createTeacherAccount:createTeacherAccount,resetTeacherPassword:resetTeacherPassword,removeSchoolMember:removeSchoolMember,resetTeacherPasswordIndex:resetTeacherPasswordIndex,removeSchoolMemberIndex:removeSchoolMemberIndex
 };
 
-sb.auth.onAuthStateChange(function(event,session){if(event==="SIGNED_OUT"&&!session){S.user=null;S.profile=null;S.role=null;el("session").style.display="none";show("login")}});
+sb.auth.onAuthStateChange(function(event,session){if(event==="SIGNED_OUT"&&!session){S.user=null;S.profile=null;S.role=null;el("session").style.display="none";el("globalSearchButton").style.display="none";show("login")}});
 sb.auth.getSession().then(function(r){var token=new URL(location.href).searchParams.get("child");if(token){el("childToken").value=norm(token);redeem();return}if(r.data.session)bootstrap()});
 if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js").then(function(r){r.update()}).catch(function(){})});
 })();
