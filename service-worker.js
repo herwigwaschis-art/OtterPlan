@@ -1,5 +1,5 @@
-const CACHE="milo-v36";
-const STATIC=["./","./index.html","./manifest.webmanifest","./milo-icon.svg","./milo-wordmark.svg"];
+const CACHE="milo-v37";
+const STATIC=["./","./?menu=1","./index.html","./manifest.webmanifest","./milo-icon.svg","./milo-icon-180.png","./milo-icon-192.png","./milo-icon-512.png","./milo-wordmark.svg"];
 const LIBRARIES=new Set([
   "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
   "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js",
