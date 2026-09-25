@@ -125,7 +125,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .week-ritual{max-width:980px;margin:0 auto 18px;padding:20px 24px;border:1px solid #cce4db;border-left:5px solid var(--accent);border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px}.week-ritual.friday{border-color:#e9dbb3;border-left-color:#d4a42f}.week-ritual h3{margin:0 0 6px;font-size:20px}.week-ritual p{margin:0;font-size:14px;color:var(--muted)}.week-ritual .btn{flex-shrink:0}.week-ritual .eyebrow{margin-bottom:5px}@media(max-width:600px){.week-ritual{padding:18px;align-items:stretch;flex-direction:column;gap:14px}.week-ritual .btn{width:100%}}
-</style>
+.voice-btn{float:right;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--accent);min-width:40px;min-height:36px;margin-top:-2px}.teacher-launcher-card[draggable=true]{cursor:grab}.teacher-launcher-card[draggable=true]:active{cursor:grabbing}@media(max-width:600px){.teacher-launcher-card{touch-action:manipulation}}</style>
 </head>
 <body>
 <header>
@@ -222,7 +222,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
     <div id="teacherDetail" style="display:none">
       <div class="detail-toolbar">
         <button class="btn secondary" onclick="APP.back()">← Klasse</button>
-        <div class="teacher-actions"><button class="btn" onclick="APP.checkin()">🎯 Ziel</button><button class="btn ghost" onclick="APP.checkout()">✅ Woche abschließen</button><button class="btn ghost" onclick="APP.reward()">🐚 Belohnung</button><button class="btn ghost" onclick="APP.openStudentMore()">Mehr …</button></div>
+        <div class="teacher-actions"><button class="btn" onclick="APP.checkin()">🎯 Ziel</button><button class="btn ghost" onclick="APP.checkout()">✅ Woche abschließen</button><button class="btn ghost" onclick="APP.reward()">🐚 Belohnung</button><button class="btn ghost" onclick="APP.previewChild()">Schüleransicht</button><button class="btn ghost" onclick="APP.openStudentMore()">Mehr …</button></div>
       </div>
       <div class="hero centered"><div><h2 id="teacherName"></h2><p id="teacherMeta" class="muted"></p></div></div>
       <div class="student-tabs">
@@ -240,7 +240,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
           <div class="quick-note-grid">
             <div><label for="planObsDate">Datum</label><input id="planObsDate" type="date"></div>
             <div><label for="planObsCategory">Art</label><select id="planObsCategory"><option value="observation">Beobachtung</option><option value="progress">Fortschritt</option><option value="challenge">Herausforderung</option><option value="strategy">Hilfreiche Strategie</option></select></div>
-            <div><label for="planObsText">Notiz</label><input id="planObsText" maxlength="2000" placeholder="z. B. sagt häufiger Stopp und fragt selbstständig um Hilfe"></div>
+            <div><label for="planObsText">Notiz</label><button type="button" class="voice-btn" title="Beobachtung diktieren" aria-label="Beobachtung diktieren" onclick="APP.dictateObservation('planObsText')">🎙</button><input id="planObsText" maxlength="2000" placeholder="z. B. sagt häufiger Stopp und fragt selbstständig um Hilfe"></div>
             <button class="btn small" onclick="APP.saveObservation('plan')">Speichern</button>
           </div>
         </div>
@@ -269,7 +269,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
             <div class="dev-controls" style="margin-bottom:8px">
               <div><label for="notesObsDate">Datum</label><input id="notesObsDate" type="date"></div>
               <div><label for="notesObsCategory">Art</label><select id="notesObsCategory"><option value="observation">Beobachtung</option><option value="progress">Fortschritt</option><option value="challenge">Herausforderung</option><option value="strategy">Hilfreiche Strategie</option></select></div>
-              <div style="grid-column:span 2"><label for="notesObsText">Notiz</label><textarea id="notesObsText" maxlength="2000" placeholder="Beschreibe möglichst konkret, was passiert ist."></textarea></div>
+              <div style="grid-column:span 2"><label for="notesObsText">Notiz</label><button type="button" class="voice-btn" title="Beobachtung diktieren" aria-label="Beobachtung diktieren" onclick="APP.dictateObservation('notesObsText')">🎙</button><textarea id="notesObsText" maxlength="2000" placeholder="Beschreibe möglichst konkret, was passiert ist."></textarea></div>
             </div>
             <button class="btn small" onclick="APP.saveObservation('notes')">Notiz speichern</button>
           </div>
@@ -282,7 +282,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
   <div id="gradeArea" style="display:none">
     <div id="gradeOverviewContent">
       <button class="btn secondary grade-back" onclick="APP.backFromGrade()">← Klassen</button>
-      <div class="section-center"><h2 id="gradeTitle" style="margin:0">Stufenüberblick</h2><p id="gradeDate" class="current-date-line"></p><p class="muted" style="margin:6px 0 0">Alle Kinder dieser Stufe mit einem Wochenplan.</p></div>
+      <div class="section-center"><h2 id="gradeTitle" style="margin:0">Stufenüberblick</h2><p id="gradeDate" class="current-date-line"></p><p class="muted" style="margin:6px 0 0">Alle Kinder dieser Stufe.</p></div>
       <div id="gradeSummary" class="grade-summary"></div>
       <div class="grade-filter-bar">
         <div class="filter-chips">
@@ -314,17 +314,17 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
   </div>
 </section>
 
-<section id="childView" class="screen">
+<section id="childView" class="screen"><button id="previewBack" class="btn secondary" style="display:none;margin-bottom:14px" onclick="APP.backFromChildPreview()">← Zur Lehrkraftansicht</button>
   <div id="childDate" class="current-date-line" style="margin-bottom:8px"></div>
   <div class="child-top"><h2 id="childTitle" class="child-name"></h2><div id="childShellBadge" class="child-shells">🐚 <span id="childShells"></span></div></div>
   <div class="child-main">
-    <div class="kid-card"><div class="kid-label">Mein Ziel</div><div id="childGoal" class="kid-goal"></div><div id="childHelp" class="kid-tip"></div></div>
+    <div class="kid-card"><div class="kid-label">Mein Ziel</div><div class="toolbar" style="align-items:center"><div id="childGoal" class="kid-goal" style="flex:1"></div><button class="btn secondary" aria-label="Ziel vorlesen" title="Ziel vorlesen" onclick="APP.speakGoal()">🔊</button></div><div id="childHelp" class="kid-tip"></div></div>
     <div class="kid-card kid-reward"><div><div class="kid-label">Belohnung</div><div id="childRewardTitle" class="kid-reward-title"></div></div><div><div id="childReward" class="kid-reward-count"></div><div class="progress"><div id="childBar"></div></div><div id="childRewardHint" class="kid-tip"></div></div></div>
   </div>
   <div class="child-mini"><div class="mini-card"><div id="childGood" class="mini-value">0</div><div class="mini-label">😊 geschafft</div></div><div class="mini-card"><div id="childRated" class="mini-value">0</div><div class="mini-label">bewertet</div></div></div>
   <div class="card" style="margin-bottom:15px"><div class="kid-label">Heute</div><div id="childToday" class="today-grid"></div></div>
   <div id="childCheckoutCard" class="card" style="display:none;margin-bottom:15px"><div class="checkout-compact"><div id="childCheckoutFace" class="checkout-face"></div><div class="checkout-copy"><b id="childCheckoutSelf"></b><span id="childCheckoutDecision"></span><div id="childCheckoutNote" style="margin-top:4px;font-size:11px"></div></div></div></div>
-  <details class="card clean"><summary>Ganze Woche anzeigen</summary><div id="childWeek" class="week" style="margin-top:13px"></div></details>
+  <div class="card"><h3 style="margin-top:0">Meine Woche</h3><div id="childWeek" class="week"></div></div>
 </section>
 </main>
 
@@ -449,7 +449,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
 <div id="adminGateModal" class="modal-bg"><div class="modal">
   <div class="eyebrow">Admin</div><h2 style="margin:5px 0 8px">Admin-Bereich öffnen</h2>
   <p class="muted" style="font-size:13px;margin-top:0">Kennwort eingeben.</p>
-  <label for="adminGateCode">Kennwort</label><input id="adminGateCode" type="password" autocomplete="off">
+  <label for="adminGateCode">Kennwort</label><input id="adminGateCode" type="password" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();APP.verifyAdminGate()}">
   <div class="toolbar" style="justify-content:flex-end;margin-top:16px"><button class="btn secondary" onclick="APP.close('adminGateModal')">Abbrechen</button><button class="btn" onclick="APP.verifyAdminGate()">Öffnen</button></div>
 </div></div>
 
@@ -603,7 +603,7 @@ function updateDateUI(){
  var w=el("weekNavLabel");if(w)w.textContent=(isCurrentWeek()?"Diese Woche · ":"")+weekRangeLabel();
  var n=el("teacherWeekNav");if(n)n.style.display=S.role==="teacher"&&(S.teacherArea==="grade"||S.teacherArea==="class"&&!!S.classRow)?"flex":"none"
 }
-function plan(sid){if(S.gradeActivePlan&&S.gradeActivePlan.student_id===sid)return S.gradeActivePlan;return S.plans.find(function(p){return p.student_id===sid})||null}
+function plan(sid){if(S.teacherArea==="grade")return S.gradeActivePlan&&S.gradeActivePlan.student_id===sid?S.gradeActivePlan:null;return S.plans.find(function(p){return p.student_id===sid})||null}
 function shells(sid){var p=S.progress.find(function(x){return x.student_id===sid});return p?p.shells||0:0}
 function rs(sid){return S.rewards.filter(function(r){return r.student_id===sid&&r.active}).sort(function(a,b){return a.shells_required-b.shells_required})}
 function rating(sid,day,lesson){return S.ratings.find(function(r){return r.student_id===sid&&Number(r.weekday)===Number(day)&&Number(r.lesson_no)===Number(lesson)})||null}
@@ -615,10 +615,11 @@ function resetIdle(){clearTimeout(idleTimer);if(S.role==="teacher")idleTimer=set
 async function login(){var email=el("email").value.trim(),password=el("password").value;if(!email||!password){toast("E-Mail und Passwort eingeben");return}var r=await sb.auth.signInWithPassword({email:email,password:password});if(r.error){toast("Anmeldung fehlgeschlagen");return}await bootstrap()}
 function openChild(){show("childLogin");setTimeout(scan,180)}
 function showLogin(){stopScan();show("login")}
+function childAccessUrl(token){var u=new URL(window.location.href);u.search="";u.hash="";u.searchParams.set("child",token);return u.href}
 function norm(v){v=String(v||"").trim();if(v.indexOf("otterplan:")===0)v=v.slice(10);return v}
 async function scan(){if(!window.Html5Qrcode){toast("Kamera nicht verfügbar");return}await stopScan();try{S.scanner=new Html5Qrcode("qr-reader");await S.scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:220,height:220}},function(code){el("childToken").value=norm(code);stopScan().then(redeem)},function(){})}catch(e){toast("Kamera konnte nicht gestartet werden")}}
 async function stopScan(){if(S.scanner){try{await S.scanner.stop()}catch(e){}try{S.scanner.clear()}catch(e){}S.scanner=null}}
-async function redeem(){var token=norm(el("childToken").value);if(!token){toast("QR-Code fehlt");return}await stopScan();var ses=await sb.auth.getSession();if(ses.data.session&&S.role==="teacher"){toast("Kinderzugang bitte auf dem Kindergerät testen.");return}if(ses.data.session)await sb.auth.signOut();var a=await sb.auth.signInAnonymously();if(a.error){toast("Kinderzugang konnte nicht gestartet werden");return}var r=await sb.rpc("redeem_child_qr",{p_qr_token:token});if(r.error){await sb.auth.signOut();toast("QR-Code ungültig");return}el("childToken").value="";await bootstrap()}
+async function redeem(){var token=norm(el("childToken").value);if(!token){toast("QR-Code fehlt");return}await stopScan();var ses=await sb.auth.getSession();if(ses.data.session&&S.role==="teacher"){toast("Kinderzugang bitte auf dem Kindergerät testen.");return}if(ses.data.session)await sb.auth.signOut();var a=await sb.auth.signInAnonymously();if(a.error){toast("Kinderzugang konnte nicht gestartet werden");return}var r=await sb.rpc("redeem_child_qr",{p_qr_token:token});if(r.error){await sb.auth.signOut();toast("QR-Code ungültig");return}el("childToken").value="";if(new URL(location.href).searchParams.has("child"))history.replaceState({},"",location.pathname);await bootstrap()}
 async function logout(){closeTopMenu();Object.keys(sessionStorage).filter(function(k){return k.indexOf("otter_admin_")===0}).forEach(function(k){sessionStorage.removeItem(k)});stopRealtime();await stopScan();await sb.auth.signOut();S.user=null;S.profile=null;S.role=null;S.weekOffset=0;S.gradeQuickMode=false;S.undoRating=null;S.classRow=null;S.student=null;S.initialStartResolved=false;S.pendingStartGrade=null;el("session").style.display="none";show("login")}
 
 async function bootstrap(){
@@ -736,7 +737,7 @@ function openClassChooser(){
      return '<button class="class-choice '+(active?'active':'')+'" onclick="APP.chooseClass(\''+x.id+'\')"><div><b>'+esc(x.name)+'</b><span>'+esc(meta)+'</span></div><strong>'+(active?'✓':'→')+'</strong></button>';
    }).join("")+'</div></div>';
  }).join("");
- var gradeChoices=S.gradeLinks.length?'<div class="chooser-overview"><div class="class-choice-title">Stufenüberblick</div><div class="class-choice-list">'+S.gradeLinks.map(function(g){return '<button class="class-choice" onclick="APP.openGradeOverview('+g.grade_level+')"><div><b>Stufe '+g.grade_level+' öffnen</b><span>Gesamtüberblick über alle Kinder mit Wochenplan</span></div><strong>→</strong></button>'}).join("")+'</div></div>':'';
+ var gradeChoices=S.gradeLinks.length?'<div class="chooser-overview"><div class="class-choice-title">Stufenüberblick</div><div class="class-choice-list">'+S.gradeLinks.map(function(g){return '<button class="class-choice" onclick="APP.openGradeOverview('+g.grade_level+')"><div><b>Stufe '+g.grade_level+' öffnen</b><span>Gesamtüberblick über alle Kinder der Stufe</span></div><strong>→</strong></button>'}).join("")+'</div></div>':'';
  el("classChooserList").innerHTML=classChoices+gradeChoices;
  modal("classChooserModal",true)
 }
@@ -816,7 +817,7 @@ function renderGradeOverview(){
  var ci=rows.filter(function(x){return x.checkin_completed}).length;
  var co=rows.filter(function(x){return !!x.checkout_self}).length;
  var todayDone=rows.filter(function(x){return Number(x.today_rated_count||0)>0}).length;
- el("gradeSummary").innerHTML='<div class="dash-card"><div class="dash-value">'+rows.length+'</div><div class="dash-label">Kinder mit Plan</div></div><div class="dash-card"><div class="dash-value">'+ci+'/'+rows.length+'</div><div class="dash-label">Check-in erledigt</div></div><div class="dash-card"><div class="dash-value">'+co+'/'+rows.length+'</div><div class="dash-label">Check-out erledigt</div></div>';
+ el("gradeSummary").innerHTML='<div class="dash-card"><div class="dash-value">'+rows.length+'</div><div class="dash-label">Kinder insgesamt</div></div><div class="dash-card"><div class="dash-value">'+ci+'/'+rows.length+'</div><div class="dash-label">Check-in erledigt</div></div><div class="dash-card"><div class="dash-value">'+co+'/'+rows.length+'</div><div class="dash-label">Check-out erledigt</div></div>';
  ["all","checkin","checkout","today"].forEach(function(v){var x=el("gradeFilter"+(v==="all"?"All":v==="checkin"?"Checkin":v==="checkout"?"Checkout":"Today"));if(x)x.classList.toggle("active",S.gradeFilter===v)});
  var todayFilter=el("gradeFilterToday");if(todayFilter)todayFilter.style.display=isCurrentWeek()?"inline-block":"none";
  var classes=[...new Set(rows.map(function(x){return x.class_name}))].sort();
@@ -830,7 +831,7 @@ function renderGradeOverview(){
      var idx=rows.indexOf(x);
      return '<div class="grade-plan-card"><h3>'+esc(x.avatar_emoji||"🦦")+' '+esc(x.display_name)+'</h3><div class="goal">'+esc(x.goal||"Noch kein Ziel")+'</div><div class="student-status"><span class="status-chip">'+ciText+'</span><span class="status-chip">'+coText+'</span>'+(todayText?'<span class="status-chip">'+todayText+'</span>':'')+'</div><div class="grade-plan-actions" style="margin-top:12px"><button class="btn small grade-plan-open" onclick="APP.gradeOpenStudent('+idx+')">Plan öffnen →</button><button class="btn secondary small" onclick="APP.gradeCheckin('+idx+')">Check-in</button><button class="btn secondary small" onclick="APP.gradeCheckout('+idx+')">Check-out</button></div></div>';
    }).join("")+'</div></section>';
- }).join("")||'<div class="card" style="text-align:center"><h3 style="margin:0 0 5px">'+(rows.length?"Keine Treffer":"Noch keine Wochenpläne")+'</h3><p class="muted" style="margin:0">'+(rows.length?"Passe den Filter an.":"Sobald Kinder in Stufe "+S.gradeLevel+" einen Plan haben, erscheinen sie hier.")+'</p></div>';
+ }).join("")||'<div class="card" style="text-align:center"><h3 style="margin:0 0 5px">'+(rows.length?"Keine Treffer":"Noch keine Kinder")+'</h3><p class="muted" style="margin:0">'+(rows.length?"Passe den Filter an.":"In Stufe "+S.gradeLevel+" sind noch keine aktiven Kinder zugeordnet.")+'</p></div>';
  if(isCurrentWeek()&&new Date().getDay()>=1&&new Date().getDay()<=5&&S.gradeFilter==="all"&&todayDone<rows.length){
    var t=el("gradeDate");if(t)t.textContent="📅 "+todayLong()+" · "+todayDone+"/"+rows.length+" Kinder heute bewertet"
  }
@@ -893,18 +894,25 @@ function gradeBackToOverview(){
 }
 function gradeCheckin(i){
  var x=S.gradeRows[Number(i)];if(!x)return;
- S.gradeActivePlan={student_id:x.student_id,week_start:week(),goal:x.goal,help_text:x.help_text,checkin_completed:x.checkin_completed,checkin_feeling:x.checkin_feeling,checkout_self:x.checkout_self,checkout_decision:x.checkout_decision,checkout_note:x.checkout_note};
+ S.gradeActivePlan=x.goal==null?null:{student_id:x.student_id,week_start:week(),goal:x.goal,help_text:x.help_text,checkin_completed:x.checkin_completed,checkin_feeling:x.checkin_feeling,checkout_self:x.checkout_self,checkout_decision:x.checkout_decision,checkout_note:x.checkout_note};
  S.student={id:x.student_id,display_name:x.display_name,avatar_emoji:x.avatar_emoji};
  checkin()
 }
 function gradeCheckout(i){
  var x=S.gradeRows[Number(i)];if(!x)return;
- S.gradeActivePlan={student_id:x.student_id,week_start:week(),goal:x.goal,help_text:x.help_text,checkin_completed:x.checkin_completed,checkin_feeling:x.checkin_feeling,checkout_self:x.checkout_self,checkout_decision:x.checkout_decision,checkout_note:x.checkout_note};
+ S.gradeActivePlan=x.goal==null?null:{student_id:x.student_id,week_start:week(),goal:x.goal,help_text:x.help_text,checkin_completed:x.checkin_completed,checkin_feeling:x.checkin_feeling,checkout_self:x.checkout_self,checkout_decision:x.checkout_decision,checkout_note:x.checkout_note};
  S.student={id:x.student_id,display_name:x.display_name,avatar_emoji:x.avatar_emoji};
  checkout()
 }
 function backFromGrade(){S.gradeQuickMode=false;S.gradeActivePlan=null;S.gradeStudentData=null;S.student=null;S.gradeRows=[];S.ratings=[];S.scheduleSlots=[];showTeacherArea("class");renderHome()}
 
+function classOrderKey(){return "milo_class_order_"+(S.user?S.user.id:"anonymous")}
+function classOrder(id){try{var a=JSON.parse(localStorage.getItem(classOrderKey())||"[]"),i=a.indexOf(id);return i<0?1000+S.classes.findIndex(function(c){return c.id===id}):i}catch(e){return 1000}}
+function dragClass(event){var tile=event.target.closest("[data-class-id]");if(tile)event.dataTransfer.setData("text/plain",tile.dataset.classId)}
+function dropClass(event){event.preventDefault();var tile=event.target.closest("[data-class-id]");if(!tile)return;var from=event.dataTransfer.getData("text/plain"),to=tile.dataset.classId;
+ if(!S.classes.some(function(c){return c.id===from})||!S.classes.some(function(c){return c.id===to})||from===to)return;
+ var ids=S.classes.slice().sort(function(a,b){return classOrder(a.id)-classOrder(b.id)}).map(function(c){return c.id}),old=ids.indexOf(from);ids.splice(old,1);ids.splice(ids.indexOf(to),0,from);localStorage.setItem(classOrderKey(),JSON.stringify(ids));renderHome()
+}
 function renderHome(){
  el("teacherHome").style.display="block";el("teacherDetail").style.display="none";updateDateUI();
  if(!S.classRow){
@@ -914,16 +922,16 @@ function renderHome(){
    el("dashboard").innerHTML="";
    var canSetUp=adminSchools().length>0||S.schools.length===0;
    var classCards=[],overviewCards=[];
-   S.classes.forEach(function(x){
-     classCards.push('<button class="teacher-launcher-card" onclick="APP.chooseClass(\''+x.id+'\')"><div><b>'+esc(x.name)+'</b><span>'+(x.grade_level?'Stufe '+x.grade_level+' · ':'')+esc(x.school_year||'')+'</span></div><span class="launch-arrow">→</span></button>')
+   S.classes.slice().sort(function(a,b){return classOrder(a.id)-classOrder(b.id)}).forEach(function(x){
+     classCards.push('<button type="button" draggable="true" data-class-id="'+esc(x.id)+'" class="teacher-launcher-card" onclick="APP.chooseClass(\''+x.id+'\')" ondragstart="APP.dragClass(event)" ondragover="event.preventDefault()" ondrop="APP.dropClass(event)"><div><b>'+esc(x.name)+'</b><span>'+(x.grade_level?'Stufe '+x.grade_level+' · ':'')+esc(x.school_year||'')+'</span></div><span class="launch-arrow">→</span></button>')
    });
    S.gradeLinks.forEach(function(g){
-     overviewCards.push('<button class="overview-launcher-card" onclick="APP.openGradeOverview('+Number(g.grade_level)+')"><div><b>Stufe '+Number(g.grade_level)+' öffnen</b><span>Gesamtüberblick über alle Kinder mit Wochenplan</span></div><span class="launch-arrow">→</span></button>')
+     overviewCards.push('<button class="overview-launcher-card" onclick="APP.openGradeOverview('+Number(g.grade_level)+')"><div><b>Stufe '+Number(g.grade_level)+' öffnen</b><span>Gesamtüberblick über alle Kinder der Stufe</span></div><span class="launch-arrow">→</span></button>')
    });
    if(classCards.length||overviewCards.length){
      var classSection=classCards.length?'<div class="launcher-section-title">Meine Klassen</div><div class="teacher-launcher-grid">'+classCards.join("")+'</div>':'';
      var overviewSection=overviewCards.length?'<div class="teacher-launcher-overview"><div class="launcher-section-title">Stufenüberblick</div><div class="overview-launcher-list">'+overviewCards.join("")+'</div></div>':'';
-     el("studentGrid").innerHTML='<div class="teacher-launcher" style="grid-column:1/-1"><div class="teacher-launcher-head"><div class="launcher-date">'+todayLong()+'</div><h2>Schön, dass du da bist.</h2><p>Wähle deine Klasse oder öffne den Stufenüberblick.</p></div>'+classSection+overviewSection+'<div class="teacher-launcher-note">Über das MILO-Logo kommst du jederzeit zurück zur Auswahl.</div></div>';
+     el("studentGrid").innerHTML='<div class="teacher-launcher" style="grid-column:1/-1"><div class="teacher-launcher-head"><div class="launcher-date">'+todayLong()+'</div><h2>Schön, dass du da bist.</h2><p>Wähle deine Klasse oder öffne den Stufenüberblick.</p></div>'+classSection+overviewSection+'</div>';
    }else{
      el("studentGrid").innerHTML=canSetUp
        ?'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse</h2><p class="muted" style="margin:0 0 13px">Richte zuerst deine Schule und Klasse ein.</p><button class="btn" onclick="APP.requestAdmin()">Einrichtung öffnen</button></div>'
@@ -950,7 +958,7 @@ function renderHome(){
  }else{
    el("todayFocus").innerHTML='<div><h3>Woche '+weekRangeLabel()+'</h3><p>Du siehst eine andere Woche. Ziele, Rückmeldungen und Abschlüsse beziehen sich auf diesen Zeitraum.</p><div class="today-stats"><span class="today-stat">🎯 '+plans.length+' Wochenziele</span><span class="today-stat">😊 '+totalRatings+' Rückmeldungen</span></div></div><div class="today-side"><div class="today-progress"><strong>'+completed+'/'+plans.length+'</strong><span>abgeschlossen</span></div><button class="btn secondary today-action" onclick="APP.goCurrentWeek()">Zur aktuellen Woche</button></div>';
  }
- var openClose=Math.max(0,plans.length-completed);
+ var openClose=Math.max(0,S.students.length-completed);
  el("dashboard").innerHTML='<button class="home-status-card '+(noGoal===0?'complete':'')+'" onclick="APP.openBatchGoals()"><div><b>🎯 Wochenziele</b><span>'+(noGoal?noGoal+" "+(noGoal===1?"Kind":"Kinder")+" noch ohne Ziel":"Alle Ziele sind vergeben")+'</span></div><strong>'+(noGoal?noGoal:"✓")+'</strong></button><button class="home-status-card '+(openClose===0&&plans.length?'complete':'')+'" onclick="APP.openWeekClose()"><div><b>✅ Wochenabschluss</b><span>'+(openClose?openClose+" "+(openClose===1?"Abschluss":"Abschlüsse")+" noch offen":plans.length?"Alles abgeschlossen":"Noch keine Wochenpläne")+'</span></div><strong>'+(openClose?openClose:plans.length?"✓":"–")+'</strong></button>';
  renderStudentCards();
 }
@@ -962,8 +970,8 @@ function renderStudentCards(){
    var p=plan(s.id);
    if(query&&String(s.display_name||"").toLocaleLowerCase("de").indexOf(query)<0)return false;
    if(filter==="no-goal")return !p;
-   if(filter==="no-checkin")return !!p&&!p.checkin_completed;
-   if(filter==="no-checkout")return !!p&&!p.checkout_self;
+   if(filter==="no-checkin")return !p||!p.checkin_completed;
+   if(filter==="no-checkout")return !p||!p.checkout_self;
    return true
  });
  el("studentResultCount").textContent=rows.length+" von "+S.students.length+" Kindern";
@@ -976,10 +984,10 @@ function renderWeekRitual(){
  var box=el("weekRitual");if(!box)return;
  var day=new Date().getDay();
  if(S.role!=="teacher"||!S.classRow||S.teacherArea!=="class"||!isCurrentWeek()||(day!==1&&day!==5)){box.style.display="none";box.innerHTML="";return}
- var monday=day===1,rows=monday?S.students:S.students.filter(function(s){return !!plan(s.id)});
+ var monday=day===1,rows=S.students;
  var completed=rows.filter(function(s){var p=plan(s.id);return !!(p&&(monday?p.checkin_completed:p.checkout_self))}).length;
- var missing=S.students.length-rows.length;
- var copy=rows.length?completed+" von "+rows.length+(monday?" Check-ins erledigt.":" Check-outs erledigt."):(monday?"Noch keine Kinder in dieser Klasse.":"Noch keine Wochenziele für den Check-out vorhanden.");
+ var missing=S.students.filter(function(s){return !plan(s.id)}).length;
+ var copy=rows.length?completed+" von "+rows.length+(monday?" Check-ins erledigt.":" Check-outs erledigt."):"Noch keine Kinder in dieser Klasse.";
  if(!monday&&missing)copy+=" "+missing+(missing===1?" Kind hat":" Kinder haben")+" noch kein Wochenziel.";
  box.className="week-ritual"+(monday?"":" friday");box.style.display="flex";
  box.innerHTML='<div><div class="eyebrow">'+(monday?"Montag · Wochenstart":"Freitag · Wochenabschluss")+'</div><h3>'+(monday?"Mit einem Ziel in die Woche":"Gemeinsam auf die Woche schauen")+'</h3><p>'+esc(copy)+'</p></div><button class="btn" '+(!rows.length?'disabled ':'')+'onclick="APP.'+(monday?"openWeekStart":"openWeekClose")+'()">'+(monday?"🎯 Check-in öffnen":"✅ Check-out öffnen")+'</button>';
@@ -999,17 +1007,17 @@ function openWeekStartStudent(id){
 }
 
 function openWeekClose(){
- var rows=S.students.filter(function(s){return !!plan(s.id)}).sort(function(a,b){return Number(!!plan(a.id).checkout_self)-Number(!!plan(b.id).checkout_self)});
- var completed=rows.filter(function(s){return !!plan(s.id).checkout_self}).length;
- el("weekCloseText").textContent=completed+" von "+rows.length+" Wochenplänen abgeschlossen · "+weekRangeLabel();
+ var rows=S.students.slice().sort(function(a,b){return Number(!!(plan(a.id)&&plan(a.id).checkout_self))-Number(!!(plan(b.id)&&plan(b.id).checkout_self))});
+ var completed=rows.filter(function(s){return !!(plan(s.id)&&plan(s.id).checkout_self)}).length;
+ el("weekCloseText").textContent=completed+" von "+rows.length+" Check-outs erledigt · "+weekRangeLabel();
  el("weekCloseList").innerHTML=rows.map(function(s){
-   var p=plan(s.id),done=!!p.checkout_self;
-   return '<div class="list-row"><div class="list-main"><b>'+esc(s.avatar_emoji||"🦦")+' '+esc(s.display_name)+'</b><span>'+esc(p.goal)+'</span></div><div class="toolbar"><span class="week-close-status">'+(done?"✅ abgeschlossen":"○ offen")+'</span><button class="btn '+(done?"secondary ":"")+'small" onclick="APP.openWeekCloseStudent(\''+s.id+'\')">'+(done?"Ansehen":"Abschließen")+'</button></div></div>'
- }).join("")||'<div class="muted">In dieser Woche gibt es noch keine Wochenpläne.</div>';
+   var p=plan(s.id),done=!!(p&&p.checkout_self);
+   return '<div class="list-row"><div class="list-main"><b>'+esc(s.avatar_emoji||"🦦")+' '+esc(s.display_name)+'</b><span>'+esc(p?p.goal:'Noch kein Wochenziel')+'</span></div><div class="toolbar"><span class="week-close-status">'+(done?"✅ abgeschlossen":p?"○ offen":"Noch kein Wochenziel")+'</span><button class="btn '+(done?"secondary ":"")+'small" onclick="APP.openWeekCloseStudent(\''+s.id+'\')">'+(done?"Ansehen":p?"Check-out":"Ziel anlegen")+'</button></div></div>'
+ }).join("")||'<div class="muted">Noch keine Kinder in dieser Klasse.</div>';
  modal("weekCloseModal",true)
 }
 function openWeekCloseStudent(id){
- modal("weekCloseModal",false);openStudent(id);checkout()
+ modal("weekCloseModal",false);openStudent(id);if(plan(id))checkout();else checkin()
 }
 function openStudent(id){S.student=S.students.find(function(s){return s.id===id});if(!S.student)return;S.studentTab="plan";S.developmentData=null;S.developmentStudentId=null;el("teacherHome").style.display="none";el("teacherDetail").style.display="block";renderTeacher();openStudentTab("plan")}
 function back(){S.student=null;S.developmentData=null;S.developmentStudentId=null;renderHome()}
@@ -1030,7 +1038,7 @@ function renderWeek(target,click){
  }
  el(target).innerHTML=out
 }
-function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id),isToday=isCurrentWeek()&&new Date().getDay()===S.entry.weekday;el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+S.entry.lesson_no+". Stunde"+(isToday?" · Heute":"");el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
+function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id);if(!p){toast("Lege zuerst ein Wochenziel an.");checkin();return}var isToday=isCurrentWeek()&&new Date().getDay()===S.entry.weekday;el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+S.entry.lesson_no+". Stunde"+(isToday?" · Heute":"");el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
 function offlineQueue(){try{return JSON.parse(localStorage.getItem("otterplan-rating-queue")||"[]")}catch(e){return[]}}
 function saveQueue(q){localStorage.setItem("otterplan-rating-queue",JSON.stringify(q))}
 function offerRatingUndo(previous,mode,source){
@@ -1086,6 +1094,8 @@ function toggleTopMenu(){el("topMenu").classList.toggle("show")}
 function closeTopMenu(){var m=el("topMenu");if(m)m.classList.remove("show")}
 document.addEventListener("click",closeTopMenu);
 function help(){
+ // The MILO mark is the consistent way back to the selection page.
+
  var title="MILO Hilfe",cards=[];
  if(S.role==="student"){
    title="MILO für Kinder";
@@ -1160,6 +1170,12 @@ function openStudentTab(tab){
    if(!el("notesObsDate").value)el("notesObsDate").value=defaultObservationDate();
    loadNotesTab()
  }
+}
+function dictateObservation(id){var SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SpeechRecognition){toast("Spracheingabe wird hier nicht unterstützt. Du kannst die Notiz schreiben.");el(id).focus();return}
+ var recognition=new SpeechRecognition();recognition.lang="de-DE";recognition.continuous=false;recognition.interimResults=false;
+ recognition.onresult=function(e){var words=e.results[0][0].transcript.trim(),input=el(id);input.value=(input.value?input.value.trim()+" ":"")+words;input.focus();toast("Text übernommen")};
+ recognition.onerror=function(){toast("Diktat nicht verfügbar. Du kannst die Notiz schreiben.")};recognition.start();toast("Ich höre zu …")
 }
 async function saveObservation(source){
  if(!S.student){toast("Kein Kind ausgewählt");return}
@@ -1269,11 +1285,17 @@ async function exportDevelopmentPdf(){
  doc.save("MILO_Elternsprechtag_"+safeName(name)+".pdf")
 }
 function currentSchoolDay(){var d=new Date().getDay();return d>=1&&d<=5?d:1}
+function currentTeachingSlot(now){var d=now||new Date(),mins=d.getHours()*60+d.getMinutes();
+ var windows=[[8*60+15,9*60,1],[9*60,9*60+45,2],[10*60+15,11*60,3],[11*60,11*60+45,4],[12*60,12*60+45,5],[12*60+45,13*60+30,6]];
+ for(var i=0;i<windows.length;i++)if(mins>=windows[i][0]&&mins<windows[i][1])return windows[i][2];
+ return null
+}
+function currentSchoolPhase(now){var d=now||new Date(),m=d.getHours()*60+d.getMinutes();if(m>=585&&m<605)return "Erste Pause";if(m>=705&&m<720)return "Zweite Pause";if(m>=605&&m<615)return "Wechselzeit";return currentTeachingSlot(d)?currentTeachingSlot(d)+". Stunde":"Kein Unterricht"}
 function quickLessonKey(){return "milo_quick_lesson_"+(S.classRow?S.classRow.id:"class")+"_"+dateISO(new Date())}
 function openQuickRating(){
  if(!S.students.length){toast("Noch keine Kinder angelegt");return}
  updateDateUI();el("quickDay").value=String(isCurrentWeek()?currentSchoolDay():1);
- var saved=Number(localStorage.getItem(quickLessonKey())||1);el("quickLesson").value=String(saved>=1&&saved<=6?saved:1);
+ var current=currentTeachingSlot();var saved=Number(localStorage.getItem(quickLessonKey())||0);el("quickLesson").value=String(saved>=1&&saved<=6?saved:(current||1));
  renderQuickRating();
  modal("quickRatingModal",true)
 }
@@ -1293,7 +1315,7 @@ function renderQuickRating(){
  var done=withGoal.filter(function(s){return !!rating(s.id,day,lesson)}).length;
  var noGoal=kids.length-withGoal.length,pct=withGoal.length?Math.round(done/withGoal.length*100):0;
  el("quickRatingProgress").textContent=done+" von "+withGoal.length+" bewertet"+(noGoal?" · "+noGoal+" ohne Ziel":"");
- el("quickRatingContext").textContent=DAYS[day-1]+" · "+lesson+". Stunde";
+ el("quickRatingContext").textContent=DAYS[day-1]+" · "+lesson+". Stunde"+(day===new Date().getDay()&&isCurrentWeek()?" · "+currentSchoolPhase():"");
  el("quickRatingProgressBar").style.width=pct+"%";
  var success=el("quickRatingSuccess");success.style.display=withGoal.length&&done===withGoal.length?"block":"none";success.textContent=lesson<6?"✓ Stunde vollständig bewertet · du kannst direkt zur nächsten Stunde wechseln":"✓ Stunde vollständig bewertet";
  var next=el("quickNextBtn");next.style.display=lesson<6?"inline-flex":"none";
@@ -1340,7 +1362,7 @@ async function saveCheckin(){var g=el("checkinGoal").value.trim(),h=el("checkinH
    modal("checkinModal",false);await afterGradeAction(gradeSid,"checkin",wasDetail);toast("Check-in gespeichert");return
  }
  var row={student_id:S.student.id,week_start:week(),goal:g,help_text:h,checkin_feeling:S.checkinFeeling,checkin_completed:true};var r=await sb.from("weekly_plans").upsert(row,{onConflict:"student_id,week_start"});if(r.error){toast("Speichern fehlgeschlagen");return}modal("checkinModal",false);var sid=S.student.id;await load();openStudent(sid);toast("Check-in gespeichert")}
-function checkout(){var p=plan(S.student.id);if(!p){toast("Bitte zuerst ein Ziel anlegen");return}S.checkoutSelf=p.checkout_self||"partial";S.checkoutDecision=p.checkout_decision||"continue";el("checkoutName").textContent=S.student.display_name;el("checkoutNote").value=p.checkout_note||"";setSelected("co-",S.checkoutSelf,["good","partial","difficult"]);setSelected("dec-",S.checkoutDecision,["done","continue","change"]);modal("checkoutModal",true)}
+function checkout(){var p=plan(S.student.id);if(!p){toast("Noch kein Wochenziel. Lege zuerst ein Ziel an.");checkin();return}S.checkoutSelf=p.checkout_self||"partial";S.checkoutDecision=p.checkout_decision||"continue";el("checkoutName").textContent=S.student.display_name;el("checkoutNote").value=p.checkout_note||"";setSelected("co-",S.checkoutSelf,["good","partial","difficult"]);setSelected("dec-",S.checkoutDecision,["done","continue","change"]);modal("checkoutModal",true)}
 function pickCheckoutSelf(v){S.checkoutSelf=v;setSelected("co-",v,["good","partial","difficult"])}
 function pickCheckoutDecision(v){S.checkoutDecision=v;setSelected("dec-",v,["done","continue","change"])}
 async function saveCheckout(){var p=plan(S.student.id);if(!p)return;
@@ -1377,12 +1399,12 @@ async function saveRewardTemplate(){var t=el("rewardTitle").value.trim(),n=Numbe
 async function redeemReward(id){if(!confirm("Belohnung als eingelöst markieren?"))return;var r=await sb.rpc("redeem_reward",{p_reward_id:id});if(r.error){toast("Einlösen fehlgeschlagen");return}var sid=S.student.id;await load();openStudent(sid);reward();toast("Belohnung eingelöst")}
 async function removeReward(id){if(!confirm("Belohnung entfernen?"))return;await sb.from("rewards").update({active:false}).eq("id",id);var sid=S.student.id;await load();openStudent(sid);reward()}
 function qr(){el("qrName").textContent=S.student.display_name;el("newQrBtn").style.display="block";el("qrResult").style.display="none";el("teacherQr").innerHTML="";modal("qrModal",true)}
-async function createQr(){var r=await sb.rpc("get_or_create_child_qr_code",{p_student_id:S.student.id});if(r.error){toast("QR-Code konnte nicht geladen werden");return}var row=Array.isArray(r.data)?r.data[0]:r.data;if(!row||!row.qr_token)return;el("newQrBtn").style.display="none";el("qrResult").style.display="block";el("teacherQr").innerHTML="";new QRCode(el("teacherQr"),{text:"otterplan:"+row.qr_token,width:220,height:220,correctLevel:QRCode.CorrectLevel.H});el("teacherQr").dataset.token=row.qr_token}
-async function resetQr(){if(!confirm("QR-Code zurücksetzen? Die alte Karte funktioniert danach nicht mehr."))return;var r=await sb.rpc("reset_child_qr_code",{p_student_id:S.student.id});if(r.error){toast("Zurücksetzen fehlgeschlagen");return}var row=Array.isArray(r.data)?r.data[0]:r.data;el("teacherQr").innerHTML="";new QRCode(el("teacherQr"),{text:"otterplan:"+row.qr_token,width:220,height:220,correctLevel:QRCode.CorrectLevel.H});el("teacherQr").dataset.token=row.qr_token;toast("Neuer QR-Code aktiv")}
+async function createQr(){var r=await sb.rpc("get_or_create_child_qr_code",{p_student_id:S.student.id});if(r.error){toast("QR-Code konnte nicht geladen werden");return}var row=Array.isArray(r.data)?r.data[0]:r.data;if(!row||!row.qr_token)return;el("newQrBtn").style.display="none";el("qrResult").style.display="block";el("teacherQr").innerHTML="";new QRCode(el("teacherQr"),{text:childAccessUrl(row.qr_token),width:220,height:220,correctLevel:QRCode.CorrectLevel.H});el("teacherQr").dataset.token=row.qr_token}
+async function resetQr(){if(!confirm("QR-Code zurücksetzen? Die alte Karte funktioniert danach nicht mehr."))return;var r=await sb.rpc("reset_child_qr_code",{p_student_id:S.student.id});if(r.error){toast("Zurücksetzen fehlgeschlagen");return}var row=Array.isArray(r.data)?r.data[0]:r.data;el("teacherQr").innerHTML="";new QRCode(el("teacherQr"),{text:childAccessUrl(row.qr_token),width:220,height:220,correctLevel:QRCode.CorrectLevel.H});el("teacherQr").dataset.token=row.qr_token;toast("Neuer QR-Code aktiv")}
 async function revoke(){if(!confirm("Alle gekoppelten Geräte trennen?"))return;var r=await sb.rpc("revoke_child_devices",{p_student_id:S.student.id});toast(r.error?"Trennen fehlgeschlagen":"Geräte getrennt")}
 function qrImage(text){return new Promise(function(resolve,reject){var host=document.createElement("div");host.style.position="fixed";host.style.left="-9999px";document.body.appendChild(host);try{new QRCode(host,{text:text,width:320,height:320,correctLevel:QRCode.CorrectLevel.H});setTimeout(function(){var canvas=host.querySelector("canvas"),img=host.querySelector("img"),data=canvas?canvas.toDataURL("image/png"):(img?img.src:null);host.remove();data?resolve(data):reject(new Error("QR fehlt"))},70)}catch(e){host.remove();reject(e)}})}
-async function downloadSingleQr(){var token=el("teacherQr").dataset.token;if(!token){toast("QR-Code zuerst anzeigen");return}var data=await qrImage("otterplan:"+token),doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});doc.setFont("helvetica","bold");doc.setFontSize(22);doc.text(S.student.display_name,105,35,{align:"center"});doc.addImage(data,"PNG",65,50,80,80);doc.setFont("helvetica","normal");doc.setFontSize(11);doc.text("MILO · QR-Code scannen",105,145,{align:"center"});doc.save("MILO_QR_"+safeName(S.student.display_name)+".pdf")}
-async function downloadCodes(){if(!S.students.length){toast("Noch keine Kinder");return}toast("QR-Karten werden erstellt …");var r=await sb.rpc("get_or_create_class_child_qr_codes",{p_class_id:S.classRow.id});if(r.error){toast("QR-Karten konnten nicht erstellt werden");return}var rows=r.data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"}),xs=[14,110],ys=[14,104,194];for(var i=0;i<rows.length;i++){if(i>0&&i%6===0)doc.addPage();var p=i%6,x=xs[p%2],y=ys[Math.floor(p/2)],data=await qrImage("otterplan:"+rows[i].qr_token);doc.setDrawColor(225,228,233);doc.roundedRect(x,y,86,82,5,5,"S");doc.setFont("helvetica","bold");doc.setFontSize(14);doc.text(String(rows[i].display_name),57+x-14,y+10,{align:"center",maxWidth:76});doc.addImage(data,"PNG",x+19,y+16,48,48);doc.setFont("helvetica","normal");doc.setFontSize(8);doc.text("MILO · scannen",x+43,y+74,{align:"center"})}doc.save("MILO_QR_"+safeName(S.classRow.name)+".pdf");toast("PDF erstellt")}
+async function downloadSingleQr(){var token=el("teacherQr").dataset.token;if(!token){toast("QR-Code zuerst anzeigen");return}var data=await qrImage(childAccessUrl(token)),doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});doc.setFont("helvetica","bold");doc.setFontSize(22);doc.text(S.student.display_name,105,35,{align:"center"});doc.addImage(data,"PNG",65,50,80,80);doc.setFont("helvetica","normal");doc.setFontSize(11);doc.text("MILO · QR-Code scannen",105,145,{align:"center"});doc.save("MILO_QR_"+safeName(S.student.display_name)+".pdf")}
+async function downloadCodes(){if(!S.students.length){toast("Noch keine Kinder");return}toast("QR-Karten werden erstellt …");var r=await sb.rpc("get_or_create_class_child_qr_codes",{p_class_id:S.classRow.id});if(r.error){toast("QR-Karten konnten nicht erstellt werden");return}var rows=r.data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"}),xs=[14,110],ys=[14,104,194];for(var i=0;i<rows.length;i++){if(i>0&&i%6===0)doc.addPage();var p=i%6,x=xs[p%2],y=ys[Math.floor(p/2)],data=await qrImage(childAccessUrl(rows[i].qr_token));doc.setDrawColor(225,228,233);doc.roundedRect(x,y,86,82,5,5,"S");doc.setFont("helvetica","bold");doc.setFontSize(14);doc.text(String(rows[i].display_name),57+x-14,y+10,{align:"center",maxWidth:76});doc.addImage(data,"PNG",x+19,y+16,48,48);doc.setFont("helvetica","normal");doc.setFontSize(8);doc.text("MILO · scannen",x+43,y+74,{align:"center"})}doc.save("MILO_QR_"+safeName(S.classRow.name)+".pdf");toast("PDF erstellt")}
 
 function openStudentSchedule(){
  if(!S.student)return;
@@ -1567,9 +1589,12 @@ function gradeOptions(blank){var a=blank?['<option value="">Keine</option>']:[];
 async function attachClass(){var cid=el("attachClass").value,g=Number(el("attachGrade").value);if(!cid||!g)return;var r=await sb.rpc("attach_class_to_school",{p_class_id:cid,p_school_id:S.schoolRow.id,p_grade_level:g});if(r.error){toast("Zuordnung nicht möglich");return}await load();S.teacherArea="admin";showTeacherArea("admin");toast("Klasse zugeordnet")}
 async function createSchoolClass(){var n=el("schoolClassName").value.trim(),g=Number(el("schoolClassGrade").value),y=el("schoolClassYear").value.trim()||"2026/27";if(!n||!g)return;var r=await sb.rpc("create_class_for_school",{p_school_id:S.schoolRow.id,p_name:n,p_grade_level:g,p_school_year:y});if(r.error){toast("Klasse konnte nicht angelegt werden");return}await load();S.teacherArea="admin";showTeacherArea("admin");toast("Klasse angelegt")}
 
+function previewChild(){if(S.role!=="teacher"||!S.student)return;S.previewStudent=S.student;renderChild();show("childView");el("previewBack").style.display="inline-flex"}
+function backFromChildPreview(){if(S.role!=="teacher")return;el("previewBack").style.display="none";show("teacher");if(S.previewStudent)openStudent(S.previewStudent.id);S.previewStudent=null}
+function speakGoal(){if(!("speechSynthesis" in window)){toast("Vorlesen wird auf diesem Gerät nicht unterstützt");return}var goal=el("childGoal").textContent;if(!goal)return;window.speechSynthesis.cancel();var utterance=new SpeechSynthesisUtterance(goal);utterance.lang="de-DE";utterance.rate=.85;window.speechSynthesis.speak(utterance)}
 function renderChild(){
  updateDateUI();
- var s=S.student,p=plan(s.id),sh=shells(s.id),x=stats(s.id),rewards=rs(s.id),next=rewards.find(function(r){return r.shells_required>sh});
+ var s=S.previewStudent||S.student,p=plan(s.id),sh=shells(s.id),x=stats(s.id),rewards=rs(s.id),next=rewards.find(function(r){return r.shells_required>sh});
  el("childTitle").textContent=(s.avatar_emoji||"🦦")+" "+s.display_name;
  if(S.lastChildShells!==null&&sh>S.lastChildShells){el("childShellBadge").classList.remove("shell-pop");void el("childShellBadge").offsetWidth;el("childShellBadge").classList.add("shell-pop")}S.lastChildShells=sh;
  el("childShells").textContent=sh;el("childGoal").textContent=p?p.goal:"Noch kein Ziel";el("childHelp").textContent=p&&p.help_text?"💡 "+p.help_text:"";el("childGood").textContent=x.good;el("childRated").textContent=x.total;
@@ -1597,12 +1622,12 @@ window.APP={
  login:login,logout:logout,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
  showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,setQuickLesson:setQuickLesson,quickNextLesson:quickNextLesson,quickPrevLesson:quickPrevLesson,quickGoal:quickGoal,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
- filterStudents:filterStudents,resetStudentFilters:resetStudentFilters,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekStart:openWeekStart,openWeekStartStudent:openWeekStartStudent,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
+ dragClass:dragClass,dropClass:dropClass,filterStudents:filterStudents,resetStudentFilters:resetStudentFilters,dictateObservation:dictateObservation,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekStart:openWeekStart,openWeekStartStudent:openWeekStartStudent,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
  checkin:checkin,fillCheckinTemplate:fillCheckinTemplate,pickCheckin:pickCheckin,saveCheckin:saveCheckin,
  checkout:checkout,pickCheckoutSelf:pickCheckoutSelf,pickCheckoutDecision:pickCheckoutDecision,saveCheckout:saveCheckout,
  openBatchGoals:openBatchGoals,fillBatchTemplate:fillBatchTemplate,applyBatchGoal:applyBatchGoal,saveGoalTemplate:saveGoalTemplate,deleteGoalTemplate:deleteGoalTemplate,carryGoals:carryGoals,
  reward:reward,fillRewardTemplate:fillRewardTemplate,setShells:setShells,addReward:addReward,saveRewardTemplate:saveRewardTemplate,redeemReward:redeemReward,removeReward:removeReward,
- qr:qr,createQr:createQr,resetQr:resetQr,revoke:revoke,downloadSingleQr:downloadSingleQr,downloadCodes:downloadCodes,
+ previewChild:previewChild,backFromChildPreview:backFromChildPreview,speakGoal:speakGoal,qr:qr,createQr:createQr,resetQr:resetQr,revoke:revoke,downloadSingleQr:downloadSingleQr,downloadCodes:downloadCodes,
  openStudentSchedule:openStudentSchedule,schedulePreset:schedulePreset,saveStudentSchedule:saveStudentSchedule,
  history:history,openExport:openExport,exportWeekly:exportWeekly,exportMonthly:exportMonthly,exportStudent:exportStudent,
  openClassAdmin:openClassAdmin,saveClassSettings:saveClassSettings,assignTeacher:assignTeacher,removeTeacher:removeTeacher,saveRetention:saveRetention,archiveClass:archiveClass,
@@ -1610,9 +1635,10 @@ window.APP={
 };
 
 sb.auth.onAuthStateChange(function(event,session){if(event==="SIGNED_OUT"&&!session){S.user=null;S.profile=null;S.role=null;el("session").style.display="none";show("login")}});
-sb.auth.getSession().then(function(r){if(r.data.session)bootstrap()});
+sb.auth.getSession().then(function(r){var token=new URL(location.href).searchParams.get("child");if(token){el("childToken").value=norm(token);redeem();return}if(r.data.session)bootstrap()});
 if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js").then(function(r){r.update()}).catch(function(){})});
 })();
 </script>
 </body>
 </html>
+
