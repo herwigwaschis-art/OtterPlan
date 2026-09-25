@@ -158,6 +158,40 @@ body.teacher-start-view #teacherHome .overview-launcher-card b{font-size:13px;fo
 body.teacher-start-view #teacherHome .overview-launcher-card span:not(.launch-arrow){display:none}
 body.teacher-start-view #teacherHome .overview-launcher-card .launch-arrow{font-size:16px;font-weight:400;color:#9aa6a2}
 @media(max-width:650px){body.teacher-start-view #teacherHome .teacher-launcher{margin-bottom:20px}body.teacher-start-view #teacherHome .teacher-launcher-head{margin-bottom:20px;padding-bottom:14px}body.teacher-start-view #teacherHome .teacher-launcher-head h2{font-size:26px}body.teacher-start-view #teacherHome .launcher-section-title{font-size:17px;margin-bottom:11px}body.teacher-start-view #teacherHome .teacher-launcher-grid{grid-template-columns:1fr;gap:9px}body.teacher-start-view #teacherHome .teacher-launcher-card{min-height:82px;padding:13px 15px 13px 20px;border-radius:15px}body.teacher-start-view #teacherHome .teacher-launcher-card:before{top:13px;bottom:13px}body.teacher-start-view #teacherHome .teacher-launcher-card b{font-size:18px}body.teacher-start-view #teacherHome .teacher-launcher-overview{margin-top:14px}}
+
+/* MILO login: quiet two-choice entry, with the existing brand area retained. */
+#login .login{width:min(100%,1060px);max-width:1060px;margin:30px auto}
+#login .start-page{display:grid;grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr);gap:clamp(30px,6vw,76px);align-items:center}
+#login .start-visual{min-height:390px;margin:0;padding:40px 30px;border:1px solid #d9eae3;border-radius:26px;background:linear-gradient(150deg,#edf7f2 0%,#f1f7fb 100%);box-shadow:0 14px 36px rgba(31,67,62,.055)}
+#login .start-visual:before{width:138px;height:138px;left:-55px;top:-54px;background:rgba(96,165,250,.12)}
+#login .start-visual:after{width:138px;height:138px;right:-48px;bottom:-54px;background:rgba(167,227,193,.22)}
+#login .start-wordmark{width:min(100%,390px);max-width:390px}
+#login .start-slogan{margin-top:25px;font-size:24px;line-height:1.3;font-weight:720;letter-spacing:-.025em;color:#20383a}
+#login .start-panel{width:100%;max-width:500px;margin:0 auto;text-align:left}
+#login .start-actions{display:grid;gap:12px}
+#login .start-action,#login .teacher-login summary{position:relative;width:100%;min-height:90px;padding:17px 18px;display:flex;align-items:center;gap:15px;border:1px solid #e1e9e7;border-radius:17px;background:#fff;color:#203238;text-align:left;box-shadow:0 5px 18px rgba(31,55,60,.045);transition:border-color .16s,box-shadow .16s,transform .16s}
+#login .start-action:hover,#login .teacher-login summary:hover{transform:translateY(-1px);border-color:#bfd6d0;box-shadow:0 9px 23px rgba(31,55,60,.075)}
+#login .start-action:focus-visible,#login .teacher-login summary:focus-visible{outline:3px solid rgba(14,165,160,.24);outline-offset:3px}
+#login .start-action.child{background:#fff;color:#203238;box-shadow:0 5px 18px rgba(31,55,60,.045)}
+#login .start-action-icon{width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;border:1px solid #e0eee8;border-radius:14px;background:#f0f7f3;color:#16877f;font-size:0}
+#login .start-action-icon svg{display:block;width:25px;height:25px}
+#login .start-action-copy{display:block;min-width:0;flex:1}
+#login .start-action-copy b{display:block;font-size:17px;line-height:1.28;font-weight:720;letter-spacing:-.015em;color:#203238}
+#login .start-action-copy>span{display:block;margin-top:4px;font-size:13px;line-height:1.35;font-weight:450;color:#758287;opacity:1}
+#login .start-action-chevron{display:grid;place-items:center;width:24px;height:24px;flex:0 0 24px;color:#94a19f}
+#login .start-action-chevron svg{display:block;width:20px;height:20px}
+#login .teacher-login{width:100%;max-width:none;margin:0;padding:0;overflow:visible;border:0;border-radius:0;background:transparent;box-shadow:none}
+#login .teacher-login summary{list-style:none;cursor:pointer}
+#login .teacher-login summary::-webkit-details-marker{display:none}
+#login .teacher-login summary:before,#login .teacher-login summary:after{content:none}
+#login .teacher-login[open] summary{border-color:#c6ddd6;border-radius:17px 17px 0 0;box-shadow:none}
+#login .teacher-login[open] .start-action-chevron{transform:rotate(90deg)}
+#login .teacher-login .teacher-form{padding:5px 18px 18px;border:1px solid #e1e9e7;border-top:0;border-radius:0 0 17px 17px;background:#fff;text-align:left}
+#login .teacher-login .teacher-form label{margin-top:12px;font-size:11px}
+#login .teacher-login .teacher-form input{padding:11px 12px}
+#login .teacher-login .teacher-form .btn{min-height:44px}
+@media(max-width:850px){#login .login{margin:24px auto}#login .start-page{gap:26px}#login .start-visual{min-height:350px;padding:32px 22px}#login .start-slogan{font-size:21px}#login .start-action,#login .teacher-login summary{min-height:82px;padding:14px 13px;gap:11px}#login .start-action-copy b{font-size:16px}#login .start-action-copy>span{font-size:12px}}
+@media(max-width:600px){#login .login{margin:8px auto}#login .start-page{grid-template-columns:1fr;gap:24px}#login .start-visual{min-height:190px;padding:24px 18px;border-radius:22px}#login .start-wordmark{max-width:260px}#login .start-slogan{margin-top:13px;font-size:20px}#login .start-panel{max-width:480px}#login .start-action,#login .teacher-login summary{min-height:78px;padding:13px 14px}#login .start-action-icon{width:42px;height:42px;flex-basis:42px;border-radius:13px}#login .start-action-icon svg{width:23px;height:23px}}
 </style>
 </head>
 <body>
@@ -189,24 +223,21 @@ body.teacher-start-view #teacherHome .overview-launcher-card .launch-arrow{font-
         <div class="start-slogan">Kleine Schritte. <span>Große Ziele.</span></div>
       </div>
       <div class="start-panel">
-        <h1>Willkommen bei MILO</h1>
-        <p class="muted">Dein digitaler Smileyplan für Ziele, Rückmeldung und kleine Erfolge.</p>
-        <div class="start-actions">
-          <button id="resumeSessionBtn" class="btn secondary" style="display:none" onclick="APP.resumeSession()">Mit meinem Konto fortfahren</button>
-          <button class="start-action child" onclick="APP.openChild()">
-            <span class="start-action-icon">📷</span>
-            <span><b>Schüler-Anmeldung</b><span>QR-Code scannen und direkt starten</span></span>
+        <div class="start-actions" aria-label="Anmeldung auswählen">
+          <button class="start-action child" type="button" onclick="APP.openChild()">
+            <span class="start-action-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18V9a2 2 0 0 1 2-2h9M30 7h9a2 2 0 0 1 2 2v9M41 30v9a2 2 0 0 1-2 2h-9M18 41H9a2 2 0 0 1-2-2v-9"/><path d="M14 14h7v7h-7zM27 14h7v7h-7zM14 27h7v7h-7zM28 28h2v2h-2zM33 27v3M27 34h3M34 33v2M39 23H9"/></svg></span>
+            <span class="start-action-copy"><b>QR-Code scannen</b><span>Als Schüler anmelden</span></span>
+            <span class="start-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
           </button>
           <details class="teacher-login">
-            <summary>Lehrkraft oder Eltern anmelden</summary>
-            <div class="teacher-form">
-              <label for="email">E-Mail</label><input id="email" type="email" autocomplete="username">
-              <label for="password">Passwort</label><input id="password" type="password" autocomplete="current-password">
-              <button class="btn" style="width:100%;margin-top:10px" onclick="APP.login()">Anmelden</button>
-            </div>
+            <summary class="start-action teacher-action">
+              <span class="start-action-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="16" r="7"/><path d="M10 40c.7-7.7 6.5-12 14-12s13.3 4.3 14 12M8 11V7h4M40 11V7h-4"/></svg></span>
+              <span class="start-action-copy"><b>Lehrkraft anmelden</b><span>Zum Lehrerbereich</span></span>
+              <span class="start-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+            </summary>
+            <div class="teacher-form"><label for="email">E-Mail</label><input id="email" type="email" autocomplete="username"><label for="password">Passwort</label><input id="password" type="password" autocomplete="current-password"><button class="btn" style="width:100%;margin-top:10px" onclick="APP.login()">Anmelden</button></div>
           </details>
         </div>
-        <div id="startPilotNote" class="test-note">🧪 Pilotmodus · noch keine echten Schülerdaten verwenden</div>
       </div>
     </div>
   </div>
@@ -693,7 +724,7 @@ function resetIdle(){clearTimeout(idleTimer);if(S.role==="teacher")idleTimer=set
 ["click","keydown","touchstart"].forEach(function(e){document.addEventListener(e,resetIdle,{passive:true})});
 
 async function login(){var email=el("email").value.trim(),password=el("password").value;if(!email||!password){toast("E-Mail und Passwort eingeben");return}var r=await sb.auth.signInWithPassword({email:email,password:password});if(r.error){toast("Anmeldung fehlgeschlagen");return}await bootstrap()}
-async function resumeSession(){var r=await sb.auth.getSession();if(r.data&&r.data.session){el("resumeSessionBtn").style.display="none";await bootstrap()}else{el("resumeSessionBtn").style.display="none";toast("Bitte neu anmelden")}}
+async function resumeSession(){var r=await sb.auth.getSession(),b=el("resumeSessionBtn");if(b)b.style.display="none";if(r.data&&r.data.session){await bootstrap()}else{toast("Bitte neu anmelden")}}
 function openChild(){childStatus("","");show("childLogin");setTimeout(scan,180)}
 function showLogin(){stopScan();show("login")}
 function childAccessUrl(token){var u=new URL(window.location.href);u.search="";u.hash="";u.searchParams.set("child",token);return u.href}
@@ -1970,7 +2001,7 @@ window.APP={
 };
 
 sb.auth.onAuthStateChange(function(event,session){if(event==="SIGNED_OUT"&&!session){S.user=null;S.profile=null;S.role=null;el("session").style.display="none";el("globalSearchButton").style.display="none";if(S.childRedeeming||new URL(location.href).searchParams.has("child")){show("childLogin")}else{show("login")}}});
-sb.auth.getSession().then(function(r){var params=new URL(location.href).searchParams,token=params.get("child");if(token){el("childToken").value=norm(token);show("childLogin");redeem();return}if(params.get("menu")==="1"){el("resumeSessionBtn").style.display=r.data.session?"inline-flex":"none";show("login");return}if(r.data.session)bootstrap()});
+sb.auth.getSession().then(function(r){var params=new URL(location.href).searchParams,token=params.get("child");if(token){el("childToken").value=norm(token);show("childLogin");redeem();return}if(params.get("menu")==="1"){show("login");return}if(r.data.session)bootstrap()});
 if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js").then(function(r){r.update()}).catch(function(){})});
 })();
 </script>
