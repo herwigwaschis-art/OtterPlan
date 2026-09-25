@@ -602,6 +602,7 @@ function renderPilotMode(){
 }
 function renderTeacherShell(){
  var switchName=el("classSwitchName"),switchBtn=el("classSwitchBtn");
+ switchBtn.closest(".hero").style.display=S.classRow?"":"none";
  if(!S.classes.length){
    if(S.gradeLinks.length){
      switchName.textContent="Stufenüberblick";
@@ -614,7 +615,7 @@ function renderTeacherShell(){
    }
  }else{
    switchBtn.disabled=false;
-   switchName.textContent=S.classRow?S.classRow.name:"MILO Start";
+   switchName.textContent=S.classRow?S.classRow.name:"";
    el("classMeta").textContent=S.classRow?(S.classRow.grade_level?"Stufe "+S.classRow.grade_level+" · ":"")+(S.classRow.school_year||""):"Klasse oder Gesamtüberblick auswählen";
  }
  var admins=adminSchools();
