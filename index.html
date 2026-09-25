@@ -131,6 +131,33 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
 .note-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}.note-filters label{margin:0;font-size:11px}.note-filters input,.note-filters select{width:auto;max-width:100%;min-width:130px;font-size:13px;padding:9px 10px}.child-friday{background:#e9f5ee!important;border-color:#d0e8d7!important}.child-friday h3{margin:3px 0 14px;font-size:23px}.child-friday-days{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:11px}.child-friday-day{text-align:center;background:#fff;border-radius:12px;padding:10px 4px}.child-friday-day span{display:block;font-size:11px;color:var(--muted)}.child-friday-day strong{font-size:26px}.child-friday #childFridayReward{font-size:13px}@media(max-width:600px){.note-filters input,.note-filters select{flex:1}.child-friday-day span{font-size:10px}.child-friday-day strong{font-size:20px}}
 .note-pdf-choice{display:inline-flex;align-items:center;gap:4px;margin:0 7px 0 0!important;font-size:11px!important;text-transform:none;letter-spacing:0;cursor:pointer}.note-pdf-choice input{width:17px;height:17px;margin:0;accent-color:var(--accent)}
 .goal-symbol{width:46px;height:46px;display:inline-grid;place-items:center;flex:0 0 auto;border-radius:14px;background:#e8f5f0;color:#18796f}.goal-symbol svg{display:block;width:26px;height:26px}
+
+/* Refined teacher start screen */
+body.teacher-start-view #todayBadge{display:inline-flex;padding:0;border:0;background:transparent;box-shadow:none;border-radius:0;font-size:10px;font-weight:500;color:#879397}
+body.teacher-start-view #pilotBanner,body.teacher-start-view #startPilotNote{display:none!important}
+body.teacher-start-view #teacherHome .teacher-launcher{max-width:920px;margin:0 auto 30px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+body.teacher-start-view #teacherHome .teacher-launcher-head{text-align:left;margin:0 0 26px;padding:0 0 18px;border-bottom:1px solid #e5ecea}
+body.teacher-start-view #teacherHome .teacher-launcher-head h2{margin:0;font-size:30px;line-height:1.15;font-weight:760;letter-spacing:-.04em;color:#1c3036}
+body.teacher-start-view #teacherHome .launcher-class-section{margin:0}
+body.teacher-start-view #teacherHome .launcher-section-title{display:block;margin:0 0 14px;font-size:18px;line-height:1.25;font-weight:740;letter-spacing:-.02em;text-transform:none;color:#25383d}
+body.teacher-start-view #teacherHome .teacher-launcher-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+body.teacher-start-view #teacherHome .teacher-launcher-card{position:relative;overflow:hidden;min-height:108px;padding:18px 19px 18px 23px;border:1px solid #e5ecea;border-radius:17px;background:#fff;box-shadow:0 5px 18px rgba(29,55,61,.045);transition:transform .16s,border-color .16s,box-shadow .16s}
+body.teacher-start-view #teacherHome .teacher-launcher-card:before{content:"";position:absolute;left:0;top:17px;bottom:17px;width:3px;border-radius:0 3px 3px 0;background:#85cbb4}
+body.teacher-start-view #teacherHome .teacher-launcher-card:nth-child(3n+2):before{background:#91b9dc}
+body.teacher-start-view #teacherHome .teacher-launcher-card:nth-child(3n):before{background:#ddc17b}
+body.teacher-start-view #teacherHome .teacher-launcher-card:hover{transform:translateY(-2px);border-color:#cfdfda;box-shadow:0 9px 22px rgba(29,55,61,.075)}
+body.teacher-start-view #teacherHome .teacher-launcher-card b{font-size:20px;line-height:1.2;font-weight:760;letter-spacing:-.025em;color:#1e3137}
+body.teacher-start-view #teacherHome .teacher-launcher-card div>span{margin-top:6px;font-size:11px;line-height:1.35;font-weight:500;color:#77868a}
+body.teacher-start-view #teacherHome .teacher-launcher-card .launch-arrow{display:block;flex:0 0 auto;width:auto;height:auto;padding:4px;border-radius:0;background:transparent;font-size:18px;font-weight:400;color:#899794;transition:transform .16s,color .16s}
+body.teacher-start-view #teacherHome .teacher-launcher-card:hover .launch-arrow{transform:translateX(2px);color:#477f76}
+body.teacher-start-view #teacherHome .teacher-launcher-overview{margin:18px 0 0;padding:0;border:0;background:transparent}
+body.teacher-start-view #teacherHome .overview-launcher-list{display:grid;grid-template-columns:1fr;gap:8px}
+body.teacher-start-view #teacherHome .overview-launcher-card{min-height:54px;padding:12px 15px;border:1px solid #e8eeec;border-radius:14px;background:rgba(255,255,255,.55);text-align:left;box-shadow:none;transition:background .15s,border-color .15s}
+body.teacher-start-view #teacherHome .overview-launcher-card:hover{background:#fff;border-color:#dce7e3}
+body.teacher-start-view #teacherHome .overview-launcher-card b{font-size:13px;font-weight:650;color:#596a6d}
+body.teacher-start-view #teacherHome .overview-launcher-card span:not(.launch-arrow){display:none}
+body.teacher-start-view #teacherHome .overview-launcher-card .launch-arrow{font-size:16px;font-weight:400;color:#9aa6a2}
+@media(max-width:650px){body.teacher-start-view #teacherHome .teacher-launcher{margin-bottom:20px}body.teacher-start-view #teacherHome .teacher-launcher-head{margin-bottom:20px;padding-bottom:14px}body.teacher-start-view #teacherHome .teacher-launcher-head h2{font-size:26px}body.teacher-start-view #teacherHome .launcher-section-title{font-size:17px;margin-bottom:11px}body.teacher-start-view #teacherHome .teacher-launcher-grid{grid-template-columns:1fr;gap:9px}body.teacher-start-view #teacherHome .teacher-launcher-card{min-height:82px;padding:13px 15px 13px 20px;border-radius:15px}body.teacher-start-view #teacherHome .teacher-launcher-card:before{top:13px;bottom:13px}body.teacher-start-view #teacherHome .teacher-launcher-card b{font-size:18px}body.teacher-start-view #teacherHome .teacher-launcher-overview{margin-top:14px}}
 </style>
 </head>
 <body>
@@ -839,6 +866,7 @@ function showTeacherArea(area){
  if(S.role!=="teacher")return;
  if(area==="admin"&&adminSchools().length===0&&S.schools.length>0){toast("Dafür brauchst du Admin-Rechte");return}
  S.teacherArea=area;
+ document.body.classList.toggle("teacher-start-view",area==="class"&&!S.classRow);
  el("classArea").style.display=area==="class"?"block":"none";
  el("gradeArea").style.display=area==="grade"?"block":"none";
  el("adminArea").style.display=area==="admin"?"block":"none";
@@ -1000,6 +1028,7 @@ function dropClass(event){event.preventDefault();var tile=event.target.closest("
  var ids=S.classes.slice().sort(function(a,b){return classOrder(a.id)-classOrder(b.id)}).map(function(c){return c.id}),old=ids.indexOf(from);ids.splice(old,1);ids.splice(ids.indexOf(to),0,from);localStorage.setItem(classOrderKey(),JSON.stringify(ids));renderHome()
 }
 function renderHome(){
+ document.body.classList.toggle("teacher-start-view",!S.classRow&&S.teacherArea==="class");
  el("teacherHome").style.display="block";el("teacherDetail").style.display="none";updateDateUI();
  if(!S.classRow){
    el("classOverview").open=true;el("classOverview").classList.add("launcher-mode");el("classTodayPanel").style.display="none";S.todayClassId=null;
@@ -1013,12 +1042,12 @@ function renderHome(){
      classCards.push('<button type="button" draggable="true" data-class-id="'+esc(x.id)+'" class="teacher-launcher-card" onclick="APP.chooseClass(\''+x.id+'\')" ondragstart="APP.dragClass(event)" ondragover="event.preventDefault()" ondrop="APP.dropClass(event)"><div><b>'+esc(x.name)+'</b><span>'+(x.grade_level?'Stufe '+x.grade_level+' · ':'')+esc(x.school_year||'')+'</span></div><span class="launch-arrow">→</span></button>')
    });
    S.gradeLinks.forEach(function(g){
-     overviewCards.push('<button class="overview-launcher-card" onclick="APP.openGradeOverview('+Number(g.grade_level)+')"><div><b>Stufe '+Number(g.grade_level)+' öffnen</b><span>Gesamtüberblick über alle Kinder der Stufe</span></div><span class="launch-arrow">→</span></button>')
+     overviewCards.push('<button class="overview-launcher-card" aria-label="Stufe '+Number(g.grade_level)+' Gesamtübersicht öffnen" onclick="APP.openGradeOverview('+Number(g.grade_level)+')"><div><b>Stufe '+Number(g.grade_level)+' – Gesamtübersicht</b><span>Gesamtüberblick über alle Kinder der Stufe</span></div><span class="launch-arrow" aria-hidden="true">→</span></button>')
    });
    if(classCards.length||overviewCards.length){
-     var classSection=classCards.length?'<div class="launcher-section-title">Meine Klassen</div><div class="teacher-launcher-grid">'+classCards.join("")+'</div>':'';
-     var overviewSection=overviewCards.length?'<div class="teacher-launcher-overview"><div class="launcher-section-title">Stufenüberblick</div><div class="overview-launcher-list">'+overviewCards.join("")+'</div></div>':'';
-     el("studentGrid").innerHTML='<div class="teacher-launcher" style="grid-column:1/-1"><div class="teacher-launcher-head"><div class="launcher-date">'+todayLong()+'</div><h2>Schön, dass du da bist.</h2><p>Wähle deine Klasse oder öffne den Stufenüberblick.</p></div>'+classSection+overviewSection+'</div>';
+     var classSection=classCards.length?'<section class="launcher-class-section" aria-labelledby="launcherClassTitle"><h3 id="launcherClassTitle" class="launcher-section-title">Meine Klassen</h3><div class="teacher-launcher-grid">'+classCards.join("")+'</div></section>':'';
+     var overviewSection=overviewCards.length?'<div class="teacher-launcher-overview" aria-label="Stufenübersichten"><div class="overview-launcher-list">'+overviewCards.join("")+'</div></div>':'';
+     el("studentGrid").innerHTML='<div class="teacher-launcher" style="grid-column:1/-1"><div class="teacher-launcher-head"><h2>Schön, dass du da bist!</h2></div>'+classSection+overviewSection+'</div>';
    }else{
      el("studentGrid").innerHTML=canSetUp
        ?'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse</h2><p class="muted" style="margin:0 0 13px">Richte zuerst deine Schule und Klasse ein.</p><button class="btn" onclick="APP.requestAdmin()">Einrichtung öffnen</button></div>'
