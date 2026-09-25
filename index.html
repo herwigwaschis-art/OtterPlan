@@ -337,6 +337,22 @@ body:has(#childView.active) #todayBadge{display:none}
 #childView #childFridayReward{font-size:12px}
 @media(max-width:900px){#childView .child-support-cards{grid-template-columns:1.1fr .9fr}#childView .child-week-card .week{grid-template-columns:40px repeat(5,minmax(78px,1fr))}}
 @media(max-width:600px){#childView .child-top{margin-bottom:8px}#childView .child-name{font-size:26px}#childView .child-shells{font-size:12px}#childView .child-week-card{padding:11px 10px;margin-bottom:10px}#childView .child-week-card .week{grid-template-columns:32px repeat(5,minmax(54px,1fr));gap:4px}#childView .child-week-card .head,#childView .child-week-card .time,#childView .child-week-card .cell{min-height:51px;padding:4px;border-radius:8px}#childView .child-week-card .head{font-size:10px}#childView .child-week-card .time{font-size:10px}#childView .child-week-card .subject{font-size:9px}#childView .child-week-card .cell .face{font-size:19px}#childView .child-support-cards{grid-template-columns:1fr;gap:8px;margin-bottom:9px}#childView .child-support-cards .kid-card{padding:12px 13px}#childView .child-support-cards .kid-goal{font-size:19px}#childView .child-support-cards .kid-reward{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:6px}#childView .child-support-cards .kid-reward>div:last-child{min-width:0}#childView .child-week-card h2{font-size:17px}}
+
+/* Keep the goal visible at the top without competing with the timetable. */
+#childView .child-goal-card{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:12px;row-gap:4px;margin:0 0 10px;padding:9px 13px;border:1px solid #e5ece9;border-radius:14px;background:#fff;box-shadow:0 3px 10px rgba(29,48,58,.025)}
+#childView .child-goal-card .kid-label{grid-column:1/-1;margin:0;font-size:10px}
+#childView .child-goal-card .toolbar{gap:8px}
+#childView .child-goal-card .goal-symbol{width:29px;height:29px;flex-basis:29px;border-radius:9px}
+#childView .child-goal-card .goal-symbol svg{width:17px;height:17px}
+#childView .child-goal-card .kid-goal{font-size:16px;line-height:1.25;letter-spacing:-.01em}
+#childView .child-goal-card .btn{min-height:30px;padding:4px 8px;font-size:13px}
+#childView .child-goal-card .kid-tip{grid-column:2;margin:0;font-size:11px;line-height:1.3}
+#childView .child-support-cards{grid-template-columns:minmax(0,1fr);gap:8px}
+#childView .child-support-cards .kid-reward{display:grid;grid-template-columns:minmax(0,1fr) minmax(100px,.8fr);align-items:center;gap:8px}
+#childView .child-support-cards .kid-reward-count{font-size:19px}
+#childView .child-support-cards #childRewardHint{display:none}
+#childView .child-friday h3{display:none}
+@media(max-width:600px){#childView .child-goal-card{grid-template-columns:minmax(0,1fr);gap:4px;margin-bottom:8px;padding:8px 10px}#childView .child-goal-card .kid-label{grid-column:auto}#childView .child-goal-card .kid-tip{grid-column:auto;padding-left:37px}#childView .child-goal-card .kid-goal{font-size:15px}#childView .child-support-cards{grid-template-columns:1fr}#childView .child-support-cards .kid-reward{grid-template-columns:1fr 1fr;padding:10px 12px}}
 </style>
 </head>
 <body>
@@ -523,14 +539,14 @@ body:has(#childView.active) #todayBadge{display:none}
 <section id="childView" class="screen"><button id="previewBack" class="btn secondary" style="display:none;margin-bottom:14px" onclick="APP.backFromChildPreview()">← Zur Lehrkraftansicht</button>
   <div id="parentSwitch" style="display:none;margin-bottom:12px"><label for="parentStudentSelect">Mein Kind</label><select id="parentStudentSelect" onchange="APP.selectParentStudent()"></select></div>
   <div class="child-top"><h2 id="childTitle" class="child-name"></h2><div id="childShellBadge" class="child-shells">🐚 <span id="childShells"></span></div></div>
-  <section class="child-week-card" aria-labelledby="childWeekTitle"><h2 id="childWeekTitle">Meine Woche</h2><div id="childWeek" class="week"></div></section>
+  <div class="kid-card child-goal-card"><div class="kid-label">Mein Ziel</div><div class="toolbar" style="align-items:center"><span id="childGoalIcon" class="goal-symbol" aria-hidden="true"></span><div id="childGoal" class="kid-goal" style="flex:1"></div><button class="btn secondary" aria-label="Ziel vorlesen" title="Ziel vorlesen" onclick="APP.speakGoal()">🔊</button></div><div id="childHelp" class="kid-tip"></div></div>\n  <section class="child-week-card" aria-labelledby="childWeekTitle"><h2 id="childWeekTitle">Meine Woche</h2><div id="childWeek" class="week"></div></section>
   <div id="childSelfCard" class="card child-self-card" style="display:none;margin-bottom:12px"><div class="kid-label" id="childSelfTitle">Wie war es für dich?</div><label for="childSelfSlot">Stunde oder Pause</label><select id="childSelfSlot" onchange="APP.setChildSelfSlot(this.value)"></select><div class="choice-row" style="margin-top:10px;margin-bottom:0"><button id="self-good" class="choice" aria-label="Gut geschafft" onclick="APP.saveSelfRating('good')"><span class="emoji">😊</span>Gut</button><button id="self-partial" class="choice" aria-label="Teilweise geschafft" onclick="APP.saveSelfRating('partial')"><span class="emoji">😐</span>So mittel</button><button id="self-difficult" class="choice" aria-label="Schwierig" onclick="APP.saveSelfRating('difficult')"><span class="emoji">🙁</span>Schwer</button></div></div>
   <div class="child-main child-support-cards">
-    <div class="kid-card"><div class="kid-label">Mein Ziel</div><div class="toolbar" style="align-items:center"><span id="childGoalIcon" class="goal-symbol" aria-hidden="true"></span><div id="childGoal" class="kid-goal" style="flex:1"></div><button class="btn secondary" aria-label="Ziel vorlesen" title="Ziel vorlesen" onclick="APP.speakGoal()">🔊</button></div><div id="childHelp" class="kid-tip"></div></div>
+    
     <div class="kid-card kid-reward"><div><div class="kid-label">Belohnung</div><div id="childRewardTitle" class="kid-reward-title"></div></div><div><div id="childReward" class="kid-reward-count"></div><div class="progress"><div id="childBar"></div></div><div id="childRewardDots" class="child-reward-dots" aria-hidden="true"></div><div id="childRewardHint" class="kid-tip"></div></div></div>
   </div>
   <div id="childCheckoutCard" class="card child-checkout-card" style="display:none;margin-bottom:12px"><div class="checkout-compact"><div id="childCheckoutFace" class="checkout-face"></div><div class="checkout-copy"><b id="childCheckoutSelf"></b><span id="childCheckoutDecision"></span><div id="childCheckoutNote" style="margin-top:4px;font-size:11px"></div></div></div></div>
-  <div id="childFridayCard" class="card child-friday" style="display:none;margin-bottom:12px"><div class="kid-label">Deine Woche</div><h3>Das hast du geschafft!</h3><div id="childFridayDays" class="child-friday-days"></div><div id="childFridayReward" class="muted"></div></div>
+  <div id="childFridayCard" class="card child-friday" style="display:none;margin-bottom:12px"><div class="kid-label">Deine Woche</div><div id="childFridayDays" class="child-friday-days"></div><div id="childFridayReward" class="muted"></div></div>
 </section>
 </main>
 
