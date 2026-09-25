@@ -124,6 +124,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
 @media(max-width:600px){header{height:68px;padding:0 18px}.brand-logo-img{width:120px}main{padding:22px 16px 44px}.login{margin:0 auto}.start-page{grid-template-columns:1fr;gap:26px}.start-visual{min-height:200px;padding:22px;border-radius:24px}.start-wordmark{max-width:280px}.start-slogan{font-size:21px;margin-top:14px}.start-panel h1{font-size:29px}.start-panel>.muted{margin-bottom:20px}.teacher-login{max-width:none}.teacher-launcher{padding:0}.teacher-launcher-head h2{font-size:28px}.teacher-launcher-head{margin-bottom:26px}.teacher-launcher-grid{grid-template-columns:1fr;gap:12px}.teacher-launcher-card{min-height:100px;padding:20px;flex-wrap:nowrap}.teacher-launcher-card b{font-size:21px}.teacher-launcher-overview{padding:18px;margin-top:24px}.overview-launcher-card{padding:15px}.overview-launcher-card span{font-size:13px}.week-nav{gap:4px}.week-nav .week-current{min-width:0;flex:1;font-size:13px}.week-nav button{padding:8px 12px}.today-focus{padding:20px;grid-template-columns:1fr;gap:18px}.today-side{justify-content:space-between}.today-progress{min-width:88px}.today-focus h3{font-size:20px}.dashboard-grid{grid-template-columns:1fr 1fr}.home-status-card{padding:14px;align-items:flex-start}.home-status-card b{font-size:14px}.home-status-card span{font-size:12px}.student-grid,.grade-plan-grid{grid-template-columns:1fr}.student{min-height:0}.student-search,.student-filter-wrap{min-width:0;max-width:none;flex-basis:100%}.student-browser{gap:10px}.class-switcher{font-size:26px}.detail-toolbar{display:flex;flex-wrap:wrap;gap:12px}.teacher-actions{justify-content:flex-start}.hero h2{font-size:28px}.card{padding:18px;border-radius:18px}.quick-note-grid{grid-template-columns:1fr}.quick-note-grid>div:nth-child(3){grid-column:auto}.week{grid-template-columns:35px repeat(5,minmax(38px,1fr));gap:4px}.head,.time,.cell{padding:5px}.head{font-size:12px}.time{font-size:11px}.cell{min-height:56px;border-radius:9px}.cell .face{font-size:23px}.modal{padding:20px;border-radius:20px}.choice-row,.decision-row{grid-template-columns:repeat(3,minmax(0,1fr))}.choice,.decision{font-size:13px;overflow-wrap:anywhere}.kid-goal{font-size:25px}.child-name{font-size:32px}.child-top{flex-wrap:wrap}.child-main .cell{min-height:62px}.quick-rating-row{grid-template-columns:1fr}.quick-face{flex:1;width:auto}.quick-rating-actions{justify-content:stretch}.dev-controls{grid-template-columns:1fr}.ratings button{padding:14px 5px;font-size:36px}.ratings small{font-size:11px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
+.week-ritual{max-width:980px;margin:0 auto 18px;padding:20px 24px;border:1px solid #cce4db;border-left:5px solid var(--accent);border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px}.week-ritual.friday{border-color:#e9dbb3;border-left-color:#d4a42f}.week-ritual h3{margin:0 0 6px;font-size:20px}.week-ritual p{margin:0;font-size:14px;color:var(--muted)}.week-ritual .btn{flex-shrink:0}.week-ritual .eyebrow{margin-bottom:5px}@media(max-width:600px){.week-ritual{padding:18px;align-items:stretch;flex-direction:column;gap:14px}.week-ritual .btn{width:100%}}
 </style>
 </head>
 <body>
@@ -202,6 +203,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
         </div>
       </div>
       <div id="todayFocus" class="today-focus"></div>
+      <div id="weekRitual" class="week-ritual" style="display:none"></div>
       <div id="dashboard" class="dashboard-grid"></div>
       <div id="homeTools" class="home-tools">
         <div class="home-secondary-actions">
@@ -401,6 +403,12 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
   <div class="toolbar" style="justify-content:flex-end;margin-top:12px"><button class="btn secondary" onclick="APP.close('gradeNoteModal')">Abbrechen</button><button class="btn" onclick="APP.saveObservation('grade')">Speichern</button></div>
 </div></div>
 
+<div id="weekStartModal" class="modal-bg"><div class="modal wide">
+  <div class="eyebrow">Wochenstart</div><h2 style="margin:5px 0 4px">Check-in</h2><p id="weekStartText" class="muted" style="font-size:14px;margin:0 0 16px"></p>
+  <div id="weekStartList" class="list"></div>
+  <div class="toolbar" style="justify-content:flex-end;margin-top:16px"><button class="btn secondary" onclick="APP.close('weekStartModal')">Schließen</button></div>
+</div></div>
+
 <div id="weekCloseModal" class="modal-bg"><div class="modal wide">
   <div class="eyebrow">Wochenabschluss</div><h2 style="margin:5px 0 4px">Woche abschließen</h2><p id="weekCloseText" class="muted" style="font-size:13px;margin:0 0 12px"></p>
   <div id="weekCloseList" class="list week-close-list"></div>
@@ -589,6 +597,7 @@ function resolveInitialStart(){
  return {classId:null,grade:null}
 }
 function updateDateUI(){
+ renderWeekRitual();
  var map={todayBadge:"📅 "+todayShort(),classToday:"📅 "+todayLong(),gradeDate:"📅 "+todayLong(),childDate:"📅 "+todayLong(),gradeStudentDate:isCurrentWeek()?todayShort():"Woche "+weekRangeLabel(),quickRatingDate:isCurrentWeek()?"📅 "+todayLong():"📅 Woche "+weekRangeLabel()};
  Object.keys(map).forEach(function(id){var x=el(id);if(x)x.textContent=map[id]});
  var w=el("weekNavLabel");if(w)w.textContent=(isCurrentWeek()?"Diese Woche · ":"")+weekRangeLabel();
@@ -963,8 +972,34 @@ function renderStudentCards(){
    return '<button class="student" onclick="APP.openStudent(\''+s.id+'\')"><div class="student-top"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div class="name">'+esc(s.display_name)+'</div></div><div class="goal">'+esc(p?p.goal:"Noch kein Ziel")+'</div><div class="student-status">'+(s.is_demo?'<span class="status-chip">🧪 Test</span>':'')+(ci?'<span class="status-chip">🎯 Check-in</span>':'')+(co?'<span class="status-chip">✅ Abschluss</span>':'')+'</div><div class="foot"><span>🐚 '+sh+'</span><span>'+x.good+'/'+x.total+' 😊</span></div></button>';
  }).join("")||(S.students.length?'<div class="student-empty"><h3>Keine passenden Kinder</h3><p>Ändere die Suche oder den Filter.</p><button class="btn secondary" onclick="APP.resetStudentFilters()">Alle Kinder anzeigen</button></div>':'<div class="student-empty"><h3>Noch keine Kinder</h3><p>Lege das erste Kind für diese Klasse an.</p><button class="btn" onclick="APP.addStudent()">Kind hinzufügen</button></div>');
 }
+function renderWeekRitual(){
+ var box=el("weekRitual");if(!box)return;
+ var day=new Date().getDay();
+ if(S.role!=="teacher"||!S.classRow||S.teacherArea!=="class"||!isCurrentWeek()||(day!==1&&day!==5)){box.style.display="none";box.innerHTML="";return}
+ var monday=day===1,rows=monday?S.students:S.students.filter(function(s){return !!plan(s.id)});
+ var completed=rows.filter(function(s){var p=plan(s.id);return !!(p&&(monday?p.checkin_completed:p.checkout_self))}).length;
+ var missing=S.students.length-rows.length;
+ var copy=rows.length?completed+" von "+rows.length+(monday?" Check-ins erledigt.":" Check-outs erledigt."):(monday?"Noch keine Kinder in dieser Klasse.":"Noch keine Wochenziele für den Check-out vorhanden.");
+ if(!monday&&missing)copy+=" "+missing+(missing===1?" Kind hat":" Kinder haben")+" noch kein Wochenziel.";
+ box.className="week-ritual"+(monday?"":" friday");box.style.display="flex";
+ box.innerHTML='<div><div class="eyebrow">'+(monday?"Montag · Wochenstart":"Freitag · Wochenabschluss")+'</div><h3>'+(monday?"Mit einem Ziel in die Woche":"Gemeinsam auf die Woche schauen")+'</h3><p>'+esc(copy)+'</p></div><button class="btn" '+(!rows.length?'disabled ':'')+'onclick="APP.'+(monday?"openWeekStart":"openWeekClose")+'()">'+(monday?"🎯 Check-in öffnen":"✅ Check-out öffnen")+'</button>';
+}
+function openWeekStart(){
+ var rows=S.students.slice().sort(function(a,b){return Number(!!(plan(a.id)&&plan(a.id).checkin_completed))-Number(!!(plan(b.id)&&plan(b.id).checkin_completed))});
+ var completed=rows.filter(function(s){return !!(plan(s.id)&&plan(s.id).checkin_completed)}).length;
+ el("weekStartText").textContent=completed+" von "+rows.length+" Check-ins erledigt · "+weekRangeLabel();
+ el("weekStartList").innerHTML=rows.map(function(s){
+   var p=plan(s.id),done=!!(p&&p.checkin_completed);
+   return '<div class="list-row"><div class="list-main"><b>'+esc(s.avatar_emoji||"🦦")+' '+esc(s.display_name)+'</b><span>'+esc(p?p.goal:"Noch kein Wochenziel")+'</span></div><div class="toolbar"><span class="week-close-status">'+(done?"✓ erledigt":"○ offen")+'</span><button class="btn '+(done?'secondary ':'')+'small" onclick="APP.openWeekStartStudent(\''+s.id+'\')">'+(done?"Ansehen":"Check-in")+'</button></div></div>'
+ }).join("")||'<div class="muted">Noch keine Kinder in dieser Klasse.</div>';
+ modal("weekStartModal",true)
+}
+function openWeekStartStudent(id){
+ modal("weekStartModal",false);openStudent(id);checkin()
+}
+
 function openWeekClose(){
- var rows=S.students.filter(function(s){return !!plan(s.id)});
+ var rows=S.students.filter(function(s){return !!plan(s.id)}).sort(function(a,b){return Number(!!plan(a.id).checkout_self)-Number(!!plan(b.id).checkout_self)});
  var completed=rows.filter(function(s){return !!plan(s.id).checkout_self}).length;
  el("weekCloseText").textContent=completed+" von "+rows.length+" Wochenplänen abgeschlossen · "+weekRangeLabel();
  el("weekCloseList").innerHTML=rows.map(function(s){
@@ -1562,7 +1597,7 @@ window.APP={
  login:login,logout:logout,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
  showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,setQuickLesson:setQuickLesson,quickNextLesson:quickNextLesson,quickPrevLesson:quickPrevLesson,quickGoal:quickGoal,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
- filterStudents:filterStudents,resetStudentFilters:resetStudentFilters,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
+ filterStudents:filterStudents,resetStudentFilters:resetStudentFilters,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekStart:openWeekStart,openWeekStartStudent:openWeekStartStudent,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
  checkin:checkin,fillCheckinTemplate:fillCheckinTemplate,pickCheckin:pickCheckin,saveCheckin:saveCheckin,
  checkout:checkout,pickCheckoutSelf:pickCheckoutSelf,pickCheckoutDecision:pickCheckoutDecision,saveCheckout:saveCheckout,
  openBatchGoals:openBatchGoals,fillBatchTemplate:fillBatchTemplate,applyBatchGoal:applyBatchGoal,saveGoalTemplate:saveGoalTemplate,deleteGoalTemplate:deleteGoalTemplate,carryGoals:carryGoals,
