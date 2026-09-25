@@ -839,7 +839,6 @@ function renderHome(){
  }
  el("todayFocus").style.display="grid";
  el("homeTools").style.display="flex";
- var primary=el("homePrimaryRating");if(primary)primary.textContent=isCurrentWeek()?"😊 Heute bewerten":"😊 Woche bewerten";
  var plans=S.students.filter(function(s){return !!plan(s.id)});
  var noGoal=S.students.length-plans.length;
  var totalRatings=S.ratings.length;
@@ -849,13 +848,15 @@ function renderHome(){
    var todayRatings=S.ratings.filter(function(r){return Number(r.weekday)===day}).length;
    var ratedKids=plans.filter(function(s){return S.ratings.some(function(r){return r.student_id===s.id&&Number(r.weekday)===day})}).length;
    var remaining=Math.max(0,plans.length-ratedKids);
-   el("todayFocus").innerHTML='<div><h3>'+todayLong()+'</h3><p>'+ (remaining?remaining+" "+(remaining===1?"Kind":"Kinder")+" mit Wochenziel heute noch ohne Bewertung.":"Alle Kinder mit Wochenziel wurden heute schon bewertet.") +'</p><div class="today-stats"><span class="today-stat">😊 '+todayRatings+' Bewertungen heute</span><span class="today-stat">🎯 '+plans.length+' Wochenziele</span><span class="today-stat">✅ '+completed+'/'+plans.length+' abgeschlossen</span></div></div><div class="today-progress"><strong>'+ratedKids+'/'+plans.length+'</strong><span>Kinder heute bewertet</span></div>';
+   var todayPct=plans.length?Math.round(ratedKids/plans.length*100):0;
+   el("todayFocus").innerHTML='<div><h3>'+todayLong()+'</h3><p>'+ (remaining?remaining+" "+(remaining===1?"Kind":"Kinder")+" mit Wochenziel heute noch ohne Bewertung.":"Für heute ist bei allen Kindern mit Wochenziel bereits eine Rückmeldung eingetragen.") +'</p><div class="today-stats"><span class="today-stat">😊 '+todayRatings+' Rückmeldungen</span>'+(noGoal?'<span class="today-stat">🎯 '+noGoal+' ohne Ziel</span>':'<span class="today-stat">🎯 Ziele stehen</span>')+'</div><div class="today-bar"><span style="width:'+todayPct+'%"></span></div></div><div class="today-side"><div class="today-progress"><strong>'+ratedKids+'/'+plans.length+'</strong><span>heute bewertet</span></div><button class="btn today-action" onclick="APP.openQuickRating()">😊 Jetzt bewerten</button></div>';
  }else if(isCurrentWeek()){
-   el("todayFocus").innerHTML='<div><h3>'+todayLong()+'</h3><p>Heute ist kein regulärer Schultag. Du kannst die Woche in Ruhe prüfen oder abschließen.</p><div class="today-stats"><span class="today-stat">🎯 '+plans.length+' Wochenziele</span><span class="today-stat">✅ '+completed+'/'+plans.length+' abgeschlossen</span></div></div><div class="today-progress"><strong>'+totalRatings+'</strong><span>Bewertungen diese Woche</span></div>';
+   el("todayFocus").innerHTML='<div><h3>'+todayLong()+'</h3><p>Heute ist kein regulärer Schultag. Du kannst die Woche prüfen oder offene Wochenabschlüsse erledigen.</p><div class="today-stats"><span class="today-stat">🎯 '+plans.length+' Wochenziele</span><span class="today-stat">😊 '+totalRatings+' Rückmeldungen</span></div></div><div class="today-side"><div class="today-progress"><strong>'+completed+'/'+plans.length+'</strong><span>abgeschlossen</span></div><button class="btn secondary today-action" onclick="APP.openWeekClose()">✅ Abschlüsse</button></div>';
  }else{
-   el("todayFocus").innerHTML='<div><h3>Woche '+weekRangeLabel()+'</h3><p>Du siehst gerade eine andere Woche. Mit „Diese Woche“ springst du jederzeit zurück.</p><div class="today-stats"><span class="today-stat">🎯 '+plans.length+' Wochenziele</span><span class="today-stat">😊 '+totalRatings+' Bewertungen</span></div></div><div class="today-progress"><strong>'+completed+'/'+plans.length+'</strong><span>Wochenabschlüsse</span></div>';
+   el("todayFocus").innerHTML='<div><h3>Woche '+weekRangeLabel()+'</h3><p>Du siehst eine andere Woche. Ziele, Rückmeldungen und Abschlüsse beziehen sich auf diesen Zeitraum.</p><div class="today-stats"><span class="today-stat">🎯 '+plans.length+' Wochenziele</span><span class="today-stat">😊 '+totalRatings+' Rückmeldungen</span></div></div><div class="today-side"><div class="today-progress"><strong>'+completed+'/'+plans.length+'</strong><span>abgeschlossen</span></div><button class="btn secondary today-action" onclick="APP.goCurrentWeek()">Zur aktuellen Woche</button></div>';
  }
- el("dashboard").innerHTML='<div class="dash-card"><div class="dash-value">'+plans.length+'/'+S.students.length+'</div><div class="dash-label">Wochenziele</div></div><div class="dash-card"><div class="dash-value">'+totalRatings+'</div><div class="dash-label">Bewertungen</div></div><button class="dash-card action" onclick="APP.openWeekClose()"><div class="dash-value">'+completed+'/'+plans.length+'</div><div class="dash-label">Wochenabschluss · öffnen →</div></button>';
+ var openClose=Math.max(0,plans.length-completed);
+ el("dashboard").innerHTML='<button class="home-status-card '+(noGoal===0?'complete':'')+'" onclick="APP.openBatchGoals()"><div><b>🎯 Wochenziele</b><span>'+(noGoal?noGoal+" "+(noGoal===1?"Kind":"Kinder")+" noch ohne Ziel":"Alle Ziele sind vergeben")+'</span></div><strong>'+(noGoal?noGoal:"✓")+'</strong></button><button class="home-status-card '+(openClose===0&&plans.length?'complete':'')+'" onclick="APP.openWeekClose()"><div><b>✅ Wochenabschluss</b><span>'+(openClose?openClose+" "+(openClose===1?"Abschluss":"Abschlüsse")+" noch offen":plans.length?"Alles abgeschlossen":"Noch keine Wochenpläne")+'</span></div><strong>'+(openClose?openClose:plans.length?"✓":"–")+'</strong></button>';
  el("studentGrid").innerHTML=S.students.map(function(s){
    var p=plan(s.id),sh=shells(s.id),x=stats(s.id),ci=p&&p.checkin_completed,co=p&&p.checkout_self;
    return '<button class="student" onclick="APP.openStudent(\''+s.id+'\')"><div class="student-top"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div class="name">'+esc(s.display_name)+'</div></div><div class="goal">'+esc(p?p.goal:"Noch kein Ziel")+'</div><div class="student-status">'+(s.is_demo?'<span class="status-chip">🧪 Test</span>':'')+(ci?'<span class="status-chip">🎯 Check-in</span>':'')+(co?'<span class="status-chip">✅ Abschluss</span>':'')+'</div><div class="foot"><span>🐚 '+sh+'</span><span>'+x.good+'/'+x.total+' 😊</span></div></button>';
@@ -1131,26 +1132,40 @@ async function exportDevelopmentPdf(){
  doc.save("MILO_Elternsprechtag_"+safeName(name)+".pdf")
 }
 function currentSchoolDay(){var d=new Date().getDay();return d>=1&&d<=5?d:1}
+function quickLessonKey(){return "milo_quick_lesson_"+(S.classRow?S.classRow.id:"class")+"_"+dateISO(new Date())}
 function openQuickRating(){
  if(!S.students.length){toast("Noch keine Kinder angelegt");return}
- updateDateUI();el("quickDay").value=String(currentSchoolDay());
- el("quickLesson").value="1";
+ updateDateUI();el("quickDay").value=String(isCurrentWeek()?currentSchoolDay():1);
+ var saved=Number(localStorage.getItem(quickLessonKey())||1);el("quickLesson").value=String(saved>=1&&saved<=6?saved:1);
  renderQuickRating();
  modal("quickRatingModal",true)
 }
+function setQuickLesson(n){
+ n=Math.max(1,Math.min(6,Number(n)||1));el("quickLesson").value=String(n);
+ if(isCurrentWeek())localStorage.setItem(quickLessonKey(),String(n));
+ renderQuickRating()
+}
+function quickNextLesson(){var n=Number(el("quickLesson").value||1);if(n>=6){toast("Das ist die letzte Stunde");return}setQuickLesson(n+1)}
+function quickPrevLesson(){var n=Number(el("quickLesson").value||1);if(n<=1){toast("Das ist die erste Stunde");return}setQuickLesson(n-1)}
+function quickGoal(sid){modal("quickRatingModal",false);openStudent(sid);checkin()}
 function renderQuickRating(){
  var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value);
+ el("quickLessonChips").innerHTML=[1,2,3,4,5,6].map(function(n){return '<button class="quick-lesson '+(n===lesson?'active':'')+'" onclick="APP.setQuickLesson('+n+')">'+n+'. Std.</button>'}).join("");
  var kids=S.students.filter(function(s){return slotEnabled(s.id,day,lesson)});
  var withGoal=kids.filter(function(s){return !!plan(s.id)});
  var done=withGoal.filter(function(s){return !!rating(s.id,day,lesson)}).length;
- var noGoal=kids.length-withGoal.length;
+ var noGoal=kids.length-withGoal.length,pct=withGoal.length?Math.round(done/withGoal.length*100):0;
  el("quickRatingProgress").textContent=done+" von "+withGoal.length+" bewertet"+(noGoal?" · "+noGoal+" ohne Ziel":"");
+ el("quickRatingContext").textContent=DAYS[day-1]+" · "+lesson+". Stunde";
+ el("quickRatingProgressBar").style.width=pct+"%";
+ var success=el("quickRatingSuccess");success.style.display=withGoal.length&&done===withGoal.length?"block":"none";success.textContent=lesson<6?"✓ Stunde vollständig bewertet · du kannst direkt zur nächsten Stunde wechseln":"✓ Stunde vollständig bewertet";
+ var next=el("quickNextBtn");next.style.display=lesson<6?"inline-flex":"none";
  el("quickRatingList").innerHTML=kids.map(function(s){
    var r=rating(s.id,day,lesson),p=plan(s.id);
-   function b(v,face){return '<button class="btn '+(r&&r.rating===v?'':'secondary')+' small" onclick="APP.quickRate(\''+s.id+'\',\''+v+'\')">'+face+'</button>'}
-   var actions=p?'<div class="toolbar">'+b("good","😊")+b("partial","😐")+b("difficult","🙁")+'</div>':'<span class="pill">Ziel fehlt</span>';
-   return '<div class="list-row"><div class="student-top"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div class="list-main"><b>'+esc(s.display_name)+'</b><span>'+esc(p?p.goal:"Noch kein Wochenziel")+'</span></div></div>'+actions+'</div>'
- }).join("")||'<div class="muted">Für diese Stunde sind keine Kinder eingetragen.</div>';
+   function b(v,face,label){return '<button class="quick-face '+(r&&r.rating===v?'selected':'')+'" aria-label="'+label+'" title="'+label+'" onclick="APP.quickRate(\''+s.id+'\',\''+v+'\')">'+face+'</button>'}
+   var actions=p?'<div class="quick-rating-actions">'+b("good","😊","Geschafft")+b("partial","😐","Teilweise")+b("difficult","🙁","Noch nicht")+'</div>':'<button class="quick-missing-goal" onclick="APP.quickGoal(\''+s.id+'\')">🎯 Ziel fehlt</button>';
+   return '<div class="quick-rating-row '+(r?'done':'')+'"><div class="quick-rating-person"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div style="min-width:0"><div class="quick-rating-name">'+esc(s.display_name)+'</div><div class="quick-rating-goal">'+esc(p?p.goal:"Noch kein Wochenziel")+'</div></div></div>'+actions+'</div>'
+ }).join("")||'<div class="dev-empty">Für diese Stunde sind keine Kinder eingetragen.</div>';
 }
 async function quickRate(sid,value){
  if(!plan(sid)){toast("Bitte zuerst ein Wochenziel vergeben");return}
@@ -1460,7 +1475,7 @@ window.addEventListener("online",updateNet);window.addEventListener("offline",up
 
 window.APP={
  login:login,logout:logout,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveStartPreference:saveStartPreference,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
- showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
+ showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,setQuickLesson:setQuickLesson,quickNextLesson:quickNextLesson,quickPrevLesson:quickPrevLesson,quickGoal:quickGoal,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
  openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
  checkin:checkin,fillCheckinTemplate:fillCheckinTemplate,pickCheckin:pickCheckin,saveCheckin:saveCheckin,
