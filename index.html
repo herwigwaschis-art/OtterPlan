@@ -168,7 +168,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
             <span><b>Schüler-Anmeldung</b><span>QR-Code scannen und direkt starten</span></span>
           </button>
           <details class="teacher-login">
-            <summary>Lehrkraft anmelden</summary>
+            <summary>Lehrkraft oder Eltern anmelden</summary>
             <div class="teacher-form">
               <label for="email">E-Mail</label><input id="email" type="email" autocomplete="username">
               <label for="password">Passwort</label><input id="password" type="password" autocomplete="current-password">
@@ -329,6 +329,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
 </section>
 
 <section id="childView" class="screen"><button id="previewBack" class="btn secondary" style="display:none;margin-bottom:14px" onclick="APP.backFromChildPreview()">← Zur Lehrkraftansicht</button>
+  <div id="parentSwitch" style="display:none;margin-bottom:12px"><label for="parentStudentSelect">Mein Kind</label><select id="parentStudentSelect" onchange="APP.selectParentStudent()"></select></div>
   <div id="childDate" class="current-date-line" style="margin-bottom:8px"></div>
   <div class="child-top"><h2 id="childTitle" class="child-name"></h2><div id="childShellBadge" class="child-shells">🐚 <span id="childShells"></span></div></div>
   <div class="child-main">
@@ -669,7 +670,7 @@ async function bootstrap(){
  S.user=u.data.user;
  var p=await sb.from("profiles").select("*").eq("id",S.user.id).single();
  if(p.error||!p.data){toast("Profil fehlt");await logout();return}
- S.profile=p.data;S.role=p.data.role;el("session").style.display="flex";el("globalSearchButton").style.display=S.role==="teacher"?"grid":"none";el("sessionLabel").textContent=(S.role==="teacher"?"👨‍🏫 ":"🧒 ")+(p.data.display_name||"");updateDateUI();
+ S.profile=p.data;S.role=p.data.role;el("session").style.display="flex";el("globalSearchButton").style.display=S.role==="teacher"?"grid":"none";el("sessionLabel").textContent=(S.role==="teacher"?"👨‍🏫 ":S.role==="parent"?"👪 ":"🧒 ")+(p.data.display_name||"");updateDateUI();
  resetIdle();
  
  await load();
@@ -722,8 +723,18 @@ async function load(){
    if(!sid){var legacy=await sb.from("students").select("id").eq("child_user_id",S.user.id).maybeSingle();sid=legacy.data&&legacy.data.id}
    if(!sid){toast("Dieses Gerät ist keinem Kind zugeordnet");return}
    var sr=await sb.from("students").select("*").eq("id",sid).single();S.student=sr.data;await loadStudent(true);renderChild();show("childView");
+ }else if(S.role==="parent"){
+   var links=await sb.from("parent_student_links").select("student_id").eq("parent_user_id",S.user.id),ids=(links.data||[]).map(function(x){return x.student_id});
+   if(links.error||!ids.length){toast("Noch kein Kind mit diesem Elternkonto verknüpft");show("login");return}
+   var children=await sb.from("students").select("*").in("id",ids).is("archived_at",null).order("display_name");S.parentChildren=children.data||[];
+   if(children.error||!S.parentChildren.length){toast("Kein aktives Kind zugeordnet");show("login");return}
+   S.student=S.parentChildren.find(function(x){return S.student&&x.id===S.student.id})||S.parentChildren[0];
+   el("parentSwitch").style.display=S.parentChildren.length>1?"block":"none";
+   el("parentStudentSelect").innerHTML=S.parentChildren.map(function(x){return '<option value="'+x.id+'">'+esc(x.display_name)+'</option>'}).join("");el("parentStudentSelect").value=S.student.id;
+   await loadStudent(true);renderChild();show("childView")
  }
 }
+async function selectParentStudent(){if(S.role!=="parent")return;var id=el("parentStudentSelect").value,s=(S.parentChildren||[]).find(function(x){return x.id===id});if(!s)return;S.student=s;await loadStudent(true);renderChild()}
 
 async function loadStudent(withRatings){
  var w=week(),s=S.student;
@@ -812,6 +823,7 @@ async function chooseClass(id){
 }
 async function switchClass(id){return chooseClass(id)}
 function showTeacherArea(area){
+ if(S.role!=="teacher")return;
  if(area==="admin"&&adminSchools().length===0&&S.schools.length>0){toast("Dafür brauchst du Admin-Rechte");return}
  S.teacherArea=area;
  el("classArea").style.display=area==="class"?"block":"none";
@@ -824,6 +836,7 @@ function showTeacherArea(area){
 function adminGateKey(){return "otter_admin_"+(S.schoolRow?S.schoolRow.id:"school")}
 function adminUnlocked(){return sessionStorage.getItem(adminGateKey())==="1"}
 function requestAdmin(){
+ if(S.role!=="teacher")return;
  closeTopMenu();
  if(adminSchools().length===0&&S.schools.length>0){toast("Dafür brauchst du Admin-Rechte");return}
  if(adminUnlocked()){showTeacherArea("admin");return}
@@ -1859,7 +1872,7 @@ function updateNet(){var n=navigator.onLine,p=S.user?pendingObservations().lengt
 window.addEventListener("online",updateNet);window.addEventListener("offline",updateNet);updateNet();updateDateUI();setInterval(updateDateUI,60000);
 
 window.APP={
- login:login,logout:logout,openGlobalSearch:openGlobalSearch,filterGlobalSearch:filterGlobalSearch,selectGlobalStudent:selectGlobalStudent,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
+ login:login,logout:logout,selectParentStudent:selectParentStudent,openGlobalSearch:openGlobalSearch,filterGlobalSearch:filterGlobalSearch,selectGlobalStudent:selectGlobalStudent,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
  showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,setQuickLesson:setQuickLesson,quickNextLesson:quickNextLesson,quickPrevLesson:quickPrevLesson,quickGoal:quickGoal,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,openArchive:openArchive,restoreArchivedStudent:restoreArchivedStudent,openArchivedClasses:openArchivedClasses,restoreArchivedClass:restoreArchivedClass,openYearTransition:openYearTransition,loadYearTransitionStudents:loadYearTransitionStudents,applyYearTransition:applyYearTransition,deleteStudent:deleteStudent,
  dragClass:dragClass,dropClass:dropClass,setTodayDay:setTodayDay,setTodaySlot:setTodaySlot,todayRate:todayRate,todayNote:todayNote,toggleAbsence:toggleAbsence,markStudentAbsentToday:markStudentAbsentToday,filterStudents:filterStudents,resetStudentFilters:resetStudentFilters,dictateObservation:dictateObservation,renderNoteTemplates:renderNoteTemplates,useNoteTemplate:useNoteTemplate,saveNoteTemplate:saveNoteTemplate,filterObservations:filterObservations,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekStart:openWeekStart,openWeekStartStudent:openWeekStartStudent,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
