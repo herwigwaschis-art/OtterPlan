@@ -524,7 +524,7 @@ function norm(v){v=String(v||"").trim();if(v.indexOf("otterplan:")===0)v=v.slice
 async function scan(){if(!window.Html5Qrcode){toast("Kamera nicht verfügbar");return}await stopScan();try{S.scanner=new Html5Qrcode("qr-reader");await S.scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:220,height:220}},function(code){el("childToken").value=norm(code);stopScan().then(redeem)},function(){})}catch(e){toast("Kamera konnte nicht gestartet werden")}}
 async function stopScan(){if(S.scanner){try{await S.scanner.stop()}catch(e){}try{S.scanner.clear()}catch(e){}S.scanner=null}}
 async function redeem(){var token=norm(el("childToken").value);if(!token){toast("QR-Code fehlt");return}await stopScan();var ses=await sb.auth.getSession();if(ses.data.session&&S.role==="teacher"){toast("Kinderzugang bitte auf dem Kindergerät testen.");return}if(ses.data.session)await sb.auth.signOut();var a=await sb.auth.signInAnonymously();if(a.error){toast("Kinderzugang konnte nicht gestartet werden");return}var r=await sb.rpc("redeem_child_qr",{p_qr_token:token});if(r.error){await sb.auth.signOut();toast("QR-Code ungültig");return}el("childToken").value="";await bootstrap()}
-async function logout(){closeTopMenu();Object.keys(sessionStorage).filter(function(k){return k.indexOf("otter_admin_")===0}).forEach(function(k){sessionStorage.removeItem(k)});stopRealtime();await stopScan();await sb.auth.signOut();S.user=null;S.profile=null;S.role=null;S.weekOffset=0;S.gradeQuickMode=false;S.undoRating=null;el("session").style.display="none";show("login")}
+async function logout(){closeTopMenu();Object.keys(sessionStorage).filter(function(k){return k.indexOf("otter_admin_")===0}).forEach(function(k){sessionStorage.removeItem(k)});stopRealtime();await stopScan();await sb.auth.signOut();S.user=null;S.profile=null;S.role=null;S.weekOffset=0;S.gradeQuickMode=false;S.undoRating=null;S.classRow=null;S.student=null;S.initialStartResolved=false;S.pendingStartGrade=null;el("session").style.display="none";show("login")}
 
 async function bootstrap(){
  var u=await sb.auth.getUser();if(!u.data.user){show("login");return}
@@ -815,13 +815,19 @@ function renderHome(){
    el("todayFocus").style.display="none";
    el("dashboard").innerHTML="";
    var canSetUp=adminSchools().length>0||S.schools.length===0;
-   if(S.gradeLinks.length){
-     var g=S.gradeLinks[0].grade_level;
-     el("studentGrid").innerHTML='<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Stufenüberblick</h2><p class="muted" style="margin:0 0 13px">Du hast Zugriff auf den Überblick der Stufe '+g+'.</p><button class="btn" onclick="APP.openGradeOverview('+g+')">Stufe '+g+' öffnen</button></div>';
+   var pref=getStartPreference(),cards=[];
+   S.gradeLinks.forEach(function(g){
+     cards.push('<button class="teacher-launcher-card" onclick="APP.openGradeOverview('+Number(g.grade_level)+')"><div><b>Stufe '+Number(g.grade_level)+' · Gesamtüberblick</b><span>Alle Kinder mit Wochenplan gemeinsam ansehen</span></div><span class="launch-arrow">→</span></button>')
+   });
+   S.classes.forEach(function(x){
+     cards.push('<button class="teacher-launcher-card" onclick="APP.chooseClass(\''+x.id+'\')"><div><b>'+esc(x.name)+'</b><span>'+(x.grade_level?'Stufe '+x.grade_level+' · ':'')+esc(x.school_year||'')+'</span></div><span class="launch-arrow">→</span></button>')
+   });
+   if(cards.length){
+     el("studentGrid").innerHTML='<div class="teacher-launcher" style="grid-column:1/-1"><div class="teacher-launcher-head"><h2>'+todayLong()+'</h2><p>Wo möchtest du mit MILO starten?</p></div><div class="teacher-launcher-grid">'+cards.join("")+'</div><div class="teacher-launcher-note">'+(pref.mode==="choose"?"Du hast „Immer Auswahl anzeigen“ als Startansicht gewählt.":"Sobald du eine Ansicht öffnest, kann MILO sie beim nächsten Start automatisch wieder öffnen.")+'</div></div>';
    }else{
      el("studentGrid").innerHTML=canSetUp
        ?'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse</h2><p class="muted" style="margin:0 0 13px">Richte zuerst deine Schule und Klasse ein.</p><button class="btn" onclick="APP.requestAdmin()">Einrichtung öffnen</button></div>'
-       :'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse zugeordnet</h2><p class="muted" style="margin:0">Bitte den Schul-Admin, dir eine Klasse zuzuordnen.</p></div>';
+       :'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse zugeordnet</h2><p class="muted" style="margin:0">Bitte den Schul-Admin, dir eine Klasse oder Stufe zuzuordnen.</p></div>';
    }
    return
  }
@@ -1263,10 +1269,28 @@ async function archiveClass(){if(!confirm("Klasse und alle Kinder archivieren?")
 function account(){
  var required=!!(S.profile&&S.profile.must_change_password);
  el("newOwnPassword").value="";el("newOwnPassword2").value="";
- el("passwordModalTitle").textContent=required?"Willkommen bei MILO":"Passwort ändern";
+ el("passwordModalTitle").textContent=required?"Willkommen bei MILO":"Konto & Einstellungen";
  el("passwordRequiredText").textContent=required?"Lege jetzt dein persönliches Passwort fest. Danach ist dein Konto fertig eingerichtet.":"";
  el("passwordCloseBtn").style.display=required?"none":"inline-block";
+ var block=el("startPreferenceBlock");if(block)block.style.display=S.role==="teacher"?"block":"none";
+ if(S.role==="teacher"){
+   var p=getStartPreference(),opts=['<option value="last">Zuletzt geöffnete Ansicht (empfohlen)</option>','<option value="choose">Immer Auswahl anzeigen</option>'];
+   S.classes.forEach(function(x){opts.push('<option value="class:'+x.id+'">Immer '+esc(x.name)+' öffnen</option>')});
+   S.gradeLinks.forEach(function(g){opts.push('<option value="grade:'+Number(g.grade_level)+'">Immer Stufe '+Number(g.grade_level)+' · Gesamtüberblick öffnen</option>')});
+   el("startPreference").innerHTML=opts.join("");
+   var value=p.mode==="class"&&p.fixedClassId?"class:"+p.fixedClassId:p.mode==="grade"&&p.fixedGrade?"grade:"+p.fixedGrade:p.mode||"last";
+   if(Array.from(el("startPreference").options).some(function(o){return o.value===value}))el("startPreference").value=value;else el("startPreference").value="last"
+ }
  modal("passwordModal",true)
+}
+function saveStartPreference(){
+ if(S.role!=="teacher")return;
+ var value=el("startPreference").value,p=getStartPreference();
+ if(value==="last"){p.mode="last";p.fixedType=null;p.fixedClassId=null;p.fixedGrade=null}
+ else if(value==="choose"){p.mode="choose";p.fixedType=null;p.fixedClassId=null;p.fixedGrade=null}
+ else if(value.indexOf("class:")===0){p.mode="class";p.fixedType="class";p.fixedClassId=value.slice(6);p.fixedGrade=null}
+ else if(value.indexOf("grade:")===0){p.mode="grade";p.fixedType="grade";p.fixedGrade=Number(value.slice(6));p.fixedClassId=null}
+ writeStartPreference(p);toast("Startansicht gespeichert")
 }
 async function saveOwnPassword(){var a=el("newOwnPassword").value,b=el("newOwnPassword2").value;if(a.length<10){toast("Mindestens 10 Zeichen");return}if(a!==b){toast("Passwörter stimmen nicht überein");return}var r=await sb.auth.updateUser({password:a});if(r.error){toast("Passwort konnte nicht geändert werden");return}await sb.rpc("mark_password_changed");S.profile.must_change_password=false;modal("passwordModal",false);if(location.search.indexOf("invite=1")>=0)history.replaceState({},document.title,location.pathname);toast("Passwort gespeichert")}
 async function renderAdminArea(){
@@ -1429,7 +1453,7 @@ function updateNet(){var n=navigator.onLine;el("netState").textContent=n?"● On
 window.addEventListener("online",updateNet);window.addEventListener("offline",updateNet);updateNet();updateDateUI();setInterval(updateDateUI,60000);
 
 window.APP={
- login:login,logout:logout,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
+ login:login,logout:logout,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveStartPreference:saveStartPreference,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
  showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
  openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
