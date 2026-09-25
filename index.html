@@ -125,7 +125,7 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .week-ritual{max-width:980px;margin:0 auto 18px;padding:20px 24px;border:1px solid #cce4db;border-left:5px solid var(--accent);border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px}.week-ritual.friday{border-color:#e9dbb3;border-left-color:#d4a42f}.week-ritual h3{margin:0 0 6px;font-size:20px}.week-ritual p{margin:0;font-size:14px;color:var(--muted)}.week-ritual .btn{flex-shrink:0}.week-ritual .eyebrow{margin-bottom:5px}@media(max-width:600px){.week-ritual{padding:18px;align-items:stretch;flex-direction:column;gap:14px}.week-ritual .btn{width:100%}}
-.quick-lessons{grid-template-columns:repeat(4,minmax(0,1fr))}.quick-lesson{min-height:44px}.voice-btn{float:right;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--accent);min-width:40px;min-height:36px;margin-top:-2px}.teacher-launcher-card[draggable=true]{cursor:grab}.teacher-launcher-card[draggable=true]:active{cursor:grabbing}@media(max-width:600px){.teacher-launcher-card{touch-action:manipulation}}</style>
+.self-face{font-size:14px;line-height:1;position:absolute;right:4px;bottom:4px;background:#fff;border-radius:50%;padding:2px}.slot-face{position:relative}.child-reward-dots{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.child-reward-dots span{width:16px;height:16px;border-radius:5px;border:2px solid #bdd6d0;background:#edf4f2}.child-reward-dots span.filled{background:#0f9182;border-color:#0f9182}.quick-lessons{grid-template-columns:repeat(4,minmax(0,1fr))}.quick-lesson{min-height:44px}.voice-btn{float:right;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--accent);min-width:40px;min-height:36px;margin-top:-2px}.teacher-launcher-card[draggable=true]{cursor:grab}.teacher-launcher-card[draggable=true]:active{cursor:grabbing}@media(max-width:600px){.teacher-launcher-card{touch-action:manipulation}}</style>
 </head>
 <body>
 <header>
@@ -320,10 +320,11 @@ input[type=checkbox]{min-height:20px;width:20px;height:20px;accent-color:var(--a
   <div class="child-top"><h2 id="childTitle" class="child-name"></h2><div id="childShellBadge" class="child-shells">🐚 <span id="childShells"></span></div></div>
   <div class="child-main">
     <div class="kid-card"><div class="kid-label">Mein Ziel</div><div class="toolbar" style="align-items:center"><div id="childGoal" class="kid-goal" style="flex:1"></div><button class="btn secondary" aria-label="Ziel vorlesen" title="Ziel vorlesen" onclick="APP.speakGoal()">🔊</button></div><div id="childHelp" class="kid-tip"></div></div>
-    <div class="kid-card kid-reward"><div><div class="kid-label">Belohnung</div><div id="childRewardTitle" class="kid-reward-title"></div></div><div><div id="childReward" class="kid-reward-count"></div><div class="progress"><div id="childBar"></div></div><div id="childRewardHint" class="kid-tip"></div></div></div>
+    <div class="kid-card kid-reward"><div><div class="kid-label">Belohnung</div><div id="childRewardTitle" class="kid-reward-title"></div></div><div><div id="childReward" class="kid-reward-count"></div><div class="progress"><div id="childBar"></div></div><div id="childRewardDots" class="child-reward-dots" aria-hidden="true"></div><div id="childRewardHint" class="kid-tip"></div></div></div>
   </div>
   <div class="child-mini"><div class="mini-card"><div id="childGood" class="mini-value">0</div><div class="mini-label">😊 geschafft</div></div><div class="mini-card"><div id="childRated" class="mini-value">0</div><div class="mini-label">bewertet</div></div></div>
   <div class="card" style="margin-bottom:15px"><div class="kid-label">Heute</div><div id="childToday" class="today-grid"></div></div>
+  <div id="childSelfCard" class="card" style="display:none;margin-bottom:15px"><div class="kid-label" id="childSelfTitle">Wie war es für dich?</div><div class="choice-row" style="margin-bottom:0"><button id="self-good" class="choice" aria-label="Gut geschafft" onclick="APP.saveSelfRating('good')"><span class="emoji">😊</span>Gut</button><button id="self-partial" class="choice" aria-label="Teilweise geschafft" onclick="APP.saveSelfRating('partial')"><span class="emoji">😐</span>So mittel</button><button id="self-difficult" class="choice" aria-label="Schwierig" onclick="APP.saveSelfRating('difficult')"><span class="emoji">🙁</span>Schwer</button></div></div>
   <div id="childCheckoutCard" class="card" style="display:none;margin-bottom:15px"><div class="checkout-compact"><div id="childCheckoutFace" class="checkout-face"></div><div class="checkout-copy"><b id="childCheckoutSelf"></b><span id="childCheckoutDecision"></span><div id="childCheckoutNote" style="margin-top:4px;font-size:11px"></div></div></div></div>
   <div class="card"><h3 style="margin-top:0">Meine Woche</h3><div id="childWeek" class="week"></div></div>
 </section>
@@ -511,7 +512,7 @@ var BUILTIN_GOALS=[
  {title:"Friedlich lösen",goal:"Ich löse Streit friedlich.",help:"Ich stoppe, spreche ruhig und hole Hilfe, wenn ich sie brauche."}
 ];
 var BUILTIN_REWARDS=[{title:"Sticker auswählen",shells:5},{title:"Spiel auswählen",shells:10},{title:"Wunschbelohnung",shells:20}];
-var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],absences:[],timetable:[],scheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,gradeStudentData:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null,weekOffset:0,gradeFilter:"all",gradeClassFilter:"all",gradeQuickMode:false,gradeQuickIndex:0,undoRating:null,undoTimer:null,adminTeacherEdit:null,studentTab:"plan",developmentData:null,developmentContext:"teacher",developmentStudentId:null,aiAnalysisText:"",initialStartResolved:false,pendingStartGrade:null};
+var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],absences:[],selfRatings:[],timetable:[],scheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,gradeStudentData:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null,weekOffset:0,gradeFilter:"all",gradeClassFilter:"all",gradeQuickMode:false,gradeQuickIndex:0,undoRating:null,undoTimer:null,adminTeacherEdit:null,studentTab:"plan",developmentData:null,developmentContext:"teacher",developmentStudentId:null,aiAnalysisText:"",initialStartResolved:false,pendingStartGrade:null};
 var idleTimer=null,reload=null;
 
 function el(id){return document.getElementById(id)}
@@ -622,6 +623,7 @@ function updateDateUI(){
 function plan(sid){if(S.teacherArea==="grade")return S.gradeActivePlan&&S.gradeActivePlan.student_id===sid?S.gradeActivePlan:null;return S.plans.find(function(p){return p.student_id===sid})||null}
 function shells(sid){var p=S.progress.find(function(x){return x.student_id===sid});return p?p.shells||0:0}
 function rs(sid){return S.rewards.filter(function(r){return r.student_id===sid&&r.active}).sort(function(a,b){return a.shells_required-b.shells_required})}
+function selfRating(sid,day,lesson){return S.selfRatings.find(function(r){return r.student_id===sid&&Number(r.weekday)===Number(day)&&Number(r.lesson_no)===Number(lesson)})||null}
 function rating(sid,day,lesson){return S.ratings.find(function(r){return r.student_id===sid&&Number(r.weekday)===Number(day)&&Number(r.lesson_no)===Number(lesson)})||null}
 function slotEnabled(sid,day,lesson){var x=S.scheduleSlots.find(function(s){return s.student_id===sid&&Number(s.weekday)===Number(day)&&Number(s.lesson_no)===Number(lesson)});return x?x.enabled!==false:true}
 function stats(sid){var a=S.ratings.filter(function(r){return r.student_id===sid});return {good:a.filter(function(r){return r.rating==="good"}).length,total:a.length}}
@@ -674,7 +676,7 @@ async function load(){
    }
    if(S.schoolRow){S.schoolRow=S.schools.find(function(x){return x.id===S.schoolRow.id})||S.schools[0]||null}else S.schoolRow=S.schools[0]||null;
    if(!S.classRow){
-     S.students=[];S.absences=[];S.timetable=[];S.scheduleSlots=[];S.plans=[];S.ratings=[];S.rewards=[];S.progress=[];renderTeacherShell();renderHome();show("teacher");
+     S.students=[];S.absences=[];S.selfRatings=[];S.timetable=[];S.scheduleSlots=[];S.plans=[];S.ratings=[];S.rewards=[];S.progress=[];renderTeacherShell();renderHome();show("teacher");
      if(S.pendingStartGrade){var g=S.pendingStartGrade;S.pendingStartGrade=null;setTimeout(function(){openGradeOverview(g)},40)}
      return
    }
@@ -686,9 +688,10 @@ async function load(){
      ids.length?sb.from("rewards").select("*").in("student_id",ids).eq("active",true):Promise.resolve({data:[]}),
      ids.length?sb.from("student_progress").select("*").in("student_id",ids):Promise.resolve({data:[]}),
      ids.length?sb.from("student_schedule_slots").select("*").in("student_id",ids):Promise.resolve({data:[]}),
-      ids.length?sb.from("student_absences").select("*").in("student_id",ids).gte("absent_on",w).lte("absent_on",weekDayISO(5)):Promise.resolve({data:[]})
+      ids.length?sb.from("student_absences").select("*").in("student_id",ids).gte("absent_on",w).lte("absent_on",weekDayISO(5)):Promise.resolve({data:[]}),
+     ids.length?sb.from("student_self_ratings").select("*").in("student_id",ids).eq("week_start",w):Promise.resolve({data:[]})
    ]);
-   S.timetable=[];S.plans=q[0].data||[];S.ratings=q[1].data||[];S.rewards=q[2].data||[];S.progress=q[3].data||[];S.scheduleSlots=q[4].data||[];S.absences=q[5].data||[];
+   S.timetable=[];S.plans=q[0].data||[];S.ratings=q[1].data||[];S.rewards=q[2].data||[];S.progress=q[3].data||[];S.scheduleSlots=q[4].data||[];S.absences=q[5].data||[];S.selfRatings=q[6].data||[];
    renderTeacherShell();renderHome();show("teacher");
  }else if(S.role==="student"){
    var link=await sb.from("student_device_links").select("student_id").eq("user_id",S.user.id).maybeSingle();var sid=link.data&&link.data.student_id;
@@ -704,9 +707,10 @@ async function loadStudent(withRatings){
    sb.from("weekly_plans").select("*").eq("student_id",s.id).eq("week_start",w),
    sb.from("rewards").select("*").eq("student_id",s.id).eq("active",true),
    sb.from("student_progress").select("*").eq("student_id",s.id),
-   sb.from("student_schedule_slots").select("*").eq("student_id",s.id)
+   sb.from("student_schedule_slots").select("*").eq("student_id",s.id),
+   sb.from("student_self_ratings").select("*").eq("student_id",s.id).eq("week_start",w)
  ]);
- S.timetable=[];S.plans=q[0].data||[];S.rewards=q[1].data||[];S.progress=q[2].data||[];S.scheduleSlots=q[3].data||[];
+ S.timetable=[];S.plans=q[0].data||[];S.rewards=q[1].data||[];S.progress=q[2].data||[];S.scheduleSlots=q[3].data||[];S.selfRatings=q[4].data||[];
  S.ratings=withRatings?(await sb.from("ratings").select("*").eq("student_id",s.id).eq("week_start",w)).data||[]:[];
 }
 
@@ -1064,7 +1068,7 @@ function renderWeek(target,click){
      if(!enabled){out+='<div class="cell '+(today===d?'today-cell ':'')+'" style="opacity:.28"></div>';continue}
      var r=S.student?rating(S.student.id,d,n):null;
      var label=DAYS[d-1]+", "+segmentLabel(n)+": "+(r?({good:"Geschafft",partial:"Teilweise",difficult:"Noch nicht"}[r.rating]||"Bewertet"):"Noch keine Bewertung");
-     out+='<'+(click?'button type="button"':'div')+' class="cell slot-face '+(today===d?'today-cell ':'')+(click?'click':'')+'" aria-label="'+esc(label)+'" '+(click?'onclick="APP.openRating('+d+','+n+')"':'')+'><span aria-hidden="true" class="face '+(r?'':'none')+'">'+(r?FACE[r.rating]:(click?'＋':'•'))+'</span></'+(click?'button':'div')+'>';
+     out+='<'+(click?'button type="button"':'div')+' class="cell slot-face '+(today===d?'today-cell ':'')+(click?'click':'')+'" aria-label="'+esc(label)+'" '+(click?'onclick="APP.openRating('+d+','+n+')"':'')+'><span aria-hidden="true" class="face '+(r?'':'none')+'">'+(r?FACE[r.rating]:(click?'＋':'•'))+'</span>'+(selfRating(S.student.id,d,n)?'<span class="self-face" title="Selbsteinschätzung des Kindes">'+FACE[selfRating(S.student.id,d,n).rating]+'</span>':'')+'</'+(click?'button':'div')+'>';
    }
  }
  el(target).innerHTML=out
@@ -1635,6 +1639,11 @@ async function createSchoolClass(){var n=el("schoolClassName").value.trim(),g=Nu
 function previewChild(){if(S.role!=="teacher"||!S.student)return;S.previewStudent=S.student;renderChild();show("childView");el("previewBack").style.display="inline-flex"}
 function backFromChildPreview(){if(S.role!=="teacher")return;el("previewBack").style.display="none";show("teacher");if(S.previewStudent)openStudent(S.previewStudent.id);S.previewStudent=null}
 function speakGoal(){if(!("speechSynthesis" in window)){toast("Vorlesen wird auf diesem Gerät nicht unterstützt");return}var goal=el("childGoal").textContent;if(!goal)return;window.speechSynthesis.cancel();var utterance=new SpeechSynthesisUtterance(goal);utterance.lang="de-DE";utterance.rate=.85;window.speechSynthesis.speak(utterance)}
+async function saveSelfRating(value){if(S.role!=="student"||!S.student)return;var day=new Date().getDay(),lesson=currentTeachingSlot();if(day<1||day>5||!lesson||!plan(S.student.id))return;
+ var row={student_id:S.student.id,week_start:week(),weekday:day,lesson_no:lesson,rating:value,created_by:S.user.id,updated_at:new Date().toISOString()};
+ var r=await sb.from("student_self_ratings").upsert(row,{onConflict:"student_id,week_start,weekday,lesson_no"});if(r.error){toast("Einschätzung konnte nicht gespeichert werden");return}
+ var old=selfRating(S.student.id,day,lesson);if(old)old.rating=value;else S.selfRatings.push(row);renderChild();toast("Danke, gespeichert")
+}
 function renderChild(){
  updateDateUI();
  var s=S.previewStudent||S.student,p=plan(s.id),sh=shells(s.id),x=stats(s.id),rewards=rs(s.id),next=rewards.find(function(r){return r.shells_required>sh});
@@ -1642,8 +1651,10 @@ function renderChild(){
  if(S.lastChildShells!==null&&sh>S.lastChildShells){el("childShellBadge").classList.remove("shell-pop");void el("childShellBadge").offsetWidth;el("childShellBadge").classList.add("shell-pop")}S.lastChildShells=sh;
  el("childShells").textContent=sh;el("childGoal").textContent=p?p.goal:"Noch kein Ziel";el("childHelp").textContent=p&&p.help_text?"💡 "+p.help_text:"";el("childGood").textContent=x.good;el("childRated").textContent=x.total;
  if(next){el("childRewardTitle").textContent=next.title;el("childReward").textContent=sh+" / "+next.shells_required;el("childBar").style.width=Math.min(100,Math.round(sh/next.shells_required*100))+"%";var left=next.shells_required-sh;el("childRewardHint").textContent="Noch "+left+" "+(left===1?"Muschel":"Muscheln")}else if(rewards.length){el("childRewardTitle").textContent="Stark!";el("childReward").textContent="🐚 "+sh;el("childBar").style.width="100%";el("childRewardHint").textContent="Geschafft"}else{el("childRewardTitle").textContent="Noch offen";el("childReward").textContent="🐚 "+sh;el("childBar").style.width="0%";el("childRewardHint").textContent=""}
+ var rewardGoal=next?next.shells_required:Math.max(sh,1),dots=Math.min(rewardGoal,12),filled=Math.round(Math.min(1,sh/rewardGoal)*dots);el("childRewardDots").innerHTML=Array.from({length:dots},function(_,i){return '<span class="'+(i<filled?'filled':'')+'"></span>'}).join("");
  var dow=new Date().getDay(),entries=[];if(dow>=1&&dow<=5){SEGMENTS.forEach(function(ln){if(slotEnabled(s.id,dow,ln))entries.push(ln)})}
  el("childToday").innerHTML=entries.length?entries.map(function(ln){var r=rating(s.id,dow,ln);return '<div class="today-tile"><b>'+segmentLabel(ln)+'</b><span>'+(r?FACE[r.rating]:"•")+'</span></div>'}).join(""):'<div class="muted">Heute ist frei.</div>';
+ var selfBox=el("childSelfCard"),active=currentTeachingSlot();selfBox.style.display=S.role==="student"&&dow>=1&&dow<=5&&active&&p?"block":"none";if(selfBox.style.display==="block"){el("childSelfTitle").textContent="Wie lief "+segmentLabel(active)+"?";var sr=selfRating(s.id,dow,active);["good","partial","difficult"].forEach(function(v){el("self-"+v).classList.toggle("selected",!!(sr&&sr.rating===v))})}
  var box=el("childCheckoutCard");if(p&&p.checkout_self){box.style.display="block";el("childCheckoutFace").textContent=FACE[p.checkout_self]||"";el("childCheckoutSelf").textContent=({good:"Geschafft",partial:"Teilweise",difficult:"Noch schwierig"}[p.checkout_self]||"");el("childCheckoutDecision").textContent=({done:"Ziel beendet",continue:"Ziel bleibt",change:"Neues Ziel"}[p.checkout_decision]||"");el("childCheckoutNote").textContent=p.checkout_note||""}else box.style.display="none";
  renderWeek("childWeek",false)
 }
@@ -1670,7 +1681,7 @@ window.APP={
  checkout:checkout,pickCheckoutSelf:pickCheckoutSelf,pickCheckoutDecision:pickCheckoutDecision,saveCheckout:saveCheckout,
  openBatchGoals:openBatchGoals,fillBatchTemplate:fillBatchTemplate,applyBatchGoal:applyBatchGoal,saveGoalTemplate:saveGoalTemplate,deleteGoalTemplate:deleteGoalTemplate,carryGoals:carryGoals,
  reward:reward,fillRewardTemplate:fillRewardTemplate,setShells:setShells,addReward:addReward,saveRewardTemplate:saveRewardTemplate,redeemReward:redeemReward,removeReward:removeReward,
- previewChild:previewChild,backFromChildPreview:backFromChildPreview,speakGoal:speakGoal,qr:qr,createQr:createQr,resetQr:resetQr,revoke:revoke,downloadSingleQr:downloadSingleQr,downloadCodes:downloadCodes,
+ previewChild:previewChild,backFromChildPreview:backFromChildPreview,speakGoal:speakGoal,saveSelfRating:saveSelfRating,qr:qr,createQr:createQr,resetQr:resetQr,revoke:revoke,downloadSingleQr:downloadSingleQr,downloadCodes:downloadCodes,
  openStudentSchedule:openStudentSchedule,schedulePreset:schedulePreset,saveStudentSchedule:saveStudentSchedule,
  history:history,openExport:openExport,exportWeekly:exportWeekly,exportMonthly:exportMonthly,exportStudent:exportStudent,
  openClassAdmin:openClassAdmin,saveClassSettings:saveClassSettings,assignTeacher:assignTeacher,removeTeacher:removeTeacher,saveRetention:saveRetention,archiveClass:archiveClass,
