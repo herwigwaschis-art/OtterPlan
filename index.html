@@ -996,7 +996,7 @@ function renderHome(){
    }
    return
  }
- if(S.todayClassId!==S.classRow.id){S.todayClassId=S.classRow.id;S.todayDay=isCurrentWeek()?currentSchoolDay():1;S.todaySlot=currentTeachingSlot()||1;el("classOverview").open=false}
+ if(S.todayClassId!==S.classRow.id){S.todayClassId=S.classRow.id;S.todayDay=isCurrentWeek()?currentSchoolDay():1;S.todaySlot=isCurrentWeek()?currentTeachingSlot():null;el("classOverview").open=false}
  el("classOverview").classList.remove("launcher-mode");el("classTodayPanel").style.display="block";
  el("todayFocus").style.display="none";
  el("homeTools").style.display="flex";
@@ -1028,16 +1028,16 @@ function todayRate(id,value){el("quickDay").value=String(S.todayDay);el("quickLe
 function todayNote(id){openStudent(id);openStudentTab("notes")}
 function renderTodayPanel(){
  if(!S.classRow)return;
- var day=S.todayDay||currentSchoolDay(),slot=S.todaySlot||1,kids=S.students.filter(function(s){return slotEnabled(s.id,day,slot)}),today=new Date().getDay();
- el("todayPanelTitle").textContent=segmentLabel(slot);
- el("todayPanelMeta").textContent=DAYS[day-1]+" · "+kids.length+" "+(kids.length===1?"Kind":"Kinder")+(isCurrentWeek()&&day===today&&slot===currentTeachingSlot()?" · jetzt":"");
+ var day=S.todayDay||currentSchoolDay(),slot=S.todaySlot,kids=slot?S.students.filter(function(s){return slotEnabled(s.id,day,slot)}):[],today=new Date().getDay();
+ el("todayPanelTitle").textContent=slot?segmentLabel(slot):isCurrentWeek()&&day===today?"Gerade kein Unterricht":"Abschnitt auswählen";
+ el("todayPanelMeta").textContent=slot?DAYS[day-1]+" · "+kids.length+" "+(kids.length===1?"Kind":"Kinder")+(isCurrentWeek()&&day===today&&slot===currentTeachingSlot()?" · jetzt":""):"Wähle eine Stunde oder Pause aus.";
  el("todayDayChips").innerHTML=DAYS.map(function(label,i){return '<button type="button" class="today-chip '+(day===i+1?'active':'')+'" aria-pressed="'+(day===i+1)+'" onclick="APP.setTodayDay('+(i+1)+')">'+label+'</button>'}).join("");
  el("todaySlotChips").innerHTML=SEGMENTS.map(function(n){return '<button type="button" class="today-chip '+(slot===n?'active':'')+'" aria-pressed="'+(slot===n)+'" onclick="APP.setTodaySlot('+n+')">'+segmentLabel(n)+'</button>'}).join("");
  el("todayChildren").innerHTML=kids.map(function(s){
   var p=plan(s.id),r=rating(s.id,day,slot),absent=isAbsent(s.id,day,slot),self=selfRating(s.id,day,slot);
   var actions=absent?'<span class="status-chip">Abwesend</span>':p?'<div class="today-faces">'+["good","partial","difficult"].map(function(v){return '<button type="button" class="quick-face '+(r&&r.rating===v?'selected':'')+'" aria-label="'+esc(s.display_name)+': '+({good:'Geschafft',partial:'Teilweise',difficult:'Noch nicht'}[v])+'" aria-pressed="'+(!!r&&r.rating===v)+'" onclick="APP.todayRate(\''+s.id+'\',\''+v+'\')">'+FACE[v]+'</button>'}).join("")+'</div>':'<button class="quick-missing-goal" onclick="APP.quickGoal(\''+s.id+'\')">Ziel anlegen</button>';
   return '<div class="today-child"><button type="button" class="today-child-name" onclick="APP.openStudent(\''+s.id+'\')"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><span><b>'+esc(s.display_name)+'</b><small>'+esc(p?p.goal:"Noch kein Wochenziel")+'</small></span></button>'+(self?'<span class="today-self" title="Selbsteinschätzung des Kindes">'+FACE[self.rating]+'</span>':'')+actions+'<button type="button" class="today-note" aria-label="Notiz zu '+esc(s.display_name)+'" onclick="APP.todayNote(\''+s.id+'\')">✎</button></div>'
- }).join("")||'<div class="dev-empty">Für diesen Abschnitt sind keine Kinder eingetragen. Wähle einen anderen Abschnitt.</div>';
+ }).join("")||(slot?'<div class="dev-empty">Für diesen Abschnitt sind keine Kinder eingetragen. Wähle einen anderen Abschnitt.</div>':'<div class="dev-empty">Tippe auf eine Stunde oder Pause, um Kinder und Ziele zu sehen.</div>');
 }
 function filterStudents(){renderStudentCards()}
 function resetStudentFilters(){el("studentSearch").value="";el("studentFilter").value="all";renderStudentCards()}
