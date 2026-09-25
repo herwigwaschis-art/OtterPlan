@@ -1940,7 +1940,7 @@ window.APP={
  attachClass:attachClass,createSchoolClass:createSchoolClass,openTeacherEditIndex:openTeacherEditIndex,saveTeacherEdit:saveTeacherEdit,openAdminClassEditIndex:openAdminClassEditIndex,saveAdminClassEdit:saveAdminClassEdit,archiveAdminClass:archiveAdminClass,renderAdminArea:renderAdminArea,createSchoolFromAdmin:createSchoolFromAdmin,saveAdminSettings:saveAdminSettings,createDemoStudent:createDemoStudent,deleteDemoStudents:deleteDemoStudents,createTeacherAccount:createTeacherAccount,resetTeacherPassword:resetTeacherPassword,removeSchoolMember:removeSchoolMember,resetTeacherPasswordIndex:resetTeacherPasswordIndex,removeSchoolMemberIndex:removeSchoolMemberIndex
 };
 
-sb.auth.onAuthStateChange(function(event,session){if(event==="SIGNED_OUT"&&!session){S.user=null;S.profile=null;S.role=null;el("session").style.display="none";el("globalSearchButton").style.display="none";show("login")}});
+sb.auth.onAuthStateChange(function(event,session){if(event==="SIGNED_OUT"&&!session){S.user=null;S.profile=null;S.role=null;el("session").style.display="none";el("globalSearchButton").style.display="none";if(S.childRedeeming||new URL(location.href).searchParams.has("child")){show("childLogin")}else{show("login")}}});
 sb.auth.getSession().then(function(r){var params=new URL(location.href).searchParams,token=params.get("child");if(token){el("childToken").value=norm(token);show("childLogin");redeem();return}if(params.get("menu")==="1"){el("resumeSessionBtn").style.display=r.data.session?"inline-flex":"none";show("login");return}if(r.data.session)bootstrap()});
 if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js").then(function(r){r.update()}).catch(function(){})});
 })();
