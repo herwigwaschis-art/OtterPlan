@@ -64,7 +64,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
 </head>
 <body>
 <header>
-  <div class="brand"><img class="brand-logo-img" src="./milo-wordmark.svg" alt="MILO"></div>
+  <a class="brand" href="./" aria-label="MILO Auswahlmenü öffnen" title="Zum Auswahlmenü"><img class="brand-logo-img" src="./milo-wordmark.svg" alt="MILO"></a>
   <div id="session" class="top-menu-wrap" style="display:none" onclick="event.stopPropagation()">
     <span id="todayBadge" class="today-badge"></span>
     <button class="menu-trigger" aria-label="Menü öffnen" onclick="APP.toggleTopMenu()">☰</button>
@@ -399,9 +399,7 @@ details.clean{margin-top:13px}details.clean summary{cursor:pointer;color:var(--m
   <p id="passwordRequiredText" class="muted" style="font-size:12px"></p>
   <div id="startPreferenceBlock">
     <label>Startansicht</label>
-    <select id="startPreference"></select>
-    <p class="start-pref-copy">Legt fest, was MILO auf diesem Gerät nach dem Öffnen zuerst zeigt. „Zuletzt geöffnet“ ist für den Alltag meist am praktischsten.</p>
-    <button class="btn secondary small" style="margin-top:9px" onclick="APP.saveStartPreference()">Startansicht speichern</button>
+    <p class="start-pref-copy">MILO öffnet immer das Auswahlmenü. Über das Logo oben kommst du jederzeit dorthin zurück.</p>
     <div class="account-divider"></div>
   </div>
   <label>Neues Passwort</label><input id="newOwnPassword" type="password" autocomplete="new-password">
@@ -494,16 +492,8 @@ function rememberLastView(type,value){
  writeStartPreference(p)
 }
 function resolveInitialStart(){
- var p=getStartPreference(),classId=null,grade=null;
- if(p.mode==="class")classId=p.fixedClassId;
- else if(p.mode==="grade")grade=Number(p.fixedGrade||0)||null;
- else if(p.mode==="last"){
-   if(p.lastType==="class")classId=p.lastClassId;
-   if(p.lastType==="grade")grade=Number(p.lastGrade||0)||null
- }
- if(classId&&!S.classes.some(function(x){return x.id===classId}))classId=null;
- if(grade&&!S.gradeLinks.some(function(x){return Number(x.grade_level)===grade}))grade=null;
- return {classId:classId,grade:grade}
+ // Every new visit starts at the launcher, regardless of older saved preferences.
+ return {classId:null,grade:null}
 }
 function updateDateUI(){
  var map={todayBadge:"📅 "+todayShort(),classToday:"📅 "+todayLong(),gradeDate:"📅 "+todayLong(),childDate:"📅 "+todayLong(),gradeStudentDate:isCurrentWeek()?todayShort():"Woche "+weekRangeLabel(),quickRatingDate:isCurrentWeek()?"📅 "+todayLong():"📅 Woche "+weekRangeLabel()};
@@ -819,7 +809,7 @@ function renderHome(){
    el("todayFocus").style.display="none";
    el("dashboard").innerHTML="";
    var canSetUp=adminSchools().length>0||S.schools.length===0;
-   var pref=getStartPreference(),classCards=[],overviewCards=[];
+   var classCards=[],overviewCards=[];
    S.classes.forEach(function(x){
      classCards.push('<button class="teacher-launcher-card" onclick="APP.chooseClass(\''+x.id+'\')"><div><b>'+esc(x.name)+'</b><span>'+(x.grade_level?'Stufe '+x.grade_level+' · ':'')+esc(x.school_year||'')+'</span></div><span class="launch-arrow">→</span></button>')
    });
@@ -829,7 +819,7 @@ function renderHome(){
    if(classCards.length||overviewCards.length){
      var classSection=classCards.length?'<div class="launcher-section-title">Meine Klassen</div><div class="teacher-launcher-grid">'+classCards.join("")+'</div>':'';
      var overviewSection=overviewCards.length?'<div class="teacher-launcher-overview"><div class="launcher-section-title">Stufenüberblick</div><div class="overview-launcher-list">'+overviewCards.join("")+'</div></div>':'';
-     el("studentGrid").innerHTML='<div class="teacher-launcher" style="grid-column:1/-1"><div class="teacher-launcher-head"><h2>'+todayLong()+'</h2><p>Wo möchtest du mit MILO starten?</p></div>'+classSection+overviewSection+'<div class="teacher-launcher-note">'+(pref.mode==="choose"?"Du hast „Immer Auswahl anzeigen“ als Startansicht gewählt.":"MILO kann sich deine zuletzt geöffnete Ansicht merken.")+'</div></div>';
+     el("studentGrid").innerHTML='<div class="teacher-launcher" style="grid-column:1/-1"><div class="teacher-launcher-head"><h2>'+todayLong()+'</h2><p>Wo möchtest du mit MILO starten?</p></div>'+classSection+overviewSection+'<div class="teacher-launcher-note">Über das MILO-Logo kommst du jederzeit zurück zur Auswahl.</div></div>';
    }else{
      el("studentGrid").innerHTML=canSetUp
        ?'<div class="card" style="grid-column:1/-1;text-align:center;box-shadow:none"><h2 style="margin:0 0 7px">Noch keine Klasse</h2><p class="muted" style="margin:0 0 13px">Richte zuerst deine Schule und Klasse ein.</p><button class="btn" onclick="APP.requestAdmin()">Einrichtung öffnen</button></div>'
@@ -1294,24 +1284,7 @@ function account(){
  el("passwordRequiredText").textContent=required?"Lege jetzt dein persönliches Passwort fest. Danach ist dein Konto fertig eingerichtet.":"";
  el("passwordCloseBtn").style.display=required?"none":"inline-block";
  var block=el("startPreferenceBlock");if(block)block.style.display=S.role==="teacher"?"block":"none";
- if(S.role==="teacher"){
-   var p=getStartPreference(),opts=['<option value="last">Zuletzt geöffnete Ansicht (empfohlen)</option>','<option value="choose">Immer Auswahl anzeigen</option>'];
-   if(S.classes.length){opts.push('<optgroup label="Klassen">');S.classes.forEach(function(x){opts.push('<option value="class:'+x.id+'">Immer '+esc(x.name)+' öffnen</option>')});opts.push('</optgroup>')}
-   if(S.gradeLinks.length){opts.push('<optgroup label="Stufenüberblick">');S.gradeLinks.forEach(function(g){opts.push('<option value="grade:'+Number(g.grade_level)+'">Immer Stufe '+Number(g.grade_level)+' öffnen</option>')});opts.push('</optgroup>')}
-   el("startPreference").innerHTML=opts.join("");
-   var value=p.mode==="class"&&p.fixedClassId?"class:"+p.fixedClassId:p.mode==="grade"&&p.fixedGrade?"grade:"+p.fixedGrade:p.mode||"last";
-   if(Array.from(el("startPreference").options).some(function(o){return o.value===value}))el("startPreference").value=value;else el("startPreference").value="last"
- }
  modal("passwordModal",true)
-}
-function saveStartPreference(){
- if(S.role!=="teacher")return;
- var value=el("startPreference").value,p=getStartPreference();
- if(value==="last"){p.mode="last";p.fixedType=null;p.fixedClassId=null;p.fixedGrade=null}
- else if(value==="choose"){p.mode="choose";p.fixedType=null;p.fixedClassId=null;p.fixedGrade=null}
- else if(value.indexOf("class:")===0){p.mode="class";p.fixedType="class";p.fixedClassId=value.slice(6);p.fixedGrade=null}
- else if(value.indexOf("grade:")===0){p.mode="grade";p.fixedType="grade";p.fixedGrade=Number(value.slice(6));p.fixedClassId=null}
- writeStartPreference(p);toast("Startansicht gespeichert")
 }
 async function saveOwnPassword(){var a=el("newOwnPassword").value,b=el("newOwnPassword2").value;if(a.length<10){toast("Mindestens 10 Zeichen");return}if(a!==b){toast("Passwörter stimmen nicht überein");return}var r=await sb.auth.updateUser({password:a});if(r.error){toast("Passwort konnte nicht geändert werden");return}await sb.rpc("mark_password_changed");S.profile.must_change_password=false;modal("passwordModal",false);if(location.search.indexOf("invite=1")>=0)history.replaceState({},document.title,location.pathname);toast("Passwort gespeichert")}
 async function renderAdminArea(){
@@ -1474,7 +1447,7 @@ function updateNet(){var n=navigator.onLine;el("netState").textContent=n?"● On
 window.addEventListener("online",updateNet);window.addEventListener("offline",updateNet);updateNet();updateDateUI();setInterval(updateDateUI,60000);
 
 window.APP={
- login:login,logout:logout,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveStartPreference:saveStartPreference,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
+ login:login,logout:logout,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
  showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,setQuickLesson:setQuickLesson,quickNextLesson:quickNextLesson,quickPrevLesson:quickPrevLesson,quickGoal:quickGoal,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,deleteStudent:deleteStudent,
  openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
