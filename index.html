@@ -372,6 +372,14 @@ body:has(#childView.active) #todayBadge{display:none}
 #teacherHome .class-tools-position{position:absolute;top:0;right:0;z-index:2}
 #teacherHome .class-tools-trigger{width:38px;height:38px;border:1px solid #e5ecea;border-radius:12px;background:#fff;color:#778680;font-size:17px;letter-spacing:2px;box-shadow:0 3px 10px rgba(29,55,61,.04);cursor:pointer}
 #teacherHome .class-tools-trigger:hover{background:#f5f9f7;border-color:#d7e4df;color:#496b5d}
+
+/* Align the class tools with the title without making it look detached. */
+#teacherHome .hero.centered{position:static}
+#teacherHome .hero.centered>div{width:100%}
+#teacherHome .class-heading-row{position:relative;display:flex;align-items:center;justify-content:center;width:100%;min-height:42px;gap:0}
+#teacherHome .class-tools-position{position:absolute;top:50%;right:0;z-index:2;transform:translateY(-50%)}
+#teacherHome .class-tools-trigger{width:38px;height:38px;border:0;border-radius:12px;background:transparent;color:#899693;font-size:17px;letter-spacing:2px;box-shadow:none;cursor:pointer}
+#teacherHome .class-tools-trigger:hover{background:#f1f6f4;color:#496b5d}
 </style>
 </head>
 <body>
@@ -444,9 +452,8 @@ body:has(#childView.active) #todayBadge{display:none}
   <div id="classArea">
     <div id="teacherHome">
       <div class="hero centered">
-        <div class="class-tools-position"><button class="class-tools-trigger" aria-label="Klassenfunktionen" title="Klassenfunktionen" onclick="APP.openClassMore()">•••</button></div>
         <div>
-          <div class="class-heading-row"><button id="classSwitchBtn" class="class-switcher" onclick="APP.openClassChooser()"><span id="classSwitchName">Klasse</span><span class="chev">⌄</span></button></div>
+          <div class="class-heading-row"><button id="classSwitchBtn" class="class-switcher" onclick="APP.openClassChooser()"><span id="classSwitchName">Klasse</span><span class="chev">⌄</span></button><div class="class-tools-position"><button class="class-tools-trigger" aria-label="Klassenfunktionen" title="Klassenfunktionen" onclick="APP.openClassMore()">•••</button></div></div>
           <div id="classMeta" class="muted class-meta"></div>
         </div>
       </div>
