@@ -474,6 +474,9 @@ body:has(#childView.active) #todayBadge{display:none}
 .week .absence-cell .absence-label{font-size:10px;font-weight:750;letter-spacing:.01em;color:#45847e}
 .week button.absence-cell:disabled{opacity:1;cursor:default}
 .detail-action-absence.is-active{color:#287c75;background:rgba(14,165,160,.09);border-color:rgba(14,165,160,.12)}
+
+.student{cursor:pointer}.student:focus-visible{outline:2px solid rgba(14,165,160,.48);outline-offset:3px}.student-absence-action{background:transparent!important;color:#7b898d!important}.student-absence-action:hover{background:rgba(14,165,160,.08)!important;color:#287c75!important}.student-absence-action.is-absent{background:rgba(14,165,160,.10)!important;color:#287c75!important}
+@media(max-width:650px){.student-card-actions{flex-wrap:wrap;justify-content:flex-end}.student-card-actions button{font-size:11px;padding:6px 7px}}
 </style>
 </head>
 <body>
@@ -1387,7 +1390,7 @@ function renderHome(){
  renderStudentCards();
  renderTodayPanel();
 }
-function setTodayDay(day){S.todayDay=Number(day);renderTodayPanel()}
+function setTodayDay(day){S.todayDay=Number(day);renderStudentCards();renderTodayPanel()}
 function setTodaySlot(slot){S.todaySlot=Number(slot);renderTodayPanel()}
 function todayRate(id,value){el("quickDay").value=String(S.todayDay);el("quickLesson").value=String(S.todaySlot);return quickRate(id,value)}
 function todayNote(id){openStudent(id);openStudentTab("notes")}
@@ -1404,10 +1407,10 @@ function renderTodayPanel(){
  }).join("")||(slot?'<div class="dev-empty">Für diesen Abschnitt sind keine Kinder eingetragen. Wähle einen anderen Abschnitt.</div>':'<div class="dev-empty">Tippe auf eine Stunde oder Pause, um Kinder und Ziele zu sehen.</div>');
 }
 function renderStudentCards(){
- var rows=S.students.slice().sort(function(a,b){return (a.sort_order||0)-(b.sort_order||0)||a.display_name.localeCompare(b.display_name)});
+ var rows=S.students.slice().sort(function(a,b){return (a.sort_order||0)-(b.sort_order||0)||a.display_name.localeCompare(b.display_name)}),day=Number(S.todayDay)||currentSchoolDay();
  el("studentGrid").innerHTML=rows.map(function(s){
-   var p=plan(s.id),sh=shells(s.id),x=stats(s.id),progress=x.total?Math.round(x.good/x.total*100):0;
-   return '<article class="student" draggable="true" data-student-id="'+esc(s.id)+'" ondragstart="APP.dragStudentCard(event)" ondragover="APP.overStudentCard(event)" ondragleave="APP.leaveStudentCard(event)" ondrop="APP.dropStudentCard(event)" ondragend="APP.endStudentCardDrag(event)"><div class="student-top"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div class="name">'+esc(s.display_name)+'</div><span class="student-drag-handle" title="Zum Verschieben ziehen" aria-hidden="true"><svg viewBox="0 0 16 20"><circle cx="5" cy="5" r="1.5"/><circle cx="11" cy="5" r="1.5"/><circle cx="5" cy="10" r="1.5"/><circle cx="11" cy="10" r="1.5"/><circle cx="5" cy="15" r="1.5"/><circle cx="11" cy="15" r="1.5"/></svg></span></div><div class="goal">'+esc(p?p.goal:"Noch kein Wochenziel")+'</div><div class="student-progress" aria-label="'+x.good+' von '+x.total+' positive Bewertungen"><div class="student-progress-track"><span style="width:'+progress+'%"></span></div><span>'+(x.total?x.good+"/"+x.total+" positiv":"Noch keine Rückmeldung")+'</span></div><div class="student-card-foot"><span>🐚 '+sh+'</span><div class="student-card-actions"><button onclick="APP.classChildAction(\''+s.id+'\',\'goal\')">'+(p?'Ziel':'+ Ziel')+'</button><button onclick="APP.classChildAction(\''+s.id+'\',\'reward\')">Belohnung</button><button onclick="APP.classChildAction(\''+s.id+'\',\'details\')">Details</button></div></div></article>';
+   var p=plan(s.id),sh=shells(s.id),x=stats(s.id),progress=x.total?Math.round(x.good/x.total*100):0,absent=isAbsent(s.id,day,0);
+   return '<article class="student" draggable="true" data-student-id="'+esc(s.id)+'" role="button" tabindex="0" aria-label="'+esc(s.display_name)+' öffnen" onclick="if(event.target.closest(\'button\'))return;APP.openStudent(\''+s.id+'\')" onkeydown="if((event.key===\'Enter\'||event.key===\' \')&&event.target===this){event.preventDefault();APP.openStudent(\''+s.id+'\')}" ondragstart="APP.dragStudentCard(event)" ondragover="APP.overStudentCard(event)" ondragleave="APP.leaveStudentCard(event)" ondrop="APP.dropStudentCard(event)" ondragend="APP.endStudentCardDrag(event)"><div class="student-top"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div class="name">'+esc(s.display_name)+'</div><span class="student-drag-handle" title="Zum Verschieben ziehen" aria-hidden="true"><svg viewBox="0 0 16 20"><circle cx="5" cy="5" r="1.5"/><circle cx="11" cy="5" r="1.5"/><circle cx="5" cy="10" r="1.5"/><circle cx="11" cy="10" r="1.5"/><circle cx="5" cy="15" r="1.5"/><circle cx="11" cy="15" r="1.5"/></svg></span></div><div class="goal">'+esc(p?p.goal:"Noch kein Wochenziel")+'</div><div class="student-progress" aria-label="'+x.good+' von '+x.total+' positive Bewertungen"><div class="student-progress-track"><span style="width:'+progress+'%"></span></div><span>'+(x.total?x.good+"/"+x.total+" positiv":"Noch keine Rückmeldung")+'</span></div><div class="student-card-foot"><span>🐚 '+sh+'</span><div class="student-card-actions"><button onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'goal\')">'+(p?'Ziel':'+ Ziel')+'</button><button onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'reward\')">Belohnung</button><button class="student-absence-action '+(absent?'is-absent':'')+'" title="'+(absent?'Abwesenheit für '+DAYS[day-1]+' aufheben':'Für '+DAYS[day-1]+' ganztägig abwesend markieren')+'" aria-label="'+(absent?'Kind am '+DAYS[day-1]+' wieder als anwesend markieren':'Kind am '+DAYS[day-1]+' ganztägig abwesend markieren')+'" onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'absence\')">'+(absent?'Anwesend':'Abw. · '+DAYS[day-1].slice(0,2))+'</button></div></div></article>';
  }).join("")||(S.students.length?'<div class="student-empty"><h3>Keine Kinder</h3></div>':'<div class="student-empty"><h3>Noch keine Kinder</h3><p>Lege das erste Kind für diese Klasse an.</p><button class="btn" onclick="APP.addStudent()">Kind hinzufügen</button></div>');
 }
 function renderWeekRitual(){
@@ -1792,7 +1795,7 @@ function setQuickLesson(n){
 function quickNextLesson(){var n=SEGMENTS.indexOf(Number(el("quickLesson").value||1));if(n>=SEGMENTS.length-1){toast("Das ist der letzte Abschnitt");return}setQuickLesson(SEGMENTS[n+1])}
 function quickPrevLesson(){var n=SEGMENTS.indexOf(Number(el("quickLesson").value||1));if(n<=0){toast("Das ist der erste Abschnitt");return}setQuickLesson(SEGMENTS[n-1])}
 function quickGoal(sid){modal("quickRatingModal",false);openStudent(sid);checkin()}
-function classChildAction(sid,action){var child=S.students.find(function(s){return s.id===sid});if(!child)return;S.student=child;if(action==="details"){openStudent(sid);return}if(action==="goal")checkin();else if(action==="reward")reward()}
+function classChildAction(sid,action){var child=S.students.find(function(s){return s.id===sid});if(!child)return;if(action==="absence"){var day=Number(S.todayDay)||currentSchoolDay();toggleAbsence(sid,day,0,true);return}S.student=child;if(action==="details"){openStudent(sid);return}if(action==="goal")checkin();else if(action==="reward")reward()}
 function renderQuickRating(){
  var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value);
  el("quickLessonChips").innerHTML=SEGMENTS.map(function(n){return '<button class="quick-lesson '+(n===lesson?'active':'')+'" onclick="APP.setQuickLesson('+n+')">'+segmentLabel(n)+'</button>'}).join("");
