@@ -470,7 +470,6 @@ body:has(#childView.active) #todayBadge{display:none}
         </div>
       </div>
       <section id="classTodayPanel" class="today-panel" style="display:none" aria-label="Heute in der Klasse">
-        <div class="today-panel-head"><div><h2 id="todayPanelTitle">Aktueller Abschnitt</h2><p id="todayPanelMeta" class="muted"></p></div></div>
         <div id="todayDayChips" class="today-day-chips" aria-label="Wochentag auswählen"></div>
         <div id="todaySlotChips" class="today-slot-chips" aria-label="Stunde oder Pause auswählen"></div>
         <div id="todayChildren" class="today-children"></div>
@@ -1274,9 +1273,7 @@ function todayRate(id,value){el("quickDay").value=String(S.todayDay);el("quickLe
 function todayNote(id){openStudent(id);openStudentTab("notes")}
 function renderTodayPanel(){
  if(!S.classRow)return;
- var day=S.todayDay||currentSchoolDay(),slot=S.todaySlot,kids=slot?S.students.filter(function(s){return slotEnabled(s.id,day,slot)}):[],today=new Date().getDay();
- el("todayPanelTitle").textContent=slot?segmentLabel(slot):isCurrentWeek()&&day===today?"Gerade kein Unterricht":"Abschnitt auswählen";
- el("todayPanelMeta").textContent=slot?kids.length+" "+(kids.length===1?"Kind":"Kinder"):"Wähle eine Stunde oder Pause aus.";
+ var day=S.todayDay||currentSchoolDay(),slot=S.todaySlot,kids=slot?S.students.filter(function(s){return slotEnabled(s.id,day,slot)}):[];
  el("todayDayChips").innerHTML=DAYS.map(function(label,i){return '<button type="button" class="today-chip '+(day===i+1?'active':'')+'" aria-pressed="'+(day===i+1)+'" onclick="APP.setTodayDay('+(i+1)+')">'+label+'</button>'}).join("");
  el("todaySlotChips").innerHTML=SEGMENTS.map(function(n){return '<button type="button" class="today-chip '+(slot===n?'active':'')+'" aria-pressed="'+(slot===n)+'" onclick="APP.setTodaySlot('+n+')">'+segmentLabel(n)+'</button>'}).join("");
  el("todayChildren").innerHTML=kids.map(function(s){
