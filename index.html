@@ -384,6 +384,9 @@ body:has(#childView.active) #todayBadge{display:none}
 /* Center the week date as quiet text instead of a tile. */
 #teacherWeekNav .week-current{display:flex;align-items:center;justify-content:center;min-width:210px;min-height:38px;padding:8px 12px;border:0;border-radius:0;background:transparent;box-shadow:none;color:#71817c;font-size:14px;font-weight:650}
 #teacherWeekNav .week-current:hover{background:transparent;color:#496b5d}
+
+#teacherWeekNav>button[aria-label="Vorherige Woche"],#teacherWeekNav>button[aria-label="Nächste Woche"]{width:38px;min-width:38px;height:38px;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;color:#87938f;font-size:25px;font-weight:400;line-height:1}
+#teacherWeekNav>button[aria-label="Vorherige Woche"]:hover,#teacherWeekNav>button[aria-label="Nächste Woche"]:hover{background:#f1f6f4;color:#496b5d}
 </style>
 </head>
 <body>
