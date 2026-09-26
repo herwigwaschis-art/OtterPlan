@@ -1479,6 +1479,7 @@ function renderWeek(target,click){
    return '<div class="head '+(today===day?'today-head':'')+'">'+d+'</div>'
  }).join("");
  for(var si=0;si<SEGMENTS.length;si++){var n=SEGMENTS[si];
+   if((n===7||n===8)&&S.student){var pauseEnabled=false;for(var pd=1;pd<=5;pd++){if(slotEnabled(S.student.id,pd,n)){pauseEnabled=true;break}}if(!pauseEnabled)continue}
    out+='<div class="time">'+(n===7?'1. Pause':n===8?'2. Pause':n+'. Std.')+'</div>';
    for(var d=1;d<=5;d++){
      var enabled=S.student?slotEnabled(S.student.id,d,n):true;
