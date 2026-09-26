@@ -479,6 +479,11 @@ body:has(#childView.active) #todayBadge{display:none}
 @media(max-width:650px){.student-card-actions{flex-wrap:wrap;justify-content:flex-end}.student-card-actions button{font-size:11px;padding:6px 7px}}
 
 .student-open-area{display:block;width:100%;padding:0;border:0;background:transparent;color:inherit;text-align:left;box-shadow:none;cursor:pointer}.student-open-area:hover{background:transparent;filter:none}
+
+/* Keep the goal and reward summary compact and centered. */
+.teacher-summary-grid{grid-template-columns:repeat(2,minmax(0,360px));justify-content:center;gap:14px;max-width:760px;margin:0 auto 16px}
+.teacher-summary-grid>.teacher-summary-card{grid-column:auto;min-height:98px;padding:13px 15px}
+@media(max-width:650px){.teacher-summary-grid{grid-template-columns:minmax(0,380px);justify-content:center;gap:9px}.teacher-summary-grid>.teacher-summary-card{min-height:0;padding:12px 14px}}
 </style>
 </head>
 <body>
@@ -575,7 +580,7 @@ body:has(#childView.active) #todayBadge{display:none}
         <button id="studentTabNotes" class="student-tab" onclick="APP.openStudentTab('notes')">Notizen</button>
       </div>
       <div id="teacherPlanPanel" class="student-tab-panel active">
-        <div class="grid">
+        <div class="grid teacher-summary-grid">
           <div class="card s6 teacher-summary-card"><div class="teacher-summary-heading"><div class="eyebrow">Wochenziel</div><button type="button" class="summary-edit" aria-label="Wochenziel ändern" title="Wochenziel ändern" onclick="APP.checkin()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg><span>Ändern</span></button></div><div id="teacherGoal" class="teacher-goal" style="margin-top:8px"></div></div>
           <div class="card s6 teacher-summary-card"><div class="teacher-summary-heading"><div class="eyebrow">Belohnung</div><button type="button" class="summary-edit" aria-label="Belohnung ändern" title="Belohnung ändern" onclick="APP.reward()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg><span>Ändern</span></button></div><div id="teacherRewardTitle" class="teacher-reward-title"></div><div class="teacher-reward-count"><span id="teacherRewardCount">0</span> / <span id="teacherRewardTarget">–</span> <small>Muscheln</small></div><div id="teacherRewardWeek" class="teacher-reward-week"></div><div class="teacher-reward-progress" role="progressbar" aria-label="Fortschritt zur nächsten Belohnung" aria-valuemin="0" aria-valuemax="100"><span id="teacherRewardProgress"></span></div><div id="teacherRewardRemaining" class="teacher-reward-remaining"></div></div>
           <div class="card s12"><h3 style="margin-top:0">Stunden</h3><div id="teacherWeek" class="week"></div></div>
