@@ -487,7 +487,7 @@ body:has(#childView.active) #todayBadge{display:none}
               <span class="start-action-copy"><b>Lehrkraft anmelden</b><span>Zum Lehrerbereich</span></span>
               <span class="start-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
             </summary>
-            <div class="teacher-form"><label for="email">E-Mail</label><input id="email" type="email" autocomplete="username"><label for="password">Passwort</label><input id="password" type="password" autocomplete="current-password"><button class="btn" style="width:100%;margin-top:10px" onclick="APP.login()">Anmelden</button></div>
+            <div class="teacher-form"><label for="email">E-Mail</label><input id="email" type="email" autocomplete="username"><label for="password">Passwort</label><input id="password" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter'){event.preventDefault();APP.login()}"><button class="btn" style="width:100%;margin-top:10px" onclick="APP.login()">Anmelden</button></div>
           </details>
         </div>
       </div>
@@ -823,8 +823,8 @@ body:has(#childView.active) #todayBadge{display:none}
     <p class="start-pref-copy">MILO öffnet immer das Auswahlmenü. Über das Logo oben kommst du jederzeit dorthin zurück.</p>
     <div class="account-divider"></div>
   </div>
-  <label for="newOwnPassword">Neues Passwort</label><input id="newOwnPassword" type="password" autocomplete="new-password">
-  <label for="newOwnPassword2">Nochmal eingeben</label><input id="newOwnPassword2" type="password" autocomplete="new-password">
+  <label for="newOwnPassword">Neues Passwort</label><input id="newOwnPassword" type="password" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();APP.saveOwnPassword()}">
+  <label for="newOwnPassword2">Nochmal eingeben</label><input id="newOwnPassword2" type="password" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();APP.saveOwnPassword()}">
   <div class="toolbar" style="justify-content:flex-end;margin-top:16px"><button id="passwordCloseBtn" class="btn secondary" onclick="APP.close('passwordModal')">Schließen</button><button class="btn" onclick="APP.saveOwnPassword()">Passwort ändern</button></div>
 </div></div>
 
