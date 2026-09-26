@@ -429,6 +429,21 @@ body:has(#childView.active) #todayBadge{display:none}
 #teacherPlanPanel .quick-note-actions{display:flex;justify-content:flex-end;margin-top:10px}
 @media(max-width:700px){#teacherPlanPanel .quick-note-card{padding:15px}#teacherPlanPanel .quick-note-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}#teacherPlanPanel .quick-note-template-row{grid-template-columns:1fr;gap:8px}#teacherPlanPanel .quick-note-template-row .btn{justify-self:start}}
 @media(max-width:480px){#teacherPlanPanel .quick-note-fields{grid-template-columns:1fr}}
+
+/* Clear, grouped class functions menu. */
+#classMoreModal .class-functions-modal{width:min(660px,100%);padding:23px;border-radius:23px;background:#fbfcfb;border:1px solid #e8eeeb;box-shadow:0 28px 80px rgba(28,46,48,.18)}
+#classMoreModal .class-functions-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:17px}
+#classMoreModal .class-functions-header .eyebrow{margin:0 0 4px;color:#80908b;font-size:10px;letter-spacing:.1em}
+#classMoreModal .class-functions-header h2{margin:0;color:#273b3f;font-size:23px;letter-spacing:-.035em}
+#classMoreModal .class-more-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#classMoreModal .class-more-group{min-width:0;padding:12px;border:1px solid #e9efec;border-radius:15px;background:#fff}
+#classMoreModal .class-more-group h3{margin:0 0 7px 3px;color:#82908b;font-size:10px;font-weight:750;letter-spacing:.08em;text-transform:uppercase}
+#classMoreModal .class-more-action{display:flex;align-items:center;gap:9px;width:100%;min-height:42px;padding:6px 7px;border:0;border-radius:10px;background:transparent;color:#34484a;text-align:left;font-size:12px;font-weight:650;cursor:pointer}
+#classMoreModal .class-more-action:hover{background:#f3f7f5;color:#315f52}
+#classMoreModal .class-more-icon{display:grid;place-items:center;width:29px;height:29px;flex:0 0 29px;border:1px solid #e8eeeb;border-radius:9px;background:#f8faf9;color:#70877e}
+#classMoreModal .class-more-icon svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#classMoreModal .class-more-action>b{margin-left:auto;color:#a2afaa;font-size:19px;font-weight:400}
+@media(max-width:540px){#classMoreModal .class-functions-modal{padding:18px;border-radius:19px}#classMoreModal .class-more-grid{grid-template-columns:1fr;gap:8px}#classMoreModal .class-functions-header h2{font-size:21px}}
 </style>
 </head>
 <body>
@@ -658,18 +673,25 @@ body:has(#childView.active) #todayBadge{display:none}
   <div class="quick-footer"><button class="btn secondary small" onclick="APP.close('quickRatingModal')">Fertig</button><div class="quick-footer-right"><button class="btn secondary small" onclick="APP.quickPrevLesson()">← Stunde</button><button id="quickNextBtn" class="btn secondary small" onclick="APP.quickNextLesson()">Nächste Stunde →</button></div></div>
 </div></div>
 
-<div id="classMoreModal" class="modal-bg"><div class="modal">
-  <div class="eyebrow">Klasse</div><h2 style="margin:5px 0 12px">Weitere Funktionen</h2>
-  <div class="list">
-    <button class="btn ghost" onclick="APP.close('classMoreModal');APP.addStudent()">＋ Kind hinzufügen</button>
-    <button class="btn ghost" onclick="APP.moreCarryGoals()">↻ Ziele aus der Vorwoche übernehmen</button>
-    <button class="btn ghost" onclick="APP.moreQrCards()">▦ QR-Karten herunterladen</button>
-    <button class="btn ghost" onclick="APP.moreExport()">⇩ Dokumentation exportieren</button>
-    <button class="btn ghost" onclick="APP.openClassSchedule()">Klassenstundenplan</button>
-    <button class="btn ghost" onclick="APP.openArchive()">Archivierte Kinder ansehen</button>
-    <button id="moreClassSettingsBtn" class="btn ghost" onclick="APP.moreClassSettings()">⚙︎ Klasse verwalten</button>
+<div id="classMoreModal" class="modal-bg"><div class="modal class-functions-modal">
+  <div class="class-functions-header"><div><div class="eyebrow">Klasse</div><h2>Klassenfunktionen</h2></div><button class="modal-close-x" aria-label="Klassenfunktionen schließen" onclick="APP.close('classMoreModal')">×</button></div>
+  <div class="class-more-grid">
+    <section class="class-more-group"><h3>Kinder</h3>
+      <button class="class-more-action" onclick="APP.close('classMoreModal');APP.addStudent()"><span class="class-more-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><span>Kind hinzufügen</span><b aria-hidden="true">›</b></button>
+      <button class="class-more-action" onclick="APP.openArchive()"><span class="class-more-icon"><svg viewBox="0 0 24 24"><path d="M3 5h18v4H3zM5 9v10h14V9M10 13h4"/></svg></span><span>Archivierte Kinder</span><b aria-hidden="true">›</b></button>
+    </section>
+    <section class="class-more-group"><h3>Planung</h3>
+      <button class="class-more-action" onclick="APP.moreCarryGoals()"><span class="class-more-icon"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M5 12a7 7 0 0 1 12-4l3 4M4 12l3 4a7 7 0 0 0 12-4"/></svg></span><span>Ziele übernehmen</span><b aria-hidden="true">›</b></button>
+      <button class="class-more-action" onclick="APP.openClassSchedule()"><span class="class-more-icon"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg></span><span>Stundenplan</span><b aria-hidden="true">›</b></button>
+    </section>
+    <section class="class-more-group"><h3>Dokumente</h3>
+      <button class="class-more-action" onclick="APP.moreQrCards()"><span class="class-more-icon"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v6h-6v-2"/></svg></span><span>QR-Karten</span><b aria-hidden="true">›</b></button>
+      <button class="class-more-action" onclick="APP.moreExport()"><span class="class-more-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 19h14"/></svg></span><span>Dokumentation exportieren</span><b aria-hidden="true">›</b></button>
+    </section>
+    <section id="moreClassSettingsSection" class="class-more-group"><h3>Verwaltung</h3>
+      <button id="moreClassSettingsBtn" class="class-more-action" onclick="APP.moreClassSettings()"><span class="class-more-icon"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M9 4v6m6 4v6"/></svg></span><span>Klasse verwalten</span><b aria-hidden="true">›</b></button>
+    </section>
   </div>
-  <div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('classMoreModal')">Schließen</button></div>
 </div></div>
 
 <div id="studentMoreModal" class="modal-bg"><div class="modal">
@@ -1505,7 +1527,7 @@ function help(){
  el("helpContent").innerHTML=cards.map(function(x){return '<div class="help-card"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join("");
  modal("helpModal",true)
 }
-function openClassMore(){el("moreClassSettingsBtn").style.display=canManageCurrentClass()?"block":"none";modal("classMoreModal",true)}
+function openClassMore(){var canManage=canManageCurrentClass();el("moreClassSettingsBtn").style.display=canManage?"flex":"none";el("moreClassSettingsSection").style.display=canManage?"block":"none";modal("classMoreModal",true)}
 function openStudentMore(){if(!S.student)return;el("studentMoreName").textContent=S.student.display_name+" · Mehr";modal("studentMoreModal",true)}
 function moreCarryGoals(){modal("classMoreModal",false);carryGoals()}
 function moreQrCards(){modal("classMoreModal",false);downloadCodes()}
