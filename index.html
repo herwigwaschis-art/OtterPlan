@@ -445,6 +445,21 @@ body:has(#childView.active) #todayBadge{display:none}
 #classMoreModal .class-more-icon svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 #classMoreModal .class-more-action>b{margin-left:auto;color:#a2afaa;font-size:19px;font-weight:400}
 @media(max-width:540px){#classMoreModal .class-functions-modal{padding:18px;border-radius:19px}#classMoreModal .class-more-grid{grid-template-columns:1fr;gap:8px}#classMoreModal .class-functions-header h2{font-size:21px}}
+
+/* Ruhige Aktionen in der Kind-Detailansicht */
+.detail-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.detail-back{width:34px;height:34px;flex:0 0 34px;padding:0;display:grid;place-items:center;border:0;border-radius:10px;background:transparent;color:var(--muted);box-shadow:none;cursor:pointer}
+.detail-back svg,.detail-action svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.detail-back:hover{background:rgba(14,165,160,.07);color:var(--ink)}
+.detail-back:focus-visible,.detail-action:focus-visible{outline:2px solid rgba(14,165,160,.45);outline-offset:2px}
+.detail-primary-actions{display:flex;align-items:center;justify-content:flex-end;gap:4px}
+.detail-action{min-height:34px;padding:7px 10px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(102,116,123,.13);border-radius:10px;background:rgba(255,255,255,.48);color:var(--muted);font:inherit;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:none;cursor:pointer;transition:background .16s ease,color .16s ease,border-color .16s ease}
+.detail-action:hover{background:rgba(255,255,255,.86);border-color:rgba(14,165,160,.20);color:var(--ink)}
+.detail-action-checkin{color:#427f79}
+.detail-action-absence{background:transparent;border-color:transparent;color:rgba(102,116,123,.78)}
+.detail-action-absence:hover{background:rgba(102,116,123,.07);border-color:transparent;color:var(--ink)}
+.detail-more-trigger{width:32px;height:32px;flex:0 0 32px;margin-left:1px}
+@media(max-width:650px){.detail-toolbar{display:flex;align-items:center;gap:5px;margin-bottom:12px}.detail-toolbar>.btn{justify-self:auto}.detail-primary-actions{width:auto;flex:1;gap:2px}.detail-action{min-height:34px;padding:7px 8px;font-size:10px;gap:4px}.detail-action svg{width:15px;height:15px}.detail-back{width:30px;height:32px;flex-basis:30px}.detail-primary-actions .detail-more-trigger{width:30px;height:32px;flex-basis:30px;padding:0}}
 </style>
 </head>
 <body>
@@ -533,10 +548,7 @@ body:has(#childView.active) #todayBadge{display:none}
     </div>
 
     <div id="teacherDetail" style="display:none">
-      <div class="detail-toolbar">
-        <button class="btn secondary" onclick="APP.back()">← Klasse</button>
-        <div class="detail-primary-actions"><button class="btn" onclick="APP.checkin()">Check-in</button><button class="btn secondary" onclick="APP.checkout()">Check-out</button><button class="btn ghost detail-absence-action" onclick="APP.markStudentAbsentToday()">Abwesend</button><button class="home-more-action detail-more-trigger" aria-label="Weitere Kinderfunktionen" title="Weitere Kinderfunktionen" onclick="APP.openStudentMore()">•••</button></div>
-      </div>
+      <div class="detail-toolbar"><button type="button" class="detail-back" aria-label="Zurück zur Klasse" title="Zurück zur Klasse" onclick="APP.back()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 18-6-6 6-6"/><path d="M8 12h12"/></svg></button><div class="detail-primary-actions"><button type="button" class="detail-action detail-action-checkin" onclick="APP.checkin()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg><span>Check-in</span></button><button type="button" class="detail-action detail-action-checkout" onclick="APP.checkout()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4H4v16h3"/><path d="M10 12h10m-4-4 4 4-4 4"/></svg><span>Check-out</span></button><button type="button" class="detail-action detail-action-absence" onclick="APP.markStudentAbsentToday()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M8 3v4m8-4v4M3.5 10h17m-11 4 5 5m0-5-5 5"/></svg><span>Abwesend</span></button><button class="home-more-action detail-more-trigger" aria-label="Weitere Kinderfunktionen" title="Weitere Kinderfunktionen" onclick="APP.openStudentMore()">•••</button></div></div>
       <div class="hero centered teacher-detail-title"><div><h2 id="teacherName"></h2><p id="teacherMeta" class="muted"></p></div></div>
       <div class="student-tabs">
         <button id="studentTabPlan" class="student-tab active" onclick="APP.openStudentTab('plan')">Plan</button>
