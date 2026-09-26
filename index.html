@@ -143,7 +143,7 @@ body.teacher-start-view #teacherHome .teacher-launcher-head{text-align:left;marg
 body.teacher-start-view #teacherHome .teacher-launcher-head h2{margin:0;font-size:30px;line-height:1.15;font-weight:760;letter-spacing:-.04em;color:#1c3036}
 body.teacher-start-view #teacherHome .launcher-class-section{margin:0}
 body.teacher-start-view #teacherHome .launcher-section-title{display:block;margin:0 0 14px;font-size:18px;line-height:1.25;font-weight:740;letter-spacing:-.02em;text-transform:none;color:#25383d}
-body.teacher-start-view #teacherHome .teacher-launcher-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+body.teacher-start-view #teacherHome .teacher-launcher-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 body.teacher-start-view #teacherHome .teacher-launcher-card{position:relative;overflow:hidden;min-height:108px;padding:18px 19px 18px 23px;border:1px solid #e5ecea;border-radius:17px;background:#fff;box-shadow:0 5px 18px rgba(29,55,61,.045);transition:transform .16s,border-color .16s,box-shadow .16s}
 body.teacher-start-view #teacherHome .teacher-launcher-card:before{content:"";position:absolute;left:0;top:17px;bottom:17px;width:3px;border-radius:0 3px 3px 0;background:#85cbb4}
 body.teacher-start-view #teacherHome .teacher-launcher-card:nth-child(3n+2):before{background:#91b9dc}
@@ -1220,7 +1220,7 @@ function renderHome(){
    el("classTodayPanel").style.display="none";S.todayClassId=null;
    var canSetUp=adminSchools().length>0||S.schools.length===0;
    var classCards=[],overviewCards=[];
-   S.classes.slice().sort(function(a,b){return classOrder(a.id)-classOrder(b.id)}).forEach(function(x){
+   S.classes.slice().sort(function(a,b){var ag=Number(a.grade_level)||0,bg=Number(b.grade_level)||0;return ag-bg||classOrder(a.id)-classOrder(b.id)}).forEach(function(x){
      classCards.push('<button type="button" draggable="true" data-class-id="'+esc(x.id)+'" class="teacher-launcher-card" onclick="APP.chooseClass(\''+x.id+'\')" ondragstart="APP.dragClass(event)" ondragover="event.preventDefault()" ondrop="APP.dropClass(event)"><div><b>'+esc(x.name)+'</b><span>'+(x.grade_level?'Stufe '+x.grade_level+' · ':'')+esc(x.school_year||'')+'</span></div><span class="launch-arrow">→</span></button>')
    });
    S.gradeLinks.forEach(function(g){
