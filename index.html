@@ -498,7 +498,7 @@ body:has(#childView.active) #todayBadge{display:none}
 </head>
 <body>
 <header>
-  <a class="brand" href="./?menu=1" aria-label="MILO Auswahlmenü öffnen" title="Zum Auswahlmenü"><img class="brand-logo-img" src="./milo-wordmark.svg" alt="MILO"></a>
+  <a class="brand" href="./?menu=1" aria-label="Zur MILO Startseite" title="Zur Startseite" onclick="APP.brandHome(event)"><img class="brand-logo-img" src="./milo-wordmark.svg" alt="MILO"></a>
   <div id="session" class="top-menu-wrap" style="display:none" onclick="event.stopPropagation()">
     <span id="todayBadge" class="today-badge"></span>
      <button id="globalSearchButton" class="menu-trigger" style="display:none;font-size:21px" aria-label="Kind suchen" title="Kind suchen" onclick="APP.openGlobalSearch()">⌕</button>
@@ -1377,6 +1377,15 @@ function dragClass(event){var tile=event.target.closest("[data-class-id]");if(ti
 function dropClass(event){event.preventDefault();var tile=event.target.closest("[data-class-id]");if(!tile)return;var from=event.dataTransfer.getData("text/plain"),to=tile.dataset.classId;
  if(!S.classes.some(function(c){return c.id===from})||!S.classes.some(function(c){return c.id===to})||from===to)return;
  var ids=S.classes.slice().sort(function(a,b){return classOrder(a.id)-classOrder(b.id)}).map(function(c){return c.id}),old=ids.indexOf(from);ids.splice(old,1);ids.splice(ids.indexOf(to),0,from);localStorage.setItem(classOrderKey(),JSON.stringify(ids));renderHome()
+}
+function brandHome(event){
+ if(!S.user)return;
+ event.preventDefault();
+ if(S.role==="teacher"){
+  S.classRow=null;S.student=null;S.gradeLevel=null;S.gradeStudentData=null;S.gradeActivePlan=null;S.gradeQuickMode=false;S.teacherArea="class";
+  renderHome();show("teacher");return
+ }
+ if(S.role==="student"||S.role==="parent"){renderChild();show("childView")}
 }
 function renderHome(){
  if(document.body.classList)document.body.classList.toggle("teacher-start-view",!S.classRow&&S.teacherArea==="class");
@@ -2275,6 +2284,7 @@ function updateNet(){var n=navigator.onLine,p=S.user?pendingObservations().lengt
 window.addEventListener("online",updateNet);window.addEventListener("offline",updateNet);updateNet();updateDateUI();setInterval(updateDateUI,60000);
 
 window.APP={
+ brandHome:brandHome,
  login:login,resumeSession:resumeSession,logout:logout,selectParentStudent:selectParentStudent,openGlobalSearch:openGlobalSearch,filterGlobalSearch:filterGlobalSearch,selectGlobalStudent:selectGlobalStudent,toggleTopMenu:toggleTopMenu,closeTopMenu:closeTopMenu,requestAdmin:requestAdmin,verifyAdminGate:verifyAdminGate,leaveAdmin:leaveAdmin,help:help,account:account,saveOwnPassword:saveOwnPassword,openChild:openChild,showLogin:showLogin,scan:scan,redeem:redeem,close:closeM,changeWeek:changeWeek,goCurrentWeek:goCurrentWeek,
  showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,setQuickLesson:setQuickLesson,quickNextLesson:quickNextLesson,quickPrevLesson:quickPrevLesson,quickGoal:quickGoal,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,openArchive:openArchive,restoreArchivedStudent:restoreArchivedStudent,openArchivedClasses:openArchivedClasses,restoreArchivedClass:restoreArchivedClass,openYearTransition:openYearTransition,loadYearTransitionStudents:loadYearTransitionStudents,applyYearTransition:applyYearTransition,deleteStudent:deleteStudent,
