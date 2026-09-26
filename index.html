@@ -1809,7 +1809,7 @@ async function afterGradeAction(sid,kind,wasDetail){
 async function saveCheckin(){var g=el("checkinGoal").value.trim(),h=el("checkinHelp").value.trim(),targetRaw=el("checkinShellTarget").value.trim(),weeklyTarget=targetRaw?Number(targetRaw):null;if(!g){toast("Ziel fehlt");return}if(weeklyTarget!==null&&(!Number.isInteger(weeklyTarget)||weeklyTarget<1||weeklyTarget>200)){toast("Muschelziel muss zwischen 1 und 200 liegen");return}
  if(S.teacherArea==="grade"){
    var gradeSid=S.student.id,wasDetail=!!S.gradeStudentData;
-   var gr=await sb.rpc("grade_save_checkin_with_target",{p_student_id:gradeSid,p_week_start:week(),p_goal:g,p_help_text:h,p_feeling:S.checkinFeeling,p_icon:el("checkinIcon").value,p_weekly_shell_target:weeklyTarget});
+   var gr=await sb.rpc("grade_save_checkin",{p_student_id:gradeSid,p_week_start:week(),p_goal:g,p_help_text:h,p_feeling:S.checkinFeeling,p_icon:el("checkinIcon").value,p_weekly_shell_target:weeklyTarget});
    if(gr.error){toast("Check-in konnte nicht gespeichert werden");return}
    modal("checkinModal",false);await afterGradeAction(gradeSid,"checkin",wasDetail);toast("Check-in gespeichert");return
  }
