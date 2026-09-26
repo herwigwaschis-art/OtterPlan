@@ -392,6 +392,16 @@ body:has(#childView.active) #todayBadge{display:none}
 #teacherHome .class-switcher{gap:0;padding:2px 4px;border:0;border-radius:8px;background:transparent;box-shadow:none;color:#25383d;font-size:30px;font-weight:760;letter-spacing:-.04em;cursor:pointer;transition:color .15s}
 #teacherHome .class-switcher:hover{transform:none;background:transparent;box-shadow:none;color:#477f76}
 #teacherHome .class-switcher:focus-visible{outline:2px solid #85cbb4;outline-offset:4px}
+
+/* Calm, aligned selectors for weekdays and lesson slots. */
+#classTodayPanel .today-day-chips{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;overflow:visible;padding:8px 0 7px;border-bottom:1px solid #edf1ef;scrollbar-width:none}
+#classTodayPanel .today-slot-chips{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px;overflow:visible;padding:9px 0 12px;scrollbar-width:none}
+#classTodayPanel .today-chip{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;min-height:37px;padding:6px 5px;border:1px solid transparent;border-radius:9px;background:transparent;box-shadow:none;color:#657571;font-size:12px;font-weight:650;line-height:1.2;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+#classTodayPanel .today-chip:hover{background:#f2f7f4;color:#3f665b}
+#classTodayPanel .today-day-chips .today-chip.active{border-color:transparent;border-radius:8px;background:#eaf3ef;color:#315f52}
+#classTodayPanel .today-slot-chips .today-chip{border-color:#e8eeeb;background:#fafcfb;color:#64736f}
+#classTodayPanel .today-slot-chips .today-chip.active{border-color:#d4e5dc;background:#eaf3ef;color:#315f52;font-weight:750}
+@media(max-width:680px){#classTodayPanel .today-slot-chips{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}#classTodayPanel .today-chip{min-height:35px;font-size:11px}#classTodayPanel .today-day-chips .today-chip{padding-left:1px;padding-right:1px;font-size:clamp(10px,2.7vw,11px)}}
 </style>
 </head>
 <body>
