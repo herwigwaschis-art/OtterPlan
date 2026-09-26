@@ -623,7 +623,7 @@ body:has(#childView.active) #todayBadge{display:none}
         <div class="card s12"><div class="eyebrow">Wochenziel</div><div id="gradeStudentGoal" class="teacher-goal" style="margin-top:8px"></div></div>
         <div class="card s12"><div class="grade-week-head"><h3>Wochenplan</h3><span class="muted" style="font-size:12px">Smiley antippen zum Bewerten</span></div><div id="gradeStudentWeek" class="week"></div></div>
       </div>
-      <div class="toolbar" style="justify-content:center;margin-top:14px"><button class="btn secondary small" onclick="APP.gradeDetailCheckin()">🎯 Check-in</button><button class="btn secondary small" onclick="APP.gradeDetailCheckout()">✅ Check-out</button><button class="btn secondary small" onclick="APP.openGradeDevelopment()">📈 Entwicklung</button><button class="btn secondary small" onclick="APP.openGradeNote()">📝 Notiz</button></div>
+      <div class="toolbar" style="justify-content:center;margin-top:14px"><button class="btn secondary small" onclick="APP.gradeDetailCheckin()">🎯 Check-in</button><button class="btn secondary small" onclick="APP.gradeDetailCheckout()">✅ Check-out</button><button class="btn secondary small" onclick="APP.openGradeDevelopment()">Entwicklung</button><button class="btn secondary small" onclick="APP.openGradeNote()">📝 Notiz</button></div>
       <div id="gradeQuickNav" class="quick-nav" style="display:none"><button class="btn secondary small" onclick="APP.gradeQuickNext(-1)">← Vorheriges</button><span id="gradeQuickCount" class="count"></span><button class="btn small" onclick="APP.gradeQuickNext(1)">Nächstes →</button></div>
     </div>
   </div>
@@ -698,17 +698,17 @@ body:has(#childView.active) #todayBadge{display:none}
 <div id="studentMoreModal" class="modal-bg"><div class="modal">
   <div class="eyebrow">Kind</div><h2 id="studentMoreName" style="margin:5px 0 12px">Weitere Funktionen</h2>
   <div class="eyebrow" style="margin:14px 0 8px">Schnellzugriff</div><div class="list">
-    <button class="btn ghost" onclick="APP.reward()">Belohnung</button>
-    <button class="btn ghost" onclick="APP.markStudentAbsentToday()">Abwesend heute</button>
-    <button class="btn ghost" onclick="APP.previewChild()">Schüleransicht</button>
+    <button class="btn ghost" onclick="APP.close('studentMoreModal');APP.reward()">Belohnung</button>
+    <button class="btn ghost" onclick="APP.close('studentMoreModal');APP.markStudentAbsentToday()">Abwesend heute</button>
+    <button class="btn ghost" onclick="APP.close('studentMoreModal');APP.previewChild()">Schüleransicht</button>
   </div>
   <div class="eyebrow" style="margin:18px 0 8px">Weitere Funktionen</div><div class="list">
     <button class="btn ghost" onclick="APP.moreStudentQr()">QR-Code</button>
-    <button class="btn ghost" onclick="APP.moreStudentHours()">🗓 Individuelle Stunden</button>
+    <button class="btn ghost" onclick="APP.moreStudentHours()">Individuelle Stunden</button>
     <button class="btn ghost" onclick="APP.moreStudentHistory()">📈 Entwicklung</button>
-    <button class="btn ghost" onclick="APP.moreStudentPdf()">⇩ PDF</button>
-    <button class="btn ghost" onclick="APP.openCsvExport('student')">⇩ Rohdaten als CSV</button>
-    <button class="btn ghost" onclick="APP.moreStudentManage()">⚙︎ Kind bearbeiten</button>
+    <button class="btn ghost" onclick="APP.moreStudentPdf()">PDF exportieren</button>
+    <button class="btn ghost" onclick="APP.openCsvExport('student')">Rohdaten als CSV</button>
+    <button class="btn ghost" onclick="APP.moreStudentManage()">Kind bearbeiten</button>
   </div>
   <div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('studentMoreModal')">Schließen</button></div>
 </div></div>
