@@ -387,6 +387,11 @@ body:has(#childView.active) #todayBadge{display:none}
 
 #teacherWeekNav>button[aria-label="Vorherige Woche"],#teacherWeekNav>button[aria-label="Nächste Woche"]{width:38px;min-width:38px;height:38px;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;color:#87938f;font-size:25px;font-weight:400;line-height:1}
 #teacherWeekNav>button[aria-label="Vorherige Woche"]:hover,#teacherWeekNav>button[aria-label="Nächste Woche"]:hover{background:#f1f6f4;color:#496b5d}
+
+/* The class name itself is the quiet class picker. */
+#teacherHome .class-switcher{gap:0;padding:2px 4px;border:0;border-radius:8px;background:transparent;box-shadow:none;color:#25383d;font-size:30px;font-weight:760;letter-spacing:-.04em;cursor:pointer;transition:color .15s}
+#teacherHome .class-switcher:hover{transform:none;background:transparent;box-shadow:none;color:#477f76}
+#teacherHome .class-switcher:focus-visible{outline:2px solid #85cbb4;outline-offset:4px}
 </style>
 </head>
 <body>
@@ -460,7 +465,7 @@ body:has(#childView.active) #todayBadge{display:none}
     <div id="teacherHome">
       <div class="hero centered">
         <div>
-          <div class="class-heading-row"><button id="classSwitchBtn" class="class-switcher" onclick="APP.openClassChooser()"><span id="classSwitchName">Klasse</span><span class="chev">⌄</span></button><div class="class-tools-position"><button class="class-tools-trigger" aria-label="Klassenfunktionen" title="Klassenfunktionen" onclick="APP.openClassMore()">•••</button></div></div>
+          <div class="class-heading-row"><button id="classSwitchBtn" class="class-switcher" aria-label="Klasse auswählen" title="Klasse auswählen" onclick="APP.openClassChooser()"><span id="classSwitchName">Klasse</span></button><div class="class-tools-position"><button class="class-tools-trigger" aria-label="Klassenfunktionen" title="Klassenfunktionen" onclick="APP.openClassMore()">•••</button></div></div>
           <div id="classMeta" class="muted class-meta"></div>
         </div>
       </div>
