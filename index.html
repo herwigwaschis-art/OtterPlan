@@ -463,6 +463,17 @@ body:has(#childView.active) #todayBadge{display:none}
 
 .reward-form-actions{align-items:center}
 @media(max-width:560px){.reward-form-actions .btn{flex:1 1 auto}}
+
+/* Calm weekday selectors in the teacher timetable */
+.week .day-select{appearance:none;-webkit-appearance:none;display:flex;align-items:center;justify-content:center;width:100%;min-width:0;padding:9px;min-height:0;border:0;border-radius:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:760;line-height:1.2;box-shadow:none;cursor:pointer;transition:color .15s ease,box-shadow .15s ease}
+.week .day-select:hover{background:transparent;color:var(--ink)}
+.week .day-select.today-head{background:transparent;color:var(--accent);font-weight:820}
+.week .day-select.absence-day-selected{background:transparent;color:#317d78;box-shadow:inset 0 -2px rgba(14,165,160,.55)}
+.week .day-select.today-head.absence-day-selected{color:#317d78}
+.week .absence-cell{background:rgba(105,119,124,.055);border:1px dashed rgba(105,119,124,.2);color:rgba(102,116,123,.72);box-shadow:none}
+.week .absence-cell .absence-x{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:rgba(105,119,124,.09);font-size:22px;font-weight:500;line-height:1}
+.week button.absence-cell:disabled{opacity:1;cursor:default}
+.detail-action-absence.is-active{color:#96645f;background:rgba(177,102,91,.07)}
 </style>
 </head>
 <body>
@@ -916,8 +927,8 @@ function isAbsent(sid,day,lesson){var date=weekDayISO(day);return (S.absences||[
 async function toggleAbsence(sid,day,lesson,allDay){
  var date=weekDayISO(day),segment=allDay?0:Number(lesson),existing=(S.absences||[]).find(function(x){return x.student_id===sid&&x.absent_on===date&&Number(x.segment_no)===segment});
  if(!existing&&S.ratings.some(function(r){return r.student_id===sid&&Number(r.weekday)===Number(day)&&(allDay||Number(r.lesson_no)===segment)})){toast(allDay?"Für diesen Tag gibt es bereits Bewertungen. Bitte kläre sie vor der Ganztagsabwesenheit.":"Für diese Stunde gibt es bereits eine Bewertung.");return}
- var req=existing?sb.from("student_absences").delete().eq("student_id",sid).eq("absent_on",date).eq("segment_no",segment):sb.from("student_absences").insert({student_id:sid,absent_on:date,segment_no:segment,created_by:S.user.id});
- var r=await req;if(r.error){toast("Abwesenheit konnte nicht gespeichert werden");return}
+ var req=existing?sb.from("student_absences").delete().eq("student_id",sid).eq("absent_on",date).eq("segment_no",segment).select("student_id"):sb.from("student_absences").insert({student_id:sid,absent_on:date,segment_no:segment,created_by:S.user.id});
+ var r=await req;if(r.error){toast(existing?"Abwesenheit konnte nicht aufgehoben werden":"Abwesenheit konnte nicht gespeichert werden");return}if(existing&&(!r.data||!r.data.length)){S.absences=(S.absences||[]).filter(function(x){return !(x.student_id===sid&&x.absent_on===date&&Number(x.segment_no)===segment)});if(S.student&&S.student.id===sid&&el("teacherDetail").style.display!=="none")renderTeacher();else renderHome();updateDetailAbsenceAction();toast("Abwesenheit war bereits aufgehoben");return}
  if(existing)S.absences=S.absences.filter(function(x){return x!==existing});else S.absences.push({student_id:sid,absent_on:date,segment_no:segment});
  if(S.student&&S.student.id===sid&&el("teacherDetail").style.display!=="none")renderTeacher();else renderHome();
  if(el("classTodayPanel").style.display!=="none")renderTodayPanel();
@@ -1437,7 +1448,7 @@ function openWeekClose(){
 function openWeekCloseStudent(id){
  modal("weekCloseModal",false);openStudent(id);if(plan(id))checkout();else checkin()
 }
-function openStudent(id){S.student=S.students.find(function(s){return s.id===id});if(!S.student)return;S.detailAbsenceDay=Number(S.todayDay)||currentSchoolDay()||1;S.studentTab="plan";S.developmentData=null;S.developmentStudentId=null;el("teacherHome").style.display="none";el("teacherDetail").style.display="block";renderTeacher();initObservation("plan");openStudentTab("plan")}
+function openStudent(id){S.student=S.students.find(function(s){return s.id===id});if(!S.student)return;S.detailAbsenceDay=Number(S.detailAbsenceDay)||Number(S.todayDay)||currentSchoolDay()||1;S.studentTab="plan";S.developmentData=null;S.developmentStudentId=null;el("teacherHome").style.display="none";el("teacherDetail").style.display="block";renderTeacher();initObservation("plan");openStudentTab("plan")}
 function back(){S.student=null;S.developmentData=null;S.developmentStudentId=null;renderHome()}
 function renderTeacherReward(sid){var count=shells(sid),rewards=rs(sid),next=rewards.find(function(r){return r.shells_required>count}),target=next?next.shells_required:rewards.length?rewards[rewards.length-1].shells_required:0,p=plan(sid),weekCount=stats(sid).good;el("teacherRewardTitle").textContent=next?next.title:rewards.length?"Alle Belohnungen erreicht":"Noch keine Belohnung";el("teacherRewardCount").textContent=count;el("teacherRewardTarget").textContent=target||"–";el("teacherRewardWeek").textContent=p&&p.weekly_shell_target?"Diese Woche · "+weekCount+" / "+p.weekly_shell_target+" 🐚":"Diese Woche · "+weekCount+" 😊";el("teacherRewardProgress").style.width=target?Math.min(100,Math.round(count/target*100))+"%":"0%";el("teacherRewardProgress").parentElement.setAttribute("aria-valuenow",target?Math.min(100,Math.round(count/target*100)):0);el("teacherRewardRemaining").textContent=next?"Noch "+Math.max(0,target-count)+" Muscheln":rewards.length?"Belohnung erreicht":"Belohnung festlegen"}
 function updateDetailAbsenceAction(){var b=el("detailAbsenceAction"),label=el("detailAbsenceLabel");if(!b||!label||!S.student)return;var day=Number(S.detailAbsenceDay)||Number(S.todayDay)||1,absent=isAbsent(S.student.id,day,0);label.textContent=absent?"Anwesend":"Abwesend";b.classList.toggle("is-active",absent);b.setAttribute("aria-label",(absent?"Abwesenheit für ":"Kind für ")+DAYS[day-1]+(absent?" aufheben":" als abwesend markieren"));b.title=(absent?"Abwesenheit für ":"Abwesend für ")+DAYS[day-1]}
