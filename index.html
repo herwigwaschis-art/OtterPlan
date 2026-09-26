@@ -410,6 +410,25 @@ body:has(#childView.active) #todayBadge{display:none}
 .student-drag-handle{display:flex;align-items:center;justify-content:center;margin-left:auto;flex:0 0 auto;color:#b0bfba;cursor:grab}
 .student-drag-handle svg{display:block;width:13px;height:17px;fill:currentColor}
 .student:hover .student-drag-handle{color:#718e82}
+
+/* Calm, structured note editor in the student plan. */
+#teacherPlanPanel .quick-note-card{margin-top:14px;padding:18px 20px;border:1px solid #e6ece9;border-radius:18px;background:#fff;box-shadow:0 5px 18px rgba(29,55,61,.04)}
+#teacherPlanPanel .quick-note-heading{margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #eef2f0}
+#teacherPlanPanel .quick-note-card h3{margin:0;color:#2b3e42;font-size:18px;font-weight:730;letter-spacing:-.02em}
+#teacherPlanPanel .quick-note-card label{display:block;margin:0 0 5px;color:#72817e;font-size:11px;font-weight:700}
+#teacherPlanPanel .quick-note-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#teacherPlanPanel .quick-note-template-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:10px;margin-top:12px}
+#teacherPlanPanel .quick-note-card input,#teacherPlanPanel .quick-note-card select,#teacherPlanPanel .quick-note-card textarea{width:100%;min-width:0;border:1px solid #e2e9e6;border-radius:10px;background:#fbfcfb;box-shadow:none;font-size:13px}
+#teacherPlanPanel .quick-note-card input,#teacherPlanPanel .quick-note-card select{min-height:40px;padding:8px 10px}
+#teacherPlanPanel .quick-note-template-row .btn{min-height:40px;white-space:nowrap}
+#teacherPlanPanel .quick-note-editor{margin-top:13px}
+#teacherPlanPanel .quick-note-editor-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+#teacherPlanPanel .quick-note-editor-head label{margin:0}
+#teacherPlanPanel .quick-note-editor-head .voice-btn{width:32px;height:32px;border:0;border-radius:9px;background:#f2f7f4;color:#638178}
+#teacherPlanPanel .quick-note-card textarea{display:block;min-height:84px;padding:10px 12px;line-height:1.45;resize:vertical}
+#teacherPlanPanel .quick-note-actions{display:flex;justify-content:flex-end;margin-top:10px}
+@media(max-width:700px){#teacherPlanPanel .quick-note-card{padding:15px}#teacherPlanPanel .quick-note-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}#teacherPlanPanel .quick-note-template-row{grid-template-columns:1fr;gap:8px}#teacherPlanPanel .quick-note-template-row .btn{justify-self:start}}
+@media(max-width:480px){#teacherPlanPanel .quick-note-fields{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -514,13 +533,21 @@ body:has(#childView.active) #todayBadge{display:none}
           <div class="card s12"><h3 style="margin-top:0">Stunden</h3><div id="teacherWeek" class="week"></div></div>
         </div>
         <div class="quick-note-card">
-          <h3>📝 Beobachtung festhalten</h3><p class="muted" style="font-size:11px;margin:0 0 8px">Kurz notieren, was du konkret beobachtet hast. MILO verknüpft die Notiz mit dem Wochenziel.</p>
-          <div class="quick-note-grid">
+          <div class="quick-note-heading"><h3>Notizen</h3></div>
+          <div class="quick-note-fields">
             <div><label for="planObsDate">Datum</label><input id="planObsDate" type="date"></div>
-            <div><label for="planObsCategory">Art</label><select id="planObsCategory"><option value="observation">Beobachtung</option><option value="progress">Fortschritt</option><option value="challenge">Herausforderung</option><option value="strategy">Hilfreiche Strategie</option></select><label for="planObsSegment">Abschnitt</label><select id="planObsSegment"><option value="">Ohne Zuordnung</option><option value="1">1. Stunde</option><option value="2">2. Stunde</option><option value="7">1. Pause</option><option value="3">3. Stunde</option><option value="4">4. Stunde</option><option value="8">2. Pause</option><option value="5">5. Stunde</option><option value="6">6. Stunde</option></select></div>
-            <div><label for="planObsTemplate">Vorlage</label><select id="planObsTemplate" onchange="APP.useNoteTemplate('plan')"></select><button type="button" class="btn secondary small" onclick="APP.saveNoteTemplate('plan')">Als Vorlage speichern</button><label for="planObsText">Notiz</label><button type="button" class="voice-btn" title="Beobachtung diktieren" aria-label="Beobachtung diktieren" onclick="APP.dictateObservation('planObsText')">🎙</button><input id="planObsText" maxlength="2000" placeholder="z. B. sagt häufiger Stopp und fragt selbstständig um Hilfe"></div>
-            <button class="btn small" onclick="APP.saveObservation('plan')">Speichern</button>
+            <div><label for="planObsCategory">Art</label><select id="planObsCategory"><option value="observation">Beobachtung</option><option value="progress">Fortschritt</option><option value="challenge">Herausforderung</option><option value="strategy">Hilfreiche Strategie</option></select></div>
+            <div><label for="planObsSegment">Abschnitt</label><select id="planObsSegment"><option value="">Ohne Zuordnung</option><option value="1">1. Stunde</option><option value="2">2. Stunde</option><option value="7">1. Pause</option><option value="3">3. Stunde</option><option value="4">4. Stunde</option><option value="8">2. Pause</option><option value="5">5. Stunde</option><option value="6">6. Stunde</option></select></div>
           </div>
+          <div class="quick-note-template-row">
+            <div><label for="planObsTemplate">Vorlage</label><select id="planObsTemplate" onchange="APP.useNoteTemplate('plan')"></select></div>
+            <button type="button" class="btn secondary small" onclick="APP.saveNoteTemplate('plan')">Als Vorlage speichern</button>
+          </div>
+          <div class="quick-note-editor">
+            <div class="quick-note-editor-head"><label for="planObsText">Notiz</label><button type="button" class="voice-btn" title="Notiz diktieren" aria-label="Notiz diktieren" onclick="APP.dictateObservation('planObsText')">🎙</button></div>
+            <textarea id="planObsText" rows="3" maxlength="2000" placeholder="Notiz eingeben …"></textarea>
+          </div>
+          <div class="quick-note-actions"><button class="btn small" onclick="APP.saveObservation('plan')">Notiz speichern</button></div>
         </div>
       </div>
       <div id="teacherDevelopmentPanel" class="student-tab-panel">
