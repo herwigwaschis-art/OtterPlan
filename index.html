@@ -892,7 +892,7 @@ body:has(#childView.active) #todayBadge{display:none}
 <input id="checkinShellTarget" type="number" min="1" max="200" step="1" inputmode="numeric" placeholder="z. B. 15" style="max-width:130px;text-align:center">
 <label>Meine Belohnung</label><div id="checkinRewardChoices" class="week-reward-choice" role="group" aria-label="Belohnung auswählen"></div>
 <div class="reward-choice-meta"><button id="checkinMoreRewards" class="btn ghost small" type="button" onclick="APP.toggleMoreCheckinRewards()" style="display:none">Weitere Belohnungen</button></div>
-<div id="checkinFreeWrap" class="reward-free-wrap" style="display:none"><label for="checkinFreeReward">Meine Belohnung</label><input id="checkinFreeReward" maxlength="80" placeholder="z. B. zusammen Fußball spielen"><label class="reward-save-template"><input id="checkinSaveTemplate" type="checkbox"> Als Vorlage speichern</label></div>
+<div id="checkinFreeWrap" class="reward-free-wrap" style="display:none"><label for="checkinFreeReward">Was wünschst du dir?</label><input id="checkinFreeReward" maxlength="80" placeholder="z. B. zusammen Fußball spielen"><label class="reward-save-template"><input id="checkinSaveTemplate" type="checkbox"> Als Vorlage speichern</label></div>
 <div class="reward-manage-actions"><button type="button" onclick="APP.openRewardTemplates()">Vorlagen bearbeiten</button></div>
 <label>Wie starte ich?</label><div class="choice-row"><button id="ci-good" class="choice" onclick="APP.pickCheckin('good')"><span class="emoji">😊</span>Gut</button><button id="ci-partial" class="choice" onclick="APP.pickCheckin('partial')"><span class="emoji">😐</span>Okay</button><button id="ci-difficult" class="choice" onclick="APP.pickCheckin('difficult')"><span class="emoji">🙁</span>Schwierig</button></div>
 <div class="toolbar" style="justify-content:flex-end"><button class="btn secondary" onclick="APP.close('checkinModal')">Abbrechen</button><button class="btn" onclick="APP.saveCheckin()">Check-in speichern</button></div>
@@ -2029,6 +2029,7 @@ function renderCheckinRewards(){
  var templates=S.rewardTemplates.filter(function(t){return !t.archived_at}),legacy=rs(S.student.id),choice=S.checkinRewardChoice;
  var cards=templates.map(function(t){return {kind:"template",id:t.id,title:t.title,icon:t.icon_key||"gift"}}).concat(legacy.map(function(r){return {kind:"legacy",id:r.id,title:r.title,icon:"gift"}}));
  var visible=S.checkinRewardMore?cards:cards.slice(0,6);
+ if(!S.checkinRewardMore&&choice&&choice.kind!=="free"&&!visible.some(function(c){return c.kind===choice.kind&&c.id===choice.id})){var chosen=cards.find(function(c){return c.kind===choice.kind&&c.id===choice.id});if(chosen)visible=visible.slice(0,5).concat(chosen)}
  el("checkinRewardChoices").innerHTML=visible.map(function(c){var selected=choice&&choice.kind===c.kind&&choice.id===c.id;
   return '<button type="button" class="'+(selected?'selected':'')+'" aria-pressed="'+!!selected+'" onclick="APP.pickCheckinReward(\''+c.kind+'\',\''+c.id+'\')">'+rewardIconSvg(c.icon)+'<span>'+esc(c.title)+'</span></button>'
  }).join("")+'<button type="button" class="'+(choice&&choice.kind==="free"?"selected":"")+'" aria-pressed="'+!!(choice&&choice.kind==="free")+'" onclick="APP.pickCheckinReward(\'free\')">'+rewardIconSvg("gift")+'<span>Eigene Belohnung</span></button>';
