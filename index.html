@@ -1147,7 +1147,7 @@ function weeklyReward(sid){var p=plan(sid),count=shells(sid),target=p&&p.checkin
  return {plan:p,count:count,target:target,title:p&&p.checkin_completed?p.reward_title_snapshot||"":"" ,
  status:p&&p.reward_redeemed_at?"redeemed":target&&p.reward_title_snapshot&&count>=target?"earned":"pending"}}
 
-function rs(sid){return S.rewards.filter(function(r){return r.student_id===sid&&r.active}).sort(function(a,b){return a.shells_required-b.shells_required})}
+function rs(sid){return S.rewards.filter(function(r){return r.student_id===sid&&r.active&&r.title.trim().toLocaleLowerCase("de-DE")!=="wunschbelohnung"}).sort(function(a,b){return a.shells_required-b.shells_required})}
 function selfRating(sid,day,lesson){return S.selfRatings.find(function(r){return r.student_id===sid&&Number(r.weekday)===Number(day)&&Number(r.lesson_no)===Number(lesson)})||null}
 function rating(sid,day,lesson){return S.ratings.find(function(r){return r.student_id===sid&&Number(r.weekday)===Number(day)&&Number(r.lesson_no)===Number(lesson)})||null}
 function slotEnabled(sid,day,lesson){var x=S.scheduleSlots.find(function(s){return s.student_id===sid&&Number(s.weekday)===Number(day)&&Number(s.lesson_no)===Number(lesson)});if(x)return x.enabled!==false;
@@ -2013,7 +2013,7 @@ function setSelected(prefix,value,values){values.forEach(function(v){var b=el(pr
 function checkin(){var p=plan(S.student.id),count=stats(S.student.id).good;
  if(p&&p.reward_redeemed_at){toast("Belohnung bereits eingelöst. Erst das Einlösen rückgängig machen.");return}
  S.checkinFeeling=p&&p.checkin_feeling?p.checkin_feeling:"partial";
- S.checkinRewardChoice=p&&p.reward_template_id?{kind:"template",id:p.reward_template_id}:p&&p.reward_id?{kind:"legacy",id:p.reward_id}:p&&p.reward_title_snapshot?{kind:"free"}:null;
+ S.checkinRewardChoice=p&&p.reward_template_id?{kind:"template",id:p.reward_template_id}:p&&p.reward_id?(rs(S.student.id).some(function(r){return r.id===p.reward_id})?{kind:"legacy",id:p.reward_id}:null):p&&p.reward_title_snapshot?{kind:"free"}:null;
  S.checkinRewardMore=!!(S.checkinRewardChoice&&S.checkinRewardChoice.kind!=="free"&&S.rewardTemplates.findIndex(function(t){return t.id===S.checkinRewardChoice.id})>=6);
  el("checkinFreeReward").value=p&&p.reward_title_snapshot&&!p.reward_id&&!p.reward_template_id?p.reward_title_snapshot:"";
  el("checkinSaveTemplate").checked=false;
