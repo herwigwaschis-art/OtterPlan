@@ -1,5 +1,5 @@
-const CACHE="milo-v62";
-const STATIC=["./","./?menu=1","./index.html","./manifest.webmanifest","./milo-icon.svg","./milo-icon.svg?v=40","./milo-icon-180.png","./milo-icon-192.png","./milo-icon-512.png","./milo-wordmark.svg"];
+const CACHE="milo-v63";
+const STATIC=["./","./?menu=1","./index.html","./manifest.webmanifest","./milo-icon.svg","./milo-icon.svg?v=40","./milo-icon-180.png","./milo-icon-192.png","./milo-icon-512.png","./milo-wordmark.svg","./milo-sunflower-stages.png"];
 const LIBRARIES=new Set([
   "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
   "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js",

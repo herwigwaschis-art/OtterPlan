@@ -571,6 +571,15 @@ body:has(#childView.active) #todayBadge{display:none}
 @media(max-width:760px){.week-reward-choice{grid-template-columns:repeat(3,minmax(0,1fr))}#childView .child-support-cards .kid-reward{padding:15px}}
 @media(max-width:560px){.week-reward-choice{grid-template-columns:repeat(2,minmax(0,1fr))}.reward-template-row{flex-wrap:wrap}.reward-template-row .toolbar{width:100%;justify-content:flex-end}#childView .child-support-cards .kid-reward{display:flex;min-height:0}#childView .kid-reward-title{font-size:18px}}
 #teacherHome .student-card-foot{justify-content:flex-end}
+
+/* Three plant stages share one transparent sprite so every rating stays consistent. */
+.plant-icon{display:inline-block;width:34px;height:34px;flex:none;vertical-align:middle;background-image:url("./milo-sunflower-stages.png");background-repeat:no-repeat;background-size:300% 100%}
+.plant-difficult{background-position:left center}.plant-partial{background-position:center center}.plant-good{background-position:right center}
+.ratings button{gap:5px;min-height:102px;padding:14px 5px}.ratings .plant-icon{width:58px;height:58px}.ratings small{display:block;font-size:12px;line-height:1.2;color:#526d68;font-weight:750}
+.choice .plant-icon{display:block;width:42px;height:42px;margin:0 auto 5px}
+.quick-face .plant-icon{width:35px;height:35px}.quick-face{width:48px;height:46px;padding:3px}
+.face .plant-icon{width:30px;height:30px}.self-face .plant-icon{width:17px;height:17px}.today-self .plant-icon{width:25px;height:25px}
+#childReward .plant-icon{width:25px;height:25px;margin-right:5px}
 </style>
 </head>
 <body>
@@ -669,7 +678,7 @@ body:has(#childView.active) #todayBadge{display:none}
       <div id="teacherPlanPanel" class="student-tab-panel active">
         <div class="grid teacher-summary-grid">
           <div class="card s6 teacher-summary-card teacher-goal-summary"><div class="teacher-summary-heading"><div class="eyebrow">Wochenziel</div><button type="button" class="summary-edit" aria-label="Wochenziel ändern" title="Wochenziel ändern" onclick="APP.checkin()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button></div><div id="teacherGoal" class="teacher-goal" style="margin-top:8px"></div></div>
-          <div class="card s6 teacher-summary-card teacher-reward-summary"><div class="teacher-summary-heading"><div class="eyebrow">Belohnung</div><button type="button" class="summary-edit" aria-label="Belohnung ändern" title="Belohnung ändern" onclick="APP.reward()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button></div><div id="teacherRewardTitle" class="teacher-reward-title"></div><div class="teacher-reward-count"><span id="teacherRewardCount">0</span> / <span id="teacherRewardTarget">–</span> <small>Muscheln</small></div><div id="teacherRewardWeek" class="teacher-reward-week"></div><div class="teacher-reward-progress" role="progressbar" aria-label="Fortschritt zum Wochenziel" aria-valuemin="0" aria-valuemax="100"><span id="teacherRewardProgress"></span></div><div id="teacherRewardRemaining" class="teacher-reward-remaining"></div></div>
+          <div class="card s6 teacher-summary-card teacher-reward-summary"><div class="teacher-summary-heading"><div class="eyebrow">Belohnung</div><button type="button" class="summary-edit" aria-label="Belohnung ändern" title="Belohnung ändern" onclick="APP.reward()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button></div><div id="teacherRewardTitle" class="teacher-reward-title"></div><div class="teacher-reward-count"><span id="teacherRewardCount">0</span> / <span id="teacherRewardTarget">–</span> <small>Blüten</small></div><div id="teacherRewardWeek" class="teacher-reward-week"></div><div class="teacher-reward-progress" role="progressbar" aria-label="Fortschritt zum Wochenziel" aria-valuemin="0" aria-valuemax="100"><span id="teacherRewardProgress"></span></div><div id="teacherRewardRemaining" class="teacher-reward-remaining"></div></div>
           <div class="card s12"><h3 style="margin-top:0">Stunden</h3><div id="teacherWeek" class="week"></div></div>
         </div>
         <div class="quick-note-card">
@@ -701,7 +710,7 @@ body:has(#childView.active) #todayBadge{display:none}
           <div id="teacherDevSummary" class="dev-summary-grid"></div>
           <div id="teacherDevComparison" class="self-comparison"></div>
           <div class="dev-grid">
-            <div class="dev-card"><h3>Entwicklung über die Wochen</h3><div id="teacherDevChart" class="dev-chart"></div><div class="dev-legend"><span>Linie = Anteil 😊 an allen Bewertungen je Woche</span></div></div>
+            <div class="dev-card"><h3>Entwicklung über die Wochen</h3><div id="teacherDevChart" class="dev-chart"></div><div class="dev-legend"><span>Linie = Anteil Blüten an allen Bewertungen je Woche</span></div></div>
             <div class="dev-card"><h3>Wochenziele</h3><div id="teacherDevGoals" class="dev-goals"></div></div>
             <div class="dev-card"><h3>Gesprächsübersicht</h3><div id="teacherDevText" class="dev-summary-text"></div><div class="toolbar" style="margin-top:12px"><button class="btn small" onclick="APP.exportDevelopmentPdf()">PDF für Elternsprechtag</button></div><div id="teacherAiStatus" class="ai-status"></div><div id="teacherAiResult" class="analysis-box" style="display:none"></div></div>
             <div class="dev-card"><h3>Beobachtungen im Zeitraum</h3><div id="teacherDevFilters" class="note-filters"></div><div id="teacherDevNotes" class="dev-note-list"></div></div>
@@ -745,7 +754,7 @@ body:has(#childView.active) #todayBadge{display:none}
       <div class="grade-student-head"><div><h2 id="gradeStudentName"></h2><div id="gradeStudentMeta" class="grade-student-meta"></div></div><span id="gradeStudentDate" class="date-soft"></span></div>
       <div class="grid">
         <div class="card s12"><div class="eyebrow">Wochenziel</div><div id="gradeStudentGoal" class="teacher-goal" style="margin-top:8px"></div><div id="gradeWeeklyReward" class="muted" style="font-size:13px;text-align:center;margin-top:8px"></div></div>
-        <div class="card s12"><div class="grade-week-head"><h3>Wochenplan</h3><span class="muted" style="font-size:12px">Smiley antippen zum Bewerten</span></div><div id="gradeStudentWeek" class="week"></div></div>
+        <div class="card s12"><div class="grade-week-head"><h3>Wochenplan</h3><span class="muted" style="font-size:12px">Blüte antippen zum Bewerten</span></div><div id="gradeStudentWeek" class="week"></div></div>
       </div>
       <div class="toolbar" style="justify-content:center;margin-top:14px"><button class="btn secondary small" onclick="APP.gradeDetailCheckin()">🎯 Check-in</button><button class="btn secondary small" onclick="APP.gradeDetailCheckout()">✅ Check-out</button><button class="btn secondary small" onclick="APP.openWeekHistory()">Wochenverlauf</button><button class="btn secondary small" onclick="APP.openGradeDevelopment()">Entwicklung</button><button class="btn secondary small" onclick="APP.openGradeNote()">📝 Notiz</button></div>
       <div id="gradeQuickNav" class="quick-nav" style="display:none"><button class="btn secondary small" onclick="APP.gradeQuickNext(-1)">← Vorheriges</button><span id="gradeQuickCount" class="count"></span><button class="btn small" onclick="APP.gradeQuickNext(1)">Nächstes →</button></div>
@@ -764,7 +773,7 @@ body:has(#childView.active) #todayBadge{display:none}
   <div class="child-top"><h2 id="childTitle" class="child-name"></h2></div>
   <div class="kid-card child-goal-card"><div class="kid-label">Mein Ziel</div><div class="toolbar" style="align-items:center"><span id="childGoalIcon" class="goal-symbol" aria-hidden="true"></span><div id="childGoal" class="kid-goal" style="flex:1"></div><button class="btn secondary child-goal-speak" aria-label="Ziel vorlesen" title="Ziel vorlesen" onclick="APP.speakGoal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button></div><div id="childHelp" class="kid-tip"></div></div>
   <section class="child-week-card" aria-labelledby="childWeekTitle"><h2 id="childWeekTitle">Meine Woche</h2><div id="childWeek" class="week"></div></section>
-  <div id="childSelfCard" class="card child-self-card" style="display:none;margin-bottom:12px"><div class="kid-label" id="childSelfTitle">Wie war es für dich?</div><label for="childSelfSlot">Stunde oder Pause</label><select id="childSelfSlot" onchange="APP.setChildSelfSlot(this.value)"></select><div class="choice-row" style="margin-top:10px;margin-bottom:0"><button id="self-good" class="choice" aria-label="Gut geschafft" onclick="APP.saveSelfRating('good')"><span class="emoji">😊</span>Gut</button><button id="self-partial" class="choice" aria-label="Teilweise geschafft" onclick="APP.saveSelfRating('partial')"><span class="emoji">😐</span>So mittel</button><button id="self-difficult" class="choice" aria-label="Schwierig" onclick="APP.saveSelfRating('difficult')"><span class="emoji">🙁</span>Schwer</button></div></div>
+  <div id="childSelfCard" class="card child-self-card" style="display:none;margin-bottom:12px"><div class="kid-label" id="childSelfTitle">Wie war es für dich?</div><label for="childSelfSlot">Stunde oder Pause</label><select id="childSelfSlot" onchange="APP.setChildSelfSlot(this.value)"></select><div class="choice-row" style="margin-top:10px;margin-bottom:0"><button id="self-good" class="choice" aria-label="Gut geschafft" onclick="APP.saveSelfRating('good')"><span class="plant-icon plant-good" aria-hidden="true"></span>Geschafft</button><button id="self-partial" class="choice" aria-label="Auf dem Weg" onclick="APP.saveSelfRating('partial')"><span class="plant-icon plant-partial" aria-hidden="true"></span>Auf dem Weg</button><button id="self-difficult" class="choice" aria-label="Ich übe" onclick="APP.saveSelfRating('difficult')"><span class="plant-icon plant-difficult" aria-hidden="true"></span>Ich übe</button></div></div>
   <div class="child-main child-support-cards">
     
     <div id="childRewardCard" class="kid-card kid-reward"><div id="childRewardIcon" class="kid-reward-visual" aria-hidden="true"></div><div id="childRewardHint" class="kid-reward-state"></div><div id="childRewardTitle" class="kid-reward-title"></div><div id="childReward" class="kid-reward-count"></div><div class="progress" role="progressbar" aria-label="Wochenfortschritt" aria-valuemin="0" aria-valuemax="100"><div id="childBar"></div></div></div>
@@ -880,7 +889,7 @@ body:has(#childView.active) #todayBadge{display:none}
   <div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('weekCloseModal')">Schließen</button></div>
 </div></div>
 
-<div id="ratingModal" class="modal-bg"><div class="modal"><h3 id="ratingTitle">Bewertung</h3><div id="ratingGoal" class="card" style="padding:15px"></div><div class="ratings"><button aria-label="Geschafft" title="Geschafft" onclick="APP.saveRating('good')">😊<small>Geschafft</small></button><button aria-label="Teilweise" title="Teilweise" onclick="APP.saveRating('partial')">😐<small>Teilweise</small></button><button aria-label="Noch nicht" title="Noch nicht" onclick="APP.saveRating('difficult')">🙁<small>Noch nicht</small></button></div><div class="toolbar" style="justify-content:space-between"><button class="btn ghost" onclick="APP.clearRating()">Löschen</button><button class="btn secondary" onclick="APP.close('ratingModal')">Abbrechen</button></div></div></div>
+<div id="ratingModal" class="modal-bg"><div class="modal"><h3 id="ratingTitle">Bewertung</h3><div id="ratingGoal" class="card" style="padding:15px"></div><div class="ratings"><button aria-label="Geschafft" title="Geschafft" onclick="APP.saveRating('good')"><span class="plant-icon plant-good" aria-hidden="true"></span><small>Geschafft</small></button><button aria-label="Auf dem Weg" title="Auf dem Weg" onclick="APP.saveRating('partial')"><span class="plant-icon plant-partial" aria-hidden="true"></span><small>Auf dem Weg</small></button><button aria-label="Ich übe" title="Ich übe" onclick="APP.saveRating('difficult')"><span class="plant-icon plant-difficult" aria-hidden="true"></span><small>Ich übe</small></button></div><div class="toolbar" style="justify-content:space-between"><button class="btn ghost" onclick="APP.clearRating()">Löschen</button><button class="btn secondary" onclick="APP.close('ratingModal')">Abbrechen</button></div></div></div>
 
 <div id="checkinModal" class="modal-bg"><div class="modal">
 <div class="eyebrow">Wochenstart</div><h2 style="margin:5px 0 4px">Check-in · <span id="checkinName"></span></h2>
@@ -888,13 +897,13 @@ body:has(#childView.active) #todayBadge{display:none}
 <label for="checkinTemplate">Vorlage</label><select id="checkinTemplate" onchange="APP.fillCheckinTemplate()"></select>
 <label for="checkinGoal">Mein Wochenziel</label><textarea id="checkinGoal" placeholder="Ich ..."></textarea>
 <details class="clean"><summary>Mehr zum Ziel</summary><label for="checkinIcon">Symbol</label><select id="checkinIcon"><option value="target">Ziel</option><option value="ear">Zuhören / leise</option><option value="hand">Melden / Stopp</option><option value="clock">Pünktlich / starten</option><option value="peace">Friedlich / zusammen</option></select><label for="checkinHelp">Das hilft mir</label><textarea id="checkinHelp"></textarea></details>
-<label for="checkinShellTarget">Wie viele Smileys schaffe ich?</label><div class="muted" style="font-size:12px">Ein positiver Smiley = eine Muschel.</div>
+<label for="checkinShellTarget">Wie viele Blüten möchte ich sammeln?</label><div class="muted" style="font-size:12px">Jede geschaffte Stunde bringt eine Blüte.</div>
 <input id="checkinShellTarget" type="number" min="1" max="200" step="1" inputmode="numeric" placeholder="z. B. 15" style="max-width:130px;text-align:center">
 <label>Meine Belohnung</label><div id="checkinRewardChoices" class="week-reward-choice" role="group" aria-label="Belohnung auswählen"></div>
 <div class="reward-choice-meta"><button id="checkinMoreRewards" class="btn ghost small" type="button" onclick="APP.toggleMoreCheckinRewards()" style="display:none">Weitere Belohnungen</button></div>
 <div id="checkinFreeWrap" class="reward-free-wrap" style="display:none"><label for="checkinFreeReward">Was wünschst du dir?</label><input id="checkinFreeReward" maxlength="80" placeholder="z. B. zusammen Fußball spielen"><label class="reward-save-template"><input id="checkinSaveTemplate" type="checkbox"> Als Vorlage speichern</label></div>
 <div class="reward-manage-actions"><button type="button" onclick="APP.openRewardTemplates()">Vorlagen bearbeiten</button></div>
-<label>Wie starte ich?</label><div class="choice-row"><button id="ci-good" class="choice" onclick="APP.pickCheckin('good')"><span class="emoji">😊</span>Gut</button><button id="ci-partial" class="choice" onclick="APP.pickCheckin('partial')"><span class="emoji">😐</span>Okay</button><button id="ci-difficult" class="choice" onclick="APP.pickCheckin('difficult')"><span class="emoji">🙁</span>Schwierig</button></div>
+<label>Wie starte ich?</label><div class="choice-row"><button id="ci-good" class="choice" onclick="APP.pickCheckin('good')"><span class="plant-icon plant-good" aria-hidden="true"></span>Gut</button><button id="ci-partial" class="choice" onclick="APP.pickCheckin('partial')"><span class="plant-icon plant-partial" aria-hidden="true"></span>Okay</button><button id="ci-difficult" class="choice" onclick="APP.pickCheckin('difficult')"><span class="plant-icon plant-difficult" aria-hidden="true"></span>Schwierig</button></div>
 <div class="toolbar" style="justify-content:flex-end"><button class="btn secondary" onclick="APP.close('checkinModal')">Abbrechen</button><button class="btn" onclick="APP.saveCheckin()">Check-in speichern</button></div>
 </div></div>
 
@@ -902,7 +911,7 @@ body:has(#childView.active) #todayBadge{display:none}
 <div class="eyebrow">Wochenabschluss</div><h2 style="margin:5px 0 4px">Check-out · <span id="checkoutName"></span></h2>
 <div id="checkoutWeeklyResult" class="week-reward-summary"></div>
 <div class="week-reward-actions"><button id="checkoutRedeem" class="btn small" style="display:none" onclick="APP.setWeeklyRewardRedemption(true)">Belohnung eingelöst</button><button id="checkoutUndo" class="btn ghost small" style="display:none" onclick="APP.setWeeklyRewardRedemption(false)">Einlösen rückgängig</button></div>
-<details class="clean"><summary>Rückblick und Notiz</summary><label>Wie lief es?</label><div class="choice-row"><button id="co-good" class="choice" onclick="APP.pickCheckoutSelf('good')"><span class="emoji">😊</span>Gut</button><button id="co-partial" class="choice" onclick="APP.pickCheckoutSelf('partial')"><span class="emoji">😐</span>Teilweise</button><button id="co-difficult" class="choice" onclick="APP.pickCheckoutSelf('difficult')"><span class="emoji">🙁</span>Schwierig</button></div><label>Weiter?</label><div class="decision-row"><button id="dec-done" class="decision" onclick="APP.pickCheckoutDecision('done')">Neues Ziel</button><button id="dec-continue" class="decision" onclick="APP.pickCheckoutDecision('continue')">Weiterführen</button><button id="dec-change" class="decision" onclick="APP.pickCheckoutDecision('change')">Anpassen</button></div><label for="checkoutNote">Notiz</label><textarea id="checkoutNote"></textarea></details>
+<details class="clean"><summary>Rückblick und Notiz</summary><label>Wie lief es?</label><div class="choice-row"><button id="co-good" class="choice" onclick="APP.pickCheckoutSelf('good')"><span class="plant-icon plant-good" aria-hidden="true"></span>Gut</button><button id="co-partial" class="choice" onclick="APP.pickCheckoutSelf('partial')"><span class="plant-icon plant-partial" aria-hidden="true"></span>Teilweise</button><button id="co-difficult" class="choice" onclick="APP.pickCheckoutSelf('difficult')"><span class="plant-icon plant-difficult" aria-hidden="true"></span>Schwierig</button></div><label>Weiter?</label><div class="decision-row"><button id="dec-done" class="decision" onclick="APP.pickCheckoutDecision('done')">Neues Ziel</button><button id="dec-continue" class="decision" onclick="APP.pickCheckoutDecision('continue')">Weiterführen</button><button id="dec-change" class="decision" onclick="APP.pickCheckoutDecision('change')">Anpassen</button></div><label for="checkoutNote">Notiz</label><textarea id="checkoutNote"></textarea></details>
 <div class="toolbar" style="justify-content:flex-end"><button class="btn secondary" onclick="APP.close('checkoutModal')">Schließen</button><button class="btn" onclick="APP.saveCheckout()">Check-out speichern</button></div>
 </div></div>
 
@@ -999,7 +1008,8 @@ var SUPABASE_URL="https://vcjzkyzarmxkxdwrsqjq.supabase.co";
 var SUPABASE_KEY="sb_publishable_OrhnvzLF1BrDtZFdyW71RA_SxbLV935";
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 var DAYS=["Montag","Dienstag","Mittwoch","Donnerstag","Freitag"];
-var FACE={good:"😊",partial:"😐",difficult:"🙁"};
+function plantIcon(value){return '<span class="plant-icon plant-'+(value==="good"?"good":value==="partial"?"partial":"difficult")+'" aria-hidden="true"></span>'}
+var FACE={good:plantIcon("good"),partial:plantIcon("partial"),difficult:plantIcon("difficult")};
 var BUILTIN_GOALS=[
  {title:"Zügig starten",goal:"Ich starte zügig mit meiner Arbeit.",help:"Ich lege mein Material bereit und beginne direkt."},
  {title:"Konzentriert arbeiten",goal:"Ich arbeite 10 Minuten konzentriert an meinen Aufgaben.",help:"Ich bleibe an meinem Platz und arbeite Schritt für Schritt."},
@@ -1404,7 +1414,7 @@ function renderGradeOverview(){
    return '<section><h3 class="grade-plan-title">'+esc(name)+'</h3><div class="grade-plan-grid">'+groups[name].map(function(x){
      var ciText=x.checkin_completed?"🎯 Check-in":"○ Check-in offen";
      var coText=x.checkout_self?"✅ Check-out":"○ Check-out offen";
-     var todayText=isCurrentWeek()&&new Date().getDay()>=1&&new Date().getDay()<=5?(Number(x.today_rated_count||0)>0?"😊 heute "+Number(x.today_rated_count||0):"○ heute offen"):"";
+     var todayText=isCurrentWeek()&&new Date().getDay()>=1&&new Date().getDay()<=5?(Number(x.today_rated_count||0)>0?"Heute "+Number(x.today_rated_count||0):"○ heute offen"):"";
      var idx=rows.indexOf(x);
      return '<div class="grade-plan-card"><h3>'+esc(x.avatar_emoji||"🦦")+' '+esc(x.display_name)+'</h3><div class="goal">'+esc(x.goal||"Noch kein Ziel")+'</div><div class="student-status"><span class="status-chip">'+ciText+'</span><span class="status-chip">'+coText+'</span>'+(todayText?'<span class="status-chip">'+todayText+'</span>':'')+'</div><div class="grade-plan-actions" style="margin-top:12px"><button class="btn small grade-plan-open" onclick="APP.gradeOpenStudent('+idx+')">Plan öffnen →</button><button class="btn secondary small" onclick="APP.gradeCheckin('+idx+')">Check-in</button><button class="btn secondary small" onclick="APP.gradeCheckout('+idx+')">Check-out</button></div></div>';
    }).join("")+'</div></section>';
@@ -1455,7 +1465,7 @@ function renderGradeStudent(){
    }
  }
  var w=weeklyReward(S.student.id),gradeReward=el("gradeWeeklyReward");
- if(gradeReward)gradeReward.textContent=w.title?(w.title+" · "+w.count+"/"+w.target+" Muscheln"(w.status==="redeemed"?" · eingelöst":w.status==="earned"?" · erreicht":"")):"Check-in: Ziel und Belohnung auswählen";
+ if(gradeReward)gradeReward.textContent=w.title?(w.title+" · "+w.count+"/"+w.target+" Blüten"+(w.status==="redeemed"?" · eingelöst":w.status==="earned"?" · erreicht":"")):"Check-in: Ziel und Belohnung auswählen";
  updateDateUI();renderWeek("gradeStudentWeek",true)
 }
 async function gradeQuickNext(delta){
@@ -1557,7 +1567,7 @@ function renderTodayPanel(){
  el("todaySlotChips").innerHTML=SEGMENTS.map(function(n){return '<button type="button" class="today-chip '+(slot===n?'active':'')+'" aria-pressed="'+(slot===n)+'" onclick="APP.setTodaySlot('+n+')">'+segmentLabel(n)+'</button>'}).join("");
  el("todayChildren").innerHTML=kids.map(function(s){
   var p=plan(s.id),r=rating(s.id,day,slot),absent=isAbsent(s.id,day,slot),self=selfRating(s.id,day,slot);
-  var actions=p&&p.checkin_completed&&p.weekly_shell_target&&p.reward_title_snapshot?'<div class="today-faces '+(absent?'is-absent':'')+'">'+["good","partial","difficult"].map(function(v){return '<button type="button" class="quick-face '+(r&&r.rating===v?'selected':'')+'" '+(absent?'disabled ':'')+'aria-label="'+esc(s.display_name)+': '+({good:'Geschafft',partial:'Teilweise',difficult:'Noch nicht'}[v])+'" aria-pressed="'+(!absent&&!!r&&r.rating===v)+'" onclick="APP.todayRate(\''+s.id+'\',\''+v+'\')">'+FACE[v]+'</button>'}).join("")+'</div>':'<span class="today-no-goal">Noch kein Wochenziel</span><button class="subtle-add-goal" onclick="APP.quickGoal(\''+s.id+'\')">+ Ziel</button>';
+  var actions=p&&p.checkin_completed&&p.weekly_shell_target&&p.reward_title_snapshot?'<div class="today-faces '+(absent?'is-absent':'')+'">'+["good","partial","difficult"].map(function(v){return '<button type="button" class="quick-face '+(r&&r.rating===v?'selected':'')+'" '+(absent?'disabled ':'')+'aria-label="'+esc(s.display_name)+': '+({good:'Geschafft',partial:'Auf dem Weg',difficult:'Ich übe'}[v])+'" aria-pressed="'+(!absent&&!!r&&r.rating===v)+'" onclick="APP.todayRate(\''+s.id+'\',\''+v+'\')">'+FACE[v]+'</button>'}).join("")+'</div>':'<span class="today-no-goal">Noch kein Wochenziel</span><button class="subtle-add-goal" onclick="APP.quickGoal(\''+s.id+'\')">+ Ziel</button>';
   var absentAllDay=isAbsent(s.id,day,0),absence='<details class="absence-menu '+(absent?'active':'')+'"><summary aria-label="Abwesenheit für '+esc(s.display_name)+'">'+(absent?'Abwesend':'+ Abwesend')+'</summary><div class="absence-options">'+(absentAllDay?'<button onclick="APP.toggleAbsence(\''+s.id+'\','+day+',0,true)">Ganzer Tag wieder anwesend</button>':'<button onclick="APP.toggleAbsence(\''+s.id+'\','+day+','+slot+',false)">'+(absent?'Diese Stunde wieder anwesend':'Diese Stunde abwesend')+'</button><button onclick="APP.toggleAbsence(\''+s.id+'\','+day+','+slot+',true)">Ganzer Tag abwesend</button>')+'</div></details>';
   return '<div class="today-child '+(absent?'is-absent':'')+'"><button type="button" class="today-child-name" onclick="APP.openStudent(\''+s.id+'\')"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><span><b>'+esc(s.display_name)+'</b></span></button>'+(self?'<span class="today-self" title="Selbsteinschätzung des Kindes">'+FACE[self.rating]+'</span>':'')+'<div class="today-child-actions">'+actions+absence+'</div><button type="button" class="today-note" aria-label="Notiz zu '+esc(s.display_name)+'" onclick="APP.todayNote(\''+s.id+'\')">✎</button></div>'
  }).join("")||(slot?'<div class="dev-empty">Für diesen Abschnitt sind keine Kinder eingetragen. Wähle einen anderen Abschnitt.</div>':'<div class="dev-empty">Tippe auf eine Stunde oder Pause, um Kinder und Ziele zu sehen.</div>');
@@ -1566,7 +1576,7 @@ function renderStudentCards(){
  var rows=S.students.slice().sort(function(a,b){return (a.sort_order||0)-(b.sort_order||0)||a.display_name.localeCompare(b.display_name)}),day=Number(S.todayDay)||currentSchoolDay();
  el("studentGrid").innerHTML=rows.map(function(s){
    var p=plan(s.id),sh=shells(s.id),x=stats(s.id),target=p&&p.checkin_completed?Number(p.weekly_shell_target)||0:0,progress=target?Math.min(100,Math.round(sh/target*100)):0,absent=isAbsent(s.id,day,0),dayName=DAYS[day-1];
-   return '<article class="student" draggable="true" data-student-id="'+esc(s.id)+'" onclick="if(!event.target.closest(\'button\'))APP.openStudent(\''+s.id+'\')" ondragstart="APP.dragStudentCard(event)" ondragover="APP.overStudentCard(event)" ondragleave="APP.leaveStudentCard(event)" ondrop="APP.dropStudentCard(event)" ondragend="APP.endStudentCardDrag(event)"><div class="student-top"><button type="button" class="student-name-open" aria-label="'+esc(s.display_name)+' öffnen" onclick="APP.openStudent(\''+s.id+'\')"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><span class="name">'+esc(s.display_name)+'</span></button><button type="button" class="student-absence-toggle '+(absent?'is-absent':'')+'" title="Anwesenheit für '+dayName+' umschalten" aria-label="'+(absent?'Kind am '+dayName+' als anwesend markieren':'Kind am '+dayName+' als abwesend markieren')+'" aria-pressed="'+absent+'" onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'absence\')"><span class="student-absence-dot" aria-hidden="true"></span><span>'+(absent?'Abwesend':'Anwesend')+'</span></button><span class="student-drag-handle" title="Zum Verschieben ziehen" aria-hidden="true"><svg viewBox="0 0 16 20"><circle cx="5" cy="5" r="1.5"/><circle cx="11" cy="5" r="1.5"/><circle cx="5" cy="10" r="1.5"/><circle cx="11" cy="10" r="1.5"/><circle cx="5" cy="15" r="1.5"/><circle cx="11" cy="15" r="1.5"/></svg></span></div><button type="button" class="student-open-area" aria-label="Wochenziel und Fortschritt von '+esc(s.display_name)+' öffnen" onclick="APP.openStudent(\''+s.id+'\')"><div class="goal">'+esc(p&&p.checkin_completed?p.goal:"Check-in offen")+'</div><div class="student-progress" aria-label="'+sh+' von '+target+' Muscheln dieser Woche"><div class="student-progress-track"><span style="width:'+progress+'%"></span></div><span>'+(target?sh+"/"+target+" Muscheln":"Check-in offen")+'</span></div></button><div class="student-card-foot"><div class="student-card-actions"><button onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'goal\')">'+(p&&p.checkin_completed?'Check-in':'+ Check-in')+'</button></div></div></article>';
+   return '<article class="student" draggable="true" data-student-id="'+esc(s.id)+'" onclick="if(!event.target.closest(\'button\'))APP.openStudent(\''+s.id+'\')" ondragstart="APP.dragStudentCard(event)" ondragover="APP.overStudentCard(event)" ondragleave="APP.leaveStudentCard(event)" ondrop="APP.dropStudentCard(event)" ondragend="APP.endStudentCardDrag(event)"><div class="student-top"><button type="button" class="student-name-open" aria-label="'+esc(s.display_name)+' öffnen" onclick="APP.openStudent(\''+s.id+'\')"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><span class="name">'+esc(s.display_name)+'</span></button><button type="button" class="student-absence-toggle '+(absent?'is-absent':'')+'" title="Anwesenheit für '+dayName+' umschalten" aria-label="'+(absent?'Kind am '+dayName+' als anwesend markieren':'Kind am '+dayName+' als abwesend markieren')+'" aria-pressed="'+absent+'" onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'absence\')"><span class="student-absence-dot" aria-hidden="true"></span><span>'+(absent?'Abwesend':'Anwesend')+'</span></button><span class="student-drag-handle" title="Zum Verschieben ziehen" aria-hidden="true"><svg viewBox="0 0 16 20"><circle cx="5" cy="5" r="1.5"/><circle cx="11" cy="5" r="1.5"/><circle cx="5" cy="10" r="1.5"/><circle cx="11" cy="10" r="1.5"/><circle cx="5" cy="15" r="1.5"/><circle cx="11" cy="15" r="1.5"/></svg></span></div><button type="button" class="student-open-area" aria-label="Wochenziel und Fortschritt von '+esc(s.display_name)+' öffnen" onclick="APP.openStudent(\''+s.id+'\')"><div class="goal">'+esc(p&&p.checkin_completed?p.goal:"Check-in offen")+'</div><div class="student-progress" aria-label="'+sh+' von '+target+' Blüten dieser Woche"><div class="student-progress-track"><span style="width:'+progress+'%"></span></div><span>'+(target?sh+"/"+target+" Blüten":"Check-in offen")+'</span></div></button><div class="student-card-foot"><div class="student-card-actions"><button onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'goal\')">'+(p&&p.checkin_completed?'Check-in':'+ Check-in')+'</button></div></div></article>';
  }).join("")||(S.students.length?'<div class="student-empty"><h3>Keine Kinder</h3></div>':'<div class="student-empty"><h3>Noch keine Kinder</h3><p>Lege das erste Kind für diese Klasse an.</p><button class="btn" onclick="APP.addStudent()">Kind hinzufügen</button></div>');
 }
 function renderWeekRitual(){
@@ -1615,7 +1625,7 @@ function renderTeacherReward(sid){var w=weeklyReward(sid),percent=w.target?Math.
  el("teacherRewardWeek").textContent=w.target?"Diese Woche":"Check-in offen";
  el("teacherRewardProgress").style.width=percent+"%";
  el("teacherRewardProgress").parentElement.setAttribute("aria-valuenow",percent);
- el("teacherRewardRemaining").textContent=w.status==="redeemed"?"Eingelöst":w.status==="earned"?(w.plan.checkout_self?"Belohnung verfügbar":"Beim Check-out einlösen"):w.target?"Noch "+Math.max(0,w.target-w.count)+" Muscheln":"Ziel und Belohnung wählen";
+ el("teacherRewardRemaining").textContent=w.status==="redeemed"?"Eingelöst":w.status==="earned"?(w.plan.checkout_self?"Belohnung verfügbar":"Beim Check-out einlösen"):w.target?"Noch "+Math.max(0,w.target-w.count)+" Blüten":"Ziel und Belohnung wählen";
 }
 function updateDetailAbsenceAction(){var b=el("detailAbsenceAction"),label=el("detailAbsenceLabel");if(!b||!label||!S.student)return;var day=Number(S.detailAbsenceDay)||Number(S.todayDay)||1,absent=isAbsent(S.student.id,day,0);label.textContent=absent?"Anwesend":"Abwesend";b.classList.toggle("is-active",absent);b.setAttribute("aria-label",(absent?"Abwesenheit für ":"Kind für ")+DAYS[day-1]+(absent?" aufheben":" als abwesend markieren"));b.title=(absent?"Anwesenheit für ":"Für ")+DAYS[day-1]+(absent?" aufheben":" als abwesend markieren")}
 function renderTeacher(){var p=plan(S.student.id);el("teacherName").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name;el("teacherMeta").textContent=(isCurrentWeek()?todayLong():"Woche "+weekRangeLabel());renderTeacherReward(S.student.id);updateDetailAbsenceAction();if(p&&p.checkin_completed){var ci=p.checkin_completed?" · "+(FACE[p.checkin_feeling]||""):"";var co=p.checkout_self?" · "+(FACE[p.checkout_self]||""):"";el("teacherGoal").innerHTML="<strong>"+esc(p.goal)+"</strong>"+(p.help_text?'<div class="muted" style="margin-top:6px">💡 '+esc(p.help_text)+"</div>":"")}else el("teacherGoal").textContent="Noch kein Ziel";var od=el("planObsDate");if(od&&!od.value)od.value=defaultObservationDate();renderWeek("teacherWeek",true)}
@@ -1634,7 +1644,7 @@ function renderWeek(target,click){
      var enabled=S.student?slotEnabled(S.student.id,d,n):true;
      if(!enabled){out+='<div class="cell '+(today===d?'today-cell ':'')+'"></div>';continue}
      var dayAbsent=S.student?isAbsent(S.student.id,d,0):false,absent=S.student?isAbsent(S.student.id,d,n):false,r=S.student?rating(S.student.id,d,n):null;
-     var label=DAYS[d-1]+", "+segmentLabel(n)+": "+(absent?"Abwesend":r?({good:"Geschafft",partial:"Teilweise",difficult:"Noch nicht"}[r.rating]||"Bewertet"):"Noch keine Bewertung");
+     var label=DAYS[d-1]+", "+segmentLabel(n)+": "+(absent?"Abwesend":r?({good:"Geschafft",partial:"Auf dem Weg",difficult:"Ich übe"}[r.rating]||"Bewertet"):"Noch keine Bewertung");
      var content=dayAbsent?'':absent?'<span class="absence-label">Abwesend</span>':'<span aria-hidden="true" class="face '+(r?'':'none')+'">'+(r?FACE[r.rating]:(click?'＋':'•'))+'</span>'+(S.student&&selfRating(S.student.id,d,n)?'<span class="self-face" title="Selbsteinschätzung des Kindes">'+FACE[selfRating(S.student.id,d,n).rating]+'</span>':'');
      out+='<'+(click?'button type="button"':'div')+' class="cell slot-face '+(today===d?'today-cell ':'')+(absent?'absence-cell ':'')+(dayAbsent?'whole-day-absence ':'')+(click?'click':'')+'" aria-label="'+esc(label)+'" '+(click&&!absent?'onclick="APP.openRating('+d+','+n+')"':'')+(click&&absent?' disabled title="Für diesen Tag als abwesend markiert"':'')+'>'+content+'</'+(click?'button':'div')+'>';
    }
@@ -1710,14 +1720,14 @@ function help(){
    title="MILO für Kinder";
    cards=[
     ["🎯 Mein Ziel","Oben siehst du dein Wochenziel und was dir dabei helfen kann."],
-    ["📅 Heute","Unter „Heute“ siehst du deine Stunden und die bisherigen Smileys."],
-    ["Muscheln","Ein positiver Smiley ist eine Muschel. Jede Woche beginnt bei null."]
+    ["📅 Heute","Unter „Heute“ siehst du deine Stunden und die bisherigen Blüten."],
+    ["Blüten","Für ein erreichtes Ziel gibt es eine Blüte. Jede Woche beginnt bei null."]
    ];
  }else if(S.teacherArea==="grade"){
    title="MILO · Stufenüberblick";
    cards=[
     ["🔎 Filtern","Zeige nur offene Check-ins, offene Check-outs, eine Klasse oder Kinder ohne heutige Bewertung."],
-    ["👤 Plan öffnen","Öffne ein Kind und tippe im Wochenplan direkt die Stunde an, um einen Smiley zu vergeben."],
+    ["👤 Plan öffnen","Öffne ein Kind und tippe im Wochenplan direkt die Stunde an, um einen Blüte zu vergeben."],
     ["⚡ Schnellmodus","Arbeite Kind für Kind durch. Unten wechselst du direkt zum nächsten Kind."],
     ["📅 Woche wechseln","Mit den Pfeilen oben kannst du vergangene Wochen ansehen und bearbeiten."]
    ];
@@ -1731,7 +1741,7 @@ function help(){
  }else{
    title="MILO · Klassenalltag";
    cards=[
-    ["😊 Heute bewerten","Die wichtigste Alltagsfunktion. MILO zeigt dir, wie viele Kinder heute bereits bewertet wurden."],
+    ["Heute bewerten","Die wichtigste Alltagsfunktion. MILO zeigt dir, wie viele Kinder heute bereits bewertet wurden."],
     ["📅 Woche wechseln","Mit den Pfeilen oben kannst du zurückblättern. Ein Klick auf die Wochenanzeige bringt dich zurück zur aktuellen Woche."],
     ["✅ Wochenabschluss","Die Kachel „Wochenabschluss“ zeigt offene Kinder und führt direkt zum Abschluss."],
     ["••• Weitere Funktionen","Dort findest du Kind hinzufügen, QR-Karten, Export und Klassenverwaltung."]
@@ -1756,10 +1766,10 @@ async function openWeekHistory(){if(!S.student)return;var sid=S.student.id;
  var rows=weekly.data||[],old=legacy.data||{};
  el("weekHistoryList").innerHTML=rows.map(function(w){
   var achieved=w.weekly_shell_target&&w.good_count>=w.weekly_shell_target;
-  return '<div class="week-history-item"><b>Woche ab '+esc(fmtDate(w.week_start))+'</b><span>Ziel: '+esc(w.goal||"–")+'</span><span>Muscheln: '+Number(w.good_count||0)+' / '+(w.weekly_shell_target||"–")+' · '+(w.weekly_shell_target?(achieved?"Ziel erreicht":"Ziel nicht erreicht"):"Alte Woche ohne Muschelziel")+'</span><span>Belohnung: '+esc(w.reward_title_snapshot||"Damals nicht festgelegt")+(w.reward_title_snapshot?' · '+(w.reward_redeemed_at?"eingelöst":achieved?"verfügbar":"nicht freigeschaltet"):"")+'</span><span>Check-out: '+(w.checkout_completed?"ja":"nein")+' · eingelöst: '+(w.reward_redeemed_at?"ja":"nein")+'</span></div>'
+  return '<div class="week-history-item"><b>Woche ab '+esc(fmtDate(w.week_start))+'</b><span>Ziel: '+esc(w.goal||"–")+'</span><span>Blüten: '+Number(w.good_count||0)+' / '+(w.weekly_shell_target||"–")+' · '+(w.weekly_shell_target?(achieved?"Ziel erreicht":"Ziel nicht erreicht"):"Alte Woche ohne Blüteziel")+'</span><span>Belohnung: '+esc(w.reward_title_snapshot||"Damals nicht festgelegt")+(w.reward_title_snapshot?' · '+(w.reward_redeemed_at?"eingelöst":achieved?"verfügbar":"nicht freigeschaltet"):"")+'</span><span>Check-out: '+(w.checkout_completed?"ja":"nein")+' · eingelöst: '+(w.reward_redeemed_at?"ja":"nein")+'</span></div>'
  }).join("")||'<div class="muted">Noch keine Wochenpläne.</div>';
  var legacyRows=old.redemptions||[],legacyCount=Number(old.legacy_shells||0);
- if(!legacy.error&&(legacyRows.length||legacyCount)){el("weekHistoryList").innerHTML+='<details class="clean"><summary>Früheres Sammelsystem</summary><div class="muted">Alter Muschelstand: '+legacyCount+' · wird nicht in neue Wochen übernommen.</div>'+legacyRows.map(function(r){return '<div class="week-history-item"><b>'+esc(r.title)+'</b><span>'+esc(fmtDate(String(r.redeemed_at).slice(0,10)))+' · '+Number(r.shells_required||0)+' Muscheln eingelöst</span></div>'}).join("")+'</details>'}
+ if(!legacy.error&&(legacyRows.length||legacyCount)){el("weekHistoryList").innerHTML+='<details class="clean"><summary>Früheres Sammelsystem</summary><div class="muted">Alter Blütestand: '+legacyCount+' · wird nicht in neue Wochen übernommen.</div>'+legacyRows.map(function(r){return '<div class="week-history-item"><b>'+esc(r.title)+'</b><span>'+esc(fmtDate(String(r.redeemed_at).slice(0,10)))+' · '+Number(r.shells_required||0)+' Blüten eingelöst</span></div>'}).join("")+'</details>'}
 }
 function moreStudentHistory(){modal("studentMoreModal",false);openStudentTab("development")}
 function moreStudentPdf(){modal("studentMoreModal",false);exportStudent()}
@@ -1885,12 +1895,12 @@ function developmentSummaryText(d){
  if(challenges.length)lines.push("\nWeiterer Blick\n"+challenges.slice(0,3).map(function(o){return "• "+o.note}).join("\n"));
  if(strategies.length)lines.push("\nHilfreiche Strategien\n"+strategies.slice(0,3).map(function(o){return "• "+o.note}).join("\n"));
  lines.push("\nGesprächspunkte für den Elternsprechtag\n• Aktuelles Wochenziel und Entwicklung der Rückmeldungen besprechen.\n• Konkrete beobachtete Fortschritte benennen.\n• Situationen mit weiterem Unterstützungsbedarf anhand der dokumentierten Beobachtungen besprechen.\n• Gemeinsam eine hilfreiche nächste Strategie bzw. ein nächstes Ziel festlegen.");
- if(!obs.length)lines.push("\nHinweis: Im gewählten Zeitraum wurden noch keine freien Beobachtungsnotizen erfasst. Die Zusammenfassung stützt sich daher vor allem auf Wochenziele und Smileys.");
+ if(!obs.length)lines.push("\nHinweis: Im gewählten Zeitraum wurden noch keine freien Beobachtungsnotizen erfasst. Die Zusammenfassung stützt sich daher vor allem auf Wochenziele und Blüten.");
  return lines.join("\n")
 }
 function renderDevelopment(prefix,d){
  var t=d.totals||{},rated=Number(t.rated_count||0),good=Number(t.good_count||0),partial=Number(t.partial_count||0),difficult=Number(t.difficult_count||0),pct=rated?Math.round(good/rated*100):0;
- el(prefix+"Summary").innerHTML='<div class="dev-stat"><strong>'+rated+'</strong><span>Rückmeldungen</span></div><div class="dev-stat"><strong>'+pct+' %</strong><span>😊 positiv</span></div><div class="dev-stat"><strong>'+Number(t.weeks_with_plan||0)+'</strong><span>Wochen mit Plan</span></div><div class="dev-stat"><strong>'+Number(t.observations||0)+'</strong><span>Beobachtungen</span></div>';
+ el(prefix+"Summary").innerHTML='<div class="dev-stat"><strong>'+rated+'</strong><span>Rückmeldungen</span></div><div class="dev-stat"><strong>'+pct+' %</strong><span>Blütenanteil</span></div><div class="dev-stat"><strong>'+Number(t.weeks_with_plan||0)+'</strong><span>Wochen mit Plan</span></div><div class="dev-stat"><strong>'+Number(t.observations||0)+'</strong><span>Beobachtungen</span></div>';
  var comp=d.comparison||null,compBox=el(prefix+"Comparison");
  compBox.innerHTML=comp&&comp.selfCount?'<b>Kind &amp; Lehrkraft</b><span>Das Kind hat sich '+comp.selfCount+'-mal selbst eingeschätzt. Bei '+comp.paired+' gemeinsamen Situationen stimmten '+comp.matches+' Einschätzungen überein.</span>':'<b>Selbsteinschätzung</b><span>Für diesen Zeitraum liegen noch keine Selbsteinschätzungen vor.</span>';
  el(prefix+"Chart").innerHTML=developmentChart(d);
@@ -1989,7 +1999,7 @@ function renderQuickRating(){
    function b(v,face,label){return '<button class="quick-face '+(r&&r.rating===v?'selected':'')+'" aria-label="'+label+'" title="'+label+'" onclick="APP.quickRate(\''+s.id+'\',\''+v+'\')">'+face+'</button>'}
    var absent=isAbsent(s.id,day,lesson),whole=(S.absences||[]).some(function(x){return x.student_id===s.id&&x.absent_on===weekDayISO(day)&&Number(x.segment_no)===0});
    var ready=p&&p.checkin_completed&&p.weekly_shell_target&&p.reward_title_snapshot;
-   var actions=absent?'<span class="status-chip">Abwesend'+(whole?' heute':'')+'</span>':ready?'<div class="quick-rating-actions">'+b("good","😊","Geschafft")+b("partial","😐","Teilweise")+b("difficult","🙁","Noch nicht")+'</div>':'<button class="quick-missing-goal" onclick="APP.quickGoal(\''+s.id+'\')">🎯 Ziel fehlt</button>';
+   var actions=absent?'<span class="status-chip">Abwesend'+(whole?' heute':'')+'</span>':ready?'<div class="quick-rating-actions">'+b("good",FACE.good,"Geschafft")+b("partial",FACE.partial,"Auf dem Weg")+b("difficult",FACE.difficult,"Ich übe")+'</div>':'<button class="quick-missing-goal" onclick="APP.quickGoal(\''+s.id+'\')">🎯 Ziel fehlt</button>';
    actions+='<button type="button" class="btn secondary small" title="Abwesenheit umschalten" onclick="APP.toggleAbsence(\''+s.id+'\','+day+','+(whole?0:lesson)+','+(whole?'true':'false')+')">'+(absent?'Anwesend':'Abwesend')+'</button>';
    return '<div class="quick-rating-row '+(r?'done':'')+'"><div class="quick-rating-person"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div style="min-width:0"><div class="quick-rating-name">'+esc(s.display_name)+'</div><div class="quick-rating-goal">'+esc(p?p.goal:"Noch kein Wochenziel")+'</div></div></div>'+actions+'</div>'
  }).join("")||'<div class="dev-empty">Für diese Stunde sind keine Kinder eingetragen.</div>';
@@ -2022,7 +2032,7 @@ function checkin(){var p=plan(S.student.id),count=stats(S.student.id).good;
  el("checkinHelp").value=p&&p.help_text?p.help_text:"";
  el("checkinShellTarget").value=p&&p.weekly_shell_target?p.weekly_shell_target:"";
  var note=el("checkinEditNote");note.style.display=count||p&&p.checkout_self?"block":"none";
- note.textContent=count?"Laufende Woche · "+count+" Muscheln bleiben beim Ändern erhalten.":"Bei einer Änderung wird der Check-out dieser Woche erneut durchgeführt.";
+ note.textContent=count?"Laufende Woche · "+count+" Blüten bleiben beim Ändern erhalten.":"Bei einer Änderung wird der Check-out dieser Woche erneut durchgeführt.";
  renderCheckinRewards();setSelected("ci-",S.checkinFeeling,["good","partial","difficult"]);modal("checkinModal",true)
 }
 function renderCheckinRewards(){
@@ -2054,7 +2064,7 @@ async function afterGradeAction(sid,kind,wasDetail){
 async function saveCheckin(){
  var g=el("checkinGoal").value.trim(),h=el("checkinHelp").value.trim(),target=Number(el("checkinShellTarget").value),choice=S.checkinRewardChoice;
  if(!g){toast("Wochenziel fehlt");return}
- if(!Number.isInteger(target)||target<1||target>200){toast("Bitte 1 bis 200 Smileys wählen");return}
+ if(!Number.isInteger(target)||target<1||target>200){toast("Bitte 1 bis 200 Blüten wählen");return}
  if(!choice){toast("Bitte eine Belohnung auswählen");return}
  var freeTitle=choice.kind==="free"?el("checkinFreeReward").value.trim():null;
  if(choice.kind==="free"&&(freeTitle.length<2||freeTitle.length>80)){toast("Belohnung mit 2 bis 80 Zeichen eingeben");return}
@@ -2077,7 +2087,7 @@ function checkout(){var p=plan(S.student.id);
  renderCheckoutResult();modal("checkoutModal",true)
 }
 function renderCheckoutResult(){var w=weeklyReward(S.student.id),pct=w.target?Math.min(100,Math.round(w.count/w.target*100)):0;
- el("checkoutWeeklyResult").innerHTML='<strong>'+(w.status==="redeemed"?"Eingelöst":w.status==="earned"?"Geschafft!":"Weiter so!")+'</strong><p>'+w.count+' / '+w.target+' Muscheln</p><div class="checkout-prize"><span class="reward-icon">'+rewardIconSvg(w.plan&&w.plan.reward_icon_snapshot||"gift")+'</span><span>'+esc(w.title)+'</span></div><div class="progress" role="progressbar" aria-label="Wochenfortschritt" aria-valuenow="'+pct+'" aria-valuemin="0" aria-valuemax="100"><span style="width:'+pct+'%"></span></div>';
+ el("checkoutWeeklyResult").innerHTML='<strong>'+(w.status==="redeemed"?"Eingelöst":w.status==="earned"?"Geschafft!":"Weiter so!")+'</strong><p>'+w.count+' / '+w.target+' Blüten</p><div class="checkout-prize"><span class="reward-icon">'+rewardIconSvg(w.plan&&w.plan.reward_icon_snapshot||"gift")+'</span><span>'+esc(w.title)+'</span></div><div class="progress" role="progressbar" aria-label="Wochenfortschritt" aria-valuenow="'+pct+'" aria-valuemin="0" aria-valuemax="100"><span style="width:'+pct+'%"></span></div>';
  el("checkoutRedeem").style.display=w.status==="earned"&&w.plan&&w.plan.checkout_self?"inline-flex":"none";
  el("checkoutUndo").style.display=w.status==="redeemed"?"inline-flex":"none";
  if(w.status==="earned"&&!w.plan.checkout_self)el("checkoutWeeklyResult").innerHTML+='<p>Check-out speichern, danach einlösen.</p>'
@@ -2145,7 +2155,7 @@ async function applyYearTransition(){var id=el("yearSourceClass").value,c=(S.adm
   modal("yearTransitionModal",false);S.classRow=null;await load();S.teacherArea="admin";showTeacherArea("admin");toast("Neues Schuljahr angelegt · alte Klasse archiviert")
  }finally{button.disabled=false;button.textContent="Neues Schuljahr anlegen"}
 }
-async function deleteStudent(){if(!confirm("Kind wirklich endgültig löschen? Ziele, Bewertungen, Muscheln und QR-Zugänge werden mit gelöscht."))return;var r=await sb.from("students").delete().eq("id",S.student.id);if(r.error){toast("Löschen fehlgeschlagen");return}modal("studentManageModal",false);S.student=null;await load();toast("Gelöscht")}
+async function deleteStudent(){if(!confirm("Kind wirklich endgültig löschen? Ziele, Bewertungen, Blüten und QR-Zugänge werden mit gelöscht."))return;var r=await sb.from("students").delete().eq("id",S.student.id);if(r.error){toast("Löschen fehlgeschlagen");return}modal("studentManageModal",false);S.student=null;await load();toast("Gelöscht")}
 
 function openBatchGoals(){if(!S.students.length){toast("Noch keine Kinder");return}fillGoalSelect("batchGoalTemplate");el("batchGoalText").value="";el("batchGoalHelp").value="";el("batchStudentList").innerHTML=S.students.map(function(s){return '<label class="check-item"><input type="checkbox" class="batchKid" value="'+s.id+'" checked><span>'+esc(s.avatar_emoji||"🦦")+" "+esc(s.display_name)+'</span></label>'}).join("");modal("batchGoalModal",true)}
 function fillBatchTemplate(){var g=goalFromValue(el("batchGoalTemplate").value);if(g){el("batchGoalText").value=g.goal;el("batchGoalHelp").value=g.help||""}}
@@ -2279,7 +2289,7 @@ async function saveStudentSchedule(){
  modal("scheduleModal",false);var sid=S.student.id;await load();openStudent(sid);toast("Individuelle Stunden gespeichert")
 }
 
-async function history(){el("historyName").textContent=S.student.display_name;el("historyList").innerHTML='<div class="muted">Lädt …</div>';modal("historyModal",true);var d=new Date();d.setDate(d.getDate()-84);var since=d.toISOString().slice(0,10);var q=await Promise.all([sb.from("weekly_plans").select("*").eq("student_id",S.student.id).gte("week_start",since).order("week_start",{ascending:false}),sb.from("ratings").select("*").eq("student_id",S.student.id).gte("week_start",since)]);var plans=q[0].data||[],ratings=q[1].data||[];el("historyList").innerHTML=plans.map(function(p){var rr=ratings.filter(function(x){return x.week_start===p.week_start}),good=rr.filter(function(x){return x.rating==="good"}).length;return '<div class="history-row"><b>'+fmtDate(p.week_start)+'</b><div><b>'+esc(p.goal)+'</b><div class="muted" style="font-size:10px">'+(p.checkout_note?esc(p.checkout_note):"")+'</div></div><span>'+good+'/'+rr.length+' 😊</span></div>'}).join("")||'<div class="muted">Noch kein Verlauf.</div>'}
+async function history(){el("historyName").textContent=S.student.display_name;el("historyList").innerHTML='<div class="muted">Lädt …</div>';modal("historyModal",true);var d=new Date();d.setDate(d.getDate()-84);var since=d.toISOString().slice(0,10);var q=await Promise.all([sb.from("weekly_plans").select("*").eq("student_id",S.student.id).gte("week_start",since).order("week_start",{ascending:false}),sb.from("ratings").select("*").eq("student_id",S.student.id).gte("week_start",since)]);var plans=q[0].data||[],ratings=q[1].data||[];el("historyList").innerHTML=plans.map(function(p){var rr=ratings.filter(function(x){return x.week_start===p.week_start}),good=rr.filter(function(x){return x.rating==="good"}).length;return '<div class="history-row"><b>'+fmtDate(p.week_start)+'</b><div><b>'+esc(p.goal)+'</b><div class="muted" style="font-size:10px">'+(p.checkout_note?esc(p.checkout_note):"")+'</div></div><span>'+good+'/'+rr.length+' Blüten</span></div>'}).join("")||'<div class="muted">Noch kein Verlauf.</div>'}
 
 function openExport(){modal("exportModal",true)}
 var csvExportScope="class";
@@ -2331,11 +2341,11 @@ async function exportWeekly(){var doc=new window.jspdf.jsPDF({unit:"mm",format:"
  S.students.forEach(function(s){var p=plan(s.id),w=weeklyReward(s.id);if(y>267){doc.addPage();y=18}
  doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text((s.avatar_emoji||"")+" "+s.display_name,14,y);
  doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text((p&&p.checkin_completed?p.goal:"Check-in offen").slice(0,105),14,y+5);
- doc.text(w.target?w.count+"/"+w.target+" Muscheln · "+(w.status==="redeemed"?"eingelöst":w.status==="earned"?"Ziel erreicht":"noch offen"):"Noch kein Wochenziel",14,y+10);
+ doc.text(w.target?w.count+"/"+w.target+" Blüten · "+(w.status==="redeemed"?"eingelöst":w.status==="earned"?"Ziel erreicht":"noch offen"):"Noch kein Wochenziel",14,y+10);
  if(w.title)doc.text(("Belohnung: "+w.title).slice(0,105),14,y+15);y+=23
  });doc.save("MILO_Woche_"+safeName(S.classRow.name)+".pdf")
 }
-async function exportStudent(){var d=new Date();d.setDate(d.getDate()-84);var since=d.toISOString().slice(0,10),q=await Promise.all([sb.from("weekly_plans").select("*").eq("student_id",S.student.id).gte("week_start",since).order("week_start",{ascending:false}),sb.from("ratings").select("*").eq("student_id",S.student.id).gte("week_start",since)]),plans=q[0].data||[],ratings=q[1].data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});pdfHeader(doc,"MILO · "+S.student.display_name,"Verlauf letzte 12 Wochen");var y=36;plans.forEach(function(p){var rr=ratings.filter(function(x){return x.week_start===p.week_start}),good=rr.filter(function(x){return x.rating==="good"}).length;if(y>272){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.setFontSize(10);doc.text(fmtDate(p.week_start)+" · "+good+"/"+(p.weekly_shell_target||"–")+" Muscheln",14,y);doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text(p.goal.slice(0,105),14,y+5);if(p.reward_title_snapshot)doc.text(("Belohnung: "+p.reward_title_snapshot+(p.reward_redeemed_at?" · eingelöst":"")).slice(0,105),14,y+10);if(p.checkout_note)doc.text(p.checkout_note.slice(0,105),14,y+15);y+=21});doc.save("MILO_"+safeName(S.student.display_name)+".pdf")}
+async function exportStudent(){var d=new Date();d.setDate(d.getDate()-84);var since=d.toISOString().slice(0,10),q=await Promise.all([sb.from("weekly_plans").select("*").eq("student_id",S.student.id).gte("week_start",since).order("week_start",{ascending:false}),sb.from("ratings").select("*").eq("student_id",S.student.id).gte("week_start",since)]),plans=q[0].data||[],ratings=q[1].data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});pdfHeader(doc,"MILO · "+S.student.display_name,"Verlauf letzte 12 Wochen");var y=36;plans.forEach(function(p){var rr=ratings.filter(function(x){return x.week_start===p.week_start}),good=rr.filter(function(x){return x.rating==="good"}).length;if(y>272){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.setFontSize(10);doc.text(fmtDate(p.week_start)+" · "+good+"/"+(p.weekly_shell_target||"–")+" Blüten",14,y);doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text(p.goal.slice(0,105),14,y+5);if(p.reward_title_snapshot)doc.text(("Belohnung: "+p.reward_title_snapshot+(p.reward_redeemed_at?" · eingelöst":"")).slice(0,105),14,y+10);if(p.checkout_note)doc.text(p.checkout_note.slice(0,105),14,y+15);y+=21});doc.save("MILO_"+safeName(S.student.display_name)+".pdf")}
 async function exportMonthly(){var start=startOfMonth(),ids=S.students.map(function(s){return s.id});if(!ids.length)return;var q=await Promise.all([sb.from("ratings").select("*").in("student_id",ids).gte("week_start",start),sb.from("weekly_plans").select("*").in("student_id",ids).gte("week_start",start)]),ratings=q[0].data||[],plans=q[1].data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});pdfHeader(doc,"MILO · "+S.classRow.name,"Monatsübersicht ab "+fmtDate(start));var y=36;S.students.forEach(function(s){var rr=ratings.filter(function(x){return x.student_id===s.id}),good=rr.filter(function(x){return x.rating==="good"}).length,pp=plans.filter(function(x){return x.student_id===s.id});if(y>275){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text(s.display_name,14,y);doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text(good+"/"+rr.length+" geschafft · "+pp.length+" Wochenziele",14,y+5);y+=14});doc.save("MILO_Monat_"+safeName(S.classRow.name)+".pdf")}
 
 async function openClassAdmin(){if(!S.classRow){el("classTeacherList").innerHTML="";el("classEditName").value="";el("classEditYear").value="2026/27";el("classEditGrade").value="";modal("classModal",true);return}el("classEditName").value=S.classRow.name;el("classEditYear").value=S.classRow.school_year||"";el("classEditGrade").value=S.classRow.grade_level||"";await renderClassTeachers();modal("classModal",true)}
@@ -2510,7 +2520,7 @@ function renderChild(){
  el("childRewardCard").classList.toggle("redeemed",w.status==="redeemed");
  el("childRewardIcon").innerHTML=rewardIconSvg(p&&p.reward_icon_snapshot||"gift");
  el("childRewardTitle").textContent=w.title||"Belohnung wird beim Check-in gewählt";
- el("childReward").textContent=w.target?sh+" / "+w.target+" Muscheln":"";
+ el("childReward").innerHTML=w.target?plantIcon("good")+sh+" / "+w.target+" Blüten":"";
  el("childBar").style.width=pct+"%";
  el("childBar").parentElement.setAttribute("aria-valuenow",pct);
  el("childRewardHint").textContent=w.status==="redeemed"?"Eingelöst":w.status==="earned"?"Geschafft!":w.target?"Deine Woche":"Neue Woche";
