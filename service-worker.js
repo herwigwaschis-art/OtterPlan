@@ -1,4 +1,4 @@
-const CACHE="milo-v67";
+const CACHE="milo-v68";
 const STATIC=["./","./?menu=1","./index.html","./manifest.webmanifest","./milo-icon.svg","./milo-icon.svg?v=40","./milo-icon-180.png","./milo-icon-192.png","./milo-icon-512.png","./milo-wordmark.svg","./plant-seed.svg","./plant-sprout.svg","./plant-sunflower.svg"];
 const LIBRARIES=new Set([
   "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
