@@ -507,6 +507,30 @@ body:has(#childView.active) #todayBadge{display:none}
 #childView .child-support-cards .kid-reward{padding:12px 15px}
 #childView .child-goal-card .kid-label,#childView .child-support-cards .kid-label,#childView .child-week-card h2{margin:0 0 7px;color:var(--muted);font-size:10px;font-weight:780;letter-spacing:.06em;line-height:1.3;text-transform:uppercase}
 #childView .child-week-card h2{font-size:10px}
+
+/* Weekly reward: one selected prize and one progress for each week. */
+.week-reward-choice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:8px 0 12px}
+.week-reward-choice button{min-height:64px;padding:11px 13px;border:1px solid #dce9e5;border-radius:13px;background:#fff;color:#31534d;text-align:left;font:inherit;font-weight:650;cursor:pointer}
+.week-reward-choice button.selected{border-color:#5da99a;background:#eff8f4;box-shadow:inset 0 0 0 1px #5da99a}
+.week-reward-choice button:focus-visible{outline:3px solid #b5dfd2;outline-offset:2px}
+.week-reward-choice button span{display:block;margin-top:3px;color:#7b8b88;font-size:11px;font-weight:500}
+.week-reward-summary{padding:14px 16px;margin:12px 0;border:1px solid #e0eae6;border-radius:14px;background:#f8fbf9;text-align:center}
+.week-reward-summary strong{display:block;color:#315f55;font-size:24px;letter-spacing:-.03em}
+.week-reward-summary p{margin:5px 0;color:#677b75;font-size:13px}
+.week-reward-summary b{display:block;margin-top:8px;color:#284b44;font-size:16px}
+.week-reward-summary .progress{height:8px;margin:12px auto 0;max-width:310px}
+.week-reward-summary .progress span{display:block;height:100%;border-radius:99px;background:#67af98}
+.week-reward-actions{display:flex;justify-content:center;align-items:center;gap:9px;margin:8px 0;flex-wrap:wrap}
+.week-reward-actions .btn.ghost{font-size:12px}
+.checkin-edit-note{margin:9px 0;padding:9px 12px;border-radius:11px;background:#f5f8f6;color:#61756e;font-size:12px}
+.child-reward-dots{display:flex;justify-content:center;gap:5px}
+.kid-reward .kid-reward-title{overflow-wrap:anywhere}
+.week-history-list{display:grid;gap:9px;max-height:60vh;overflow:auto}
+.week-history-item{padding:13px 15px;border:1px solid #e4ece8;border-radius:13px;background:#fbfcfb}
+.week-history-item b{display:block;margin-bottom:5px;color:#31534c}
+.week-history-item span{display:block;font-size:12px;color:#687b75;line-height:1.55}
+@media(max-width:760px){.week-reward-choice{grid-template-columns:1fr 1fr}.week-reward-choice button{min-height:62px}}
+@media(max-width:600px){.week-reward-choice{grid-template-columns:1fr}.week-reward-summary{padding:12px}.week-reward-summary strong{font-size:21px}}
 </style>
 </head>
 <body>
@@ -680,10 +704,10 @@ body:has(#childView.active) #todayBadge{display:none}
       <button class="btn secondary grade-back" onclick="APP.gradeBackToOverview()">← Stufenüberblick</button>
       <div class="grade-student-head"><div><h2 id="gradeStudentName"></h2><div id="gradeStudentMeta" class="grade-student-meta"></div></div><span id="gradeStudentDate" class="date-soft"></span></div>
       <div class="grid">
-        <div class="card s12"><div class="eyebrow">Wochenziel</div><div id="gradeStudentGoal" class="teacher-goal" style="margin-top:8px"></div></div>
+        <div class="card s12"><div class="eyebrow">Wochenziel</div><div id="gradeStudentGoal" class="teacher-goal" style="margin-top:8px"></div><div id="gradeWeeklyReward" class="muted" style="font-size:13px;text-align:center;margin-top:8px"></div></div>
         <div class="card s12"><div class="grade-week-head"><h3>Wochenplan</h3><span class="muted" style="font-size:12px">Smiley antippen zum Bewerten</span></div><div id="gradeStudentWeek" class="week"></div></div>
       </div>
-      <div class="toolbar" style="justify-content:center;margin-top:14px"><button class="btn secondary small" onclick="APP.gradeDetailCheckin()">🎯 Check-in</button><button class="btn secondary small" onclick="APP.gradeDetailCheckout()">✅ Check-out</button><button class="btn secondary small" onclick="APP.openGradeDevelopment()">Entwicklung</button><button class="btn secondary small" onclick="APP.openGradeNote()">📝 Notiz</button></div>
+      <div class="toolbar" style="justify-content:center;margin-top:14px"><button class="btn secondary small" onclick="APP.gradeDetailCheckin()">🎯 Check-in</button><button class="btn secondary small" onclick="APP.gradeDetailCheckout()">✅ Check-out</button><button class="btn secondary small" onclick="APP.openWeekHistory()">Wochenverlauf</button><button class="btn secondary small" onclick="APP.openGradeDevelopment()">Entwicklung</button><button class="btn secondary small" onclick="APP.openGradeNote()">📝 Notiz</button></div>
       <div id="gradeQuickNav" class="quick-nav" style="display:none"><button class="btn secondary small" onclick="APP.gradeQuickNext(-1)">← Vorheriges</button><span id="gradeQuickCount" class="count"></span><button class="btn small" onclick="APP.gradeQuickNext(1)">Nächstes →</button></div>
     </div>
   </div>
@@ -765,7 +789,7 @@ body:has(#childView.active) #todayBadge{display:none}
   <div class="eyebrow" style="margin:18px 0 8px">Weitere Funktionen</div><div class="list">
     <button class="btn ghost" onclick="APP.moreStudentQr()">QR-Code</button>
     <button class="btn ghost" onclick="APP.moreStudentHours()">Individuelle Stunden</button>
-    <button class="btn ghost" onclick="APP.moreStudentHistory()">Entwicklung</button>
+    <button class="btn ghost" onclick="APP.openWeekHistory()">Wochenverlauf</button><button class="btn ghost" onclick="APP.moreStudentHistory()">Entwicklung</button>
     <button class="btn ghost" onclick="APP.moreStudentPdf()">PDF exportieren</button>
     <button class="btn ghost" onclick="APP.openCsvExport('student')">Rohdaten als CSV</button>
     <button class="btn ghost" onclick="APP.moreStudentManage()">Kind bearbeiten</button>
@@ -818,9 +842,27 @@ body:has(#childView.active) #todayBadge{display:none}
 
 <div id="ratingModal" class="modal-bg"><div class="modal"><h3 id="ratingTitle">Bewertung</h3><div id="ratingGoal" class="card" style="padding:15px"></div><div class="ratings"><button aria-label="Geschafft" title="Geschafft" onclick="APP.saveRating('good')">😊<small>Geschafft</small></button><button aria-label="Teilweise" title="Teilweise" onclick="APP.saveRating('partial')">😐<small>Teilweise</small></button><button aria-label="Noch nicht" title="Noch nicht" onclick="APP.saveRating('difficult')">🙁<small>Noch nicht</small></button></div><div class="toolbar" style="justify-content:space-between"><button class="btn ghost" onclick="APP.clearRating()">Löschen</button><button class="btn secondary" onclick="APP.close('ratingModal')">Abbrechen</button></div></div></div>
 
-<div id="checkinModal" class="modal-bg"><div class="modal"><div class="eyebrow">Wochenstart</div><h2 style="margin:5px 0 4px">Check-in · <span id="checkinName"></span></h2><label for="checkinTemplate">Vorlage</label><select id="checkinTemplate" onchange="APP.fillCheckinTemplate()"></select><label for="checkinGoal">Ziel</label><textarea id="checkinGoal" placeholder="Ich ..."></textarea><label for="checkinIcon">Symbol für das Ziel</label><select id="checkinIcon"><option value="target">Ziel</option><option value="ear">Zuhören / leise</option><option value="hand">Melden / Stopp</option><option value="clock">Pünktlich / starten</option><option value="peace">Friedlich / zusammen</option></select><label for="checkinHelp">Hilft dabei</label><textarea id="checkinHelp"></textarea><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin:12px 0"><div><label for="checkinShellTarget" style="margin:0">Muschelziel der Woche</label><div class="muted" style="font-size:12px">Positive Smileys · z. B. 22</div></div><input id="checkinShellTarget" type="number" min="1" max="200" step="1" inputmode="numeric" placeholder="22" aria-label="Muschelziel dieser Woche" style="width:88px;flex:0 0 88px;text-align:center"></div><label>Startgefühl</label><div class="choice-row"><button id="ci-good" class="choice" onclick="APP.pickCheckin('good')"><span class="emoji">😊</span>Gut</button><button id="ci-partial" class="choice" onclick="APP.pickCheckin('partial')"><span class="emoji">😐</span>Okay</button><button id="ci-difficult" class="choice" onclick="APP.pickCheckin('difficult')"><span class="emoji">🙁</span>Schwierig</button></div><div class="toolbar" style="justify-content:flex-end"><button class="btn secondary" onclick="APP.close('checkinModal')">Abbrechen</button><button class="btn" onclick="APP.saveCheckin()">Speichern</button></div></div></div>
+<div id="checkinModal" class="modal-bg"><div class="modal">
+<div class="eyebrow">Wochenstart</div><h2 style="margin:5px 0 4px">Check-in · <span id="checkinName"></span></h2>
+<div id="checkinEditNote" class="checkin-edit-note" style="display:none"></div>
+<label for="checkinTemplate">Vorlage</label><select id="checkinTemplate" onchange="APP.fillCheckinTemplate()"></select>
+<label for="checkinGoal">Mein Wochenziel</label><textarea id="checkinGoal" placeholder="Ich ..."></textarea>
+<details class="clean"><summary>Mehr zum Ziel</summary><label for="checkinIcon">Symbol</label><select id="checkinIcon"><option value="target">Ziel</option><option value="ear">Zuhören / leise</option><option value="hand">Melden / Stopp</option><option value="clock">Pünktlich / starten</option><option value="peace">Friedlich / zusammen</option></select><label for="checkinHelp">Das hilft mir</label><textarea id="checkinHelp"></textarea></details>
+<label for="checkinShellTarget">Wie viele Smileys schaffe ich?</label><div class="muted" style="font-size:12px">Ein positiver Smiley = eine Muschel.</div>
+<input id="checkinShellTarget" type="number" min="1" max="200" step="1" inputmode="numeric" placeholder="z. B. 15" style="max-width:130px;text-align:center">
+<label>Meine Belohnung</label><div id="checkinRewardChoices" class="week-reward-choice" role="group" aria-label="Belohnung auswählen"></div>
+<div id="checkinRewardEmpty" class="muted" style="display:none;font-size:13px">Noch keine Belohnung vorhanden. <button type="button" class="btn ghost small" onclick="APP.close('checkinModal');APP.reward()">Belohnung anlegen</button></div>
+<label>Wie starte ich?</label><div class="choice-row"><button id="ci-good" class="choice" onclick="APP.pickCheckin('good')"><span class="emoji">😊</span>Gut</button><button id="ci-partial" class="choice" onclick="APP.pickCheckin('partial')"><span class="emoji">😐</span>Okay</button><button id="ci-difficult" class="choice" onclick="APP.pickCheckin('difficult')"><span class="emoji">🙁</span>Schwierig</button></div>
+<div class="toolbar" style="justify-content:flex-end"><button class="btn secondary" onclick="APP.close('checkinModal')">Abbrechen</button><button class="btn" onclick="APP.saveCheckin()">Check-in speichern</button></div>
+</div></div>
 
-<div id="checkoutModal" class="modal-bg"><div class="modal"><div class="eyebrow">Wochenabschluss</div><h2 style="margin:5px 0 4px">Check-out · <span id="checkoutName"></span></h2><label>Wie lief es?</label><div class="choice-row"><button id="co-good" class="choice" onclick="APP.pickCheckoutSelf('good')"><span class="emoji">😊</span>Gut</button><button id="co-partial" class="choice" onclick="APP.pickCheckoutSelf('partial')"><span class="emoji">😐</span>Teilweise</button><button id="co-difficult" class="choice" onclick="APP.pickCheckoutSelf('difficult')"><span class="emoji">🙁</span>Schwierig</button></div><label>Weiter?</label><div class="decision-row"><button id="dec-done" class="decision" onclick="APP.pickCheckoutDecision('done')">✅ Geschafft</button><button id="dec-continue" class="decision" onclick="APP.pickCheckoutDecision('continue')">🔁 Weiter</button><button id="dec-change" class="decision" onclick="APP.pickCheckoutDecision('change')">✏️ Ändern</button></div><label for="checkoutNote">Notiz</label><textarea id="checkoutNote"></textarea><div class="toolbar" style="justify-content:flex-end"><button class="btn secondary" onclick="APP.close('checkoutModal')">Abbrechen</button><button class="btn" onclick="APP.saveCheckout()">Speichern</button></div></div></div>
+<div id="checkoutModal" class="modal-bg"><div class="modal">
+<div class="eyebrow">Wochenabschluss</div><h2 style="margin:5px 0 4px">Check-out · <span id="checkoutName"></span></h2>
+<div id="checkoutWeeklyResult" class="week-reward-summary"></div>
+<div class="week-reward-actions"><button id="checkoutRedeem" class="btn small" style="display:none" onclick="APP.setWeeklyRewardRedemption(true)">Belohnung eingelöst</button><button id="checkoutUndo" class="btn ghost small" style="display:none" onclick="APP.setWeeklyRewardRedemption(false)">Einlösen rückgängig</button></div>
+<details class="clean"><summary>Rückblick und Notiz</summary><label>Wie lief es?</label><div class="choice-row"><button id="co-good" class="choice" onclick="APP.pickCheckoutSelf('good')"><span class="emoji">😊</span>Gut</button><button id="co-partial" class="choice" onclick="APP.pickCheckoutSelf('partial')"><span class="emoji">😐</span>Teilweise</button><button id="co-difficult" class="choice" onclick="APP.pickCheckoutSelf('difficult')"><span class="emoji">🙁</span>Schwierig</button></div><label>Weiter?</label><div class="decision-row"><button id="dec-done" class="decision" onclick="APP.pickCheckoutDecision('done')">Neues Ziel</button><button id="dec-continue" class="decision" onclick="APP.pickCheckoutDecision('continue')">Weiterführen</button><button id="dec-change" class="decision" onclick="APP.pickCheckoutDecision('change')">Anpassen</button></div><label for="checkoutNote">Notiz</label><textarea id="checkoutNote"></textarea></details>
+<div class="toolbar" style="justify-content:flex-end"><button class="btn secondary" onclick="APP.close('checkoutModal')">Schließen</button><button class="btn" onclick="APP.saveCheckout()">Check-out speichern</button></div>
+</div></div>
 
 <div id="addStudentModal" class="modal-bg"><div class="modal"><div class="eyebrow">Klasse</div><h2 style="margin:5px 0 14px">Neues Kind</h2><div class="inline-grid"><div><label for="newStudentName">Name</label><input id="newStudentName" maxlength="60" placeholder="Name"></div><div><label for="newStudentAvatar">Symbol</label><input id="newStudentAvatar" maxlength="8" value="🦦"></div></div><div class="toolbar" style="justify-content:flex-end;margin-top:17px"><button class="btn secondary" onclick="APP.close('addStudentModal')">Abbrechen</button><button class="btn" onclick="APP.saveStudent()">Erstellen</button></div></div></div>
 
@@ -830,7 +872,14 @@ body:has(#childView.active) #todayBadge{display:none}
 
 <div id="goalTemplateArchiveModal" class="modal-bg"><div class="modal"><div class="eyebrow">Archiv</div><h2>Archivierte Zielvorlagen</h2><div id="goalTemplateArchiveList" class="list"></div><div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('goalTemplateArchiveModal')">Schließen</button></div></div></div>
 
-<div id="rewardModal" class="modal-bg"><div class="modal"><div class="eyebrow">Belohnungen</div><h2 id="rewardName" style="margin:5px 0 12px"></h2><div class="inline-grid"><div><label for="manualShells">Muscheln</label><input id="manualShells" type="number" min="0"></div><div style="display:flex;align-items:flex-end"><button class="btn secondary" style="width:100%" onclick="APP.setShells()">Stand setzen</button></div></div><label for="rewardTemplate">Vorlage</label><select id="rewardTemplate" onchange="APP.fillRewardTemplate()"></select><div class="inline-grid"><div><label for="rewardTitle">Belohnung</label><input id="rewardTitle"></div><div><label for="rewardShells">Ab Muscheln</label><input id="rewardShells" type="number" min="1"></div></div><div class="toolbar reward-form-actions" style="margin-top:11px"><button id="rewardAddBtn" class="btn" onclick="APP.addReward()">Hinzufügen</button><button id="rewardSaveBtn" class="btn" style="display:none" onclick="APP.saveRewardEdit()">Speichern</button><button id="rewardCancelBtn" class="btn ghost" style="display:none" onclick="APP.cancelRewardEdit()">Abbrechen</button><button id="rewardSaveTemplateBtn" class="btn secondary" onclick="APP.saveRewardTemplate()">Als Vorlage speichern</button></div><label>Aktiv</label><div id="rewardList" class="list"></div><details class="clean"><summary>Archivierte Belohnungen</summary><div id="rewardArchivedList" class="list"></div></details><div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('rewardModal')">Schließen</button></div></div></div>
+<div id="weekHistoryModal" class="modal-bg"><div class="modal"><div class="eyebrow">Rückblick</div><h2 style="margin:5px 0 14px">Wochenverlauf</h2><div id="weekHistoryList" class="week-history-list"></div><div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('weekHistoryModal')">Schließen</button></div></div></div>
+<div id="rewardModal" class="modal-bg"><div class="modal"><div class="eyebrow">Belohnungen</div><h2 id="rewardName" style="margin:5px 0 12px"></h2>
+<div id="rewardWeekInfo" class="week-reward-summary"></div>
+<label for="rewardTemplate">Vorlage</label><select id="rewardTemplate" onchange="APP.fillRewardTemplate()"></select>
+<div class="inline-grid"><div><label for="rewardTitle">Belohnung</label><input id="rewardTitle"></div><div><label for="rewardShells">Vorschlag für Smileys</label><input id="rewardShells" type="number" min="1"></div></div>
+<div class="toolbar reward-form-actions" style="margin-top:11px"><button id="rewardAddBtn" class="btn" onclick="APP.addReward()">Hinzufügen</button><button id="rewardSaveBtn" class="btn" style="display:none" onclick="APP.saveRewardEdit()">Speichern</button><button id="rewardCancelBtn" class="btn ghost" style="display:none" onclick="APP.cancelRewardEdit()">Abbrechen</button><button id="rewardSaveTemplateBtn" class="btn secondary" onclick="APP.saveRewardTemplate()">Als Vorlage speichern</button></div>
+<label>Für den Check-in auswählbar</label><div id="rewardList" class="list"></div><details class="clean"><summary>Archivierte Belohnungen</summary><div id="rewardArchivedList" class="list"></div></details>
+<div class="toolbar" style="justify-content:flex-end;margin-top:15px"><button class="btn secondary" onclick="APP.close('rewardModal')">Schließen</button></div></div></div>
 
 <div id="qrModal" class="modal-bg"><div class="modal"><h3>QR-Zugang · <span id="qrName"></span></h3><button id="newQrBtn" class="btn" style="width:100%" onclick="APP.createQr()">QR-Code anzeigen</button><div id="qrResult" style="display:none;margin-top:13px"><div class="qr"><div id="teacherQr"></div></div><button class="btn secondary" style="width:100%;margin-top:11px" onclick="APP.downloadSingleQr()">Karte als PDF</button><button class="btn secondary" style="width:100%;margin-top:9px" onclick="APP.resetQr()">QR-Code zurücksetzen</button><button class="btn danger" style="width:100%;margin-top:9px" onclick="APP.revoke()">Geräte trennen</button></div><button class="btn secondary" style="width:100%;margin-top:11px" onclick="APP.close('qrModal')">Schließen</button></div></div>
 
@@ -1032,7 +1081,11 @@ function updateDateUI(){
  var n=el("teacherWeekNav");if(n)n.style.display=S.role==="teacher"&&(S.teacherArea==="grade"||S.teacherArea==="class"&&!!S.classRow)?"flex":"none"
 }
 function plan(sid){if(S.teacherArea==="grade")return S.gradeActivePlan&&S.gradeActivePlan.student_id===sid?S.gradeActivePlan:null;return S.plans.find(function(p){return p.student_id===sid})||null}
-function shells(sid){var p=S.progress.find(function(x){return x.student_id===sid});return p?p.shells||0:0}
+function shells(sid){var p=plan(sid);return p&&p.checkin_completed?stats(sid).good:0}
+function weeklyReward(sid){var p=plan(sid),count=shells(sid),target=p&&p.checkin_completed?Number(p.weekly_shell_target)||0:0;
+ return {plan:p,count:count,target:target,title:p&&p.checkin_completed?p.reward_title_snapshot||"":"" ,
+ status:p&&p.reward_redeemed_at?"redeemed":target&&p.reward_title_snapshot&&count>=target?"earned":"pending"}}
+
 function rs(sid){return S.rewards.filter(function(r){return r.student_id===sid&&r.active}).sort(function(a,b){return a.shells_required-b.shells_required})}
 function selfRating(sid,day,lesson){return S.selfRatings.find(function(r){return r.student_id===sid&&Number(r.weekday)===Number(day)&&Number(r.lesson_no)===Number(lesson)})||null}
 function rating(sid,day,lesson){return S.ratings.find(function(r){return r.student_id===sid&&Number(r.weekday)===Number(day)&&Number(r.lesson_no)===Number(lesson)})||null}
@@ -1305,7 +1358,7 @@ async function loadGradeStudent(studentId){
  if(r.error||!r.data){toast("Plan konnte nicht geladen werden");return false}
  var d=r.data;S.gradeStudentData=d;
  S.student={id:d.student.id,display_name:d.student.display_name,avatar_emoji:d.student.avatar_emoji};
- S.gradeActivePlan=d.plan||null;
+ S.gradeActivePlan=d.plan||null;S.rewards=d.rewards||[];
  S.ratings=(d.ratings||[]).map(function(x){x.student_id=S.student.id;return x});
  S.scheduleSlots=(d.schedule_slots||[]).map(function(x){x.student_id=S.student.id;return x});
  S.classScheduleSlots=d.class_schedule_slots||[];
@@ -1341,6 +1394,8 @@ function renderGradeStudent(){
      el("gradeQuickCount").textContent=(idx+1)+" von "+rows.length
    }
  }
+ var w=weeklyReward(S.student.id),gradeReward=el("gradeWeeklyReward");
+ if(gradeReward)gradeReward.textContent=w.title?(w.title+" · 🐚 "+w.count+"/"+w.target+(w.status==="redeemed"?" · eingelöst":w.status==="earned"?" · erreicht":"")):"Check-in: Ziel und Belohnung auswählen";
  updateDateUI();renderWeek("gradeStudentWeek",true)
 }
 async function gradeQuickNext(delta){
@@ -1357,17 +1412,19 @@ function gradeBackToOverview(){
  S.gradeQuickMode=false;S.gradeStudentData=null;S.gradeActivePlan=null;S.student=null;S.ratings=[];S.scheduleSlots=[];
  el("gradeStudentDetail").style.display="none";el("gradeOverviewContent").style.display="block";renderGradeOverview()
 }
-function gradeCheckin(i){
- var x=S.gradeRows[Number(i)];if(!x)return;
- S.gradeActivePlan=x.goal==null?null:{student_id:x.student_id,week_start:week(),goal:x.goal,help_text:x.help_text,checkin_completed:x.checkin_completed,checkin_feeling:x.checkin_feeling,checkout_self:x.checkout_self,checkout_decision:x.checkout_decision,checkout_note:x.checkout_note};
+async function gradeCheckin(i){var x=S.gradeRows[Number(i)];if(!x)return;
+ var r=await sb.rpc("grade_get_student_week",{p_student_id:x.student_id,p_week_start:week()});
+ if(r.error||!r.data){toast("Check-in konnte nicht geladen werden");return}
  S.student={id:x.student_id,display_name:x.display_name,avatar_emoji:x.avatar_emoji};
- checkin()
+ S.gradeActivePlan=r.data.plan||null;S.rewards=r.data.rewards||[];
+ S.ratings=(r.data.ratings||[]).map(function(y){y.student_id=x.student_id;return y});checkin()
 }
-function gradeCheckout(i){
- var x=S.gradeRows[Number(i)];if(!x)return;
- S.gradeActivePlan=x.goal==null?null:{student_id:x.student_id,week_start:week(),goal:x.goal,help_text:x.help_text,checkin_completed:x.checkin_completed,checkin_feeling:x.checkin_feeling,checkout_self:x.checkout_self,checkout_decision:x.checkout_decision,checkout_note:x.checkout_note};
+async function gradeCheckout(i){var x=S.gradeRows[Number(i)];if(!x)return;
+ var r=await sb.rpc("grade_get_student_week",{p_student_id:x.student_id,p_week_start:week()});
+ if(r.error||!r.data){toast("Check-out konnte nicht geladen werden");return}
  S.student={id:x.student_id,display_name:x.display_name,avatar_emoji:x.avatar_emoji};
- checkout()
+ S.gradeActivePlan=r.data.plan||null;S.rewards=r.data.rewards||[];
+ S.ratings=(r.data.ratings||[]).map(function(y){y.student_id=x.student_id;return y});checkout()
 }
 function backFromGrade(){S.gradeQuickMode=false;S.gradeActivePlan=null;S.gradeStudentData=null;S.student=null;S.gradeRows=[];S.ratings=[];S.scheduleSlots=[];showTeacherArea("class");renderHome()}
 
@@ -1440,7 +1497,7 @@ function renderTodayPanel(){
  el("todaySlotChips").innerHTML=SEGMENTS.map(function(n){return '<button type="button" class="today-chip '+(slot===n?'active':'')+'" aria-pressed="'+(slot===n)+'" onclick="APP.setTodaySlot('+n+')">'+segmentLabel(n)+'</button>'}).join("");
  el("todayChildren").innerHTML=kids.map(function(s){
   var p=plan(s.id),r=rating(s.id,day,slot),absent=isAbsent(s.id,day,slot),self=selfRating(s.id,day,slot);
-  var actions=p?'<div class="today-faces '+(absent?'is-absent':'')+'">'+["good","partial","difficult"].map(function(v){return '<button type="button" class="quick-face '+(r&&r.rating===v?'selected':'')+'" '+(absent?'disabled ':'')+'aria-label="'+esc(s.display_name)+': '+({good:'Geschafft',partial:'Teilweise',difficult:'Noch nicht'}[v])+'" aria-pressed="'+(!absent&&!!r&&r.rating===v)+'" onclick="APP.todayRate(\''+s.id+'\',\''+v+'\')">'+FACE[v]+'</button>'}).join("")+'</div>':'<span class="today-no-goal">Noch kein Wochenziel</span><button class="subtle-add-goal" onclick="APP.quickGoal(\''+s.id+'\')">+ Ziel</button>';
+  var actions=p&&p.checkin_completed&&p.weekly_shell_target&&p.reward_title_snapshot?'<div class="today-faces '+(absent?'is-absent':'')+'">'+["good","partial","difficult"].map(function(v){return '<button type="button" class="quick-face '+(r&&r.rating===v?'selected':'')+'" '+(absent?'disabled ':'')+'aria-label="'+esc(s.display_name)+': '+({good:'Geschafft',partial:'Teilweise',difficult:'Noch nicht'}[v])+'" aria-pressed="'+(!absent&&!!r&&r.rating===v)+'" onclick="APP.todayRate(\''+s.id+'\',\''+v+'\')">'+FACE[v]+'</button>'}).join("")+'</div>':'<span class="today-no-goal">Noch kein Wochenziel</span><button class="subtle-add-goal" onclick="APP.quickGoal(\''+s.id+'\')">+ Ziel</button>';
   var absentAllDay=isAbsent(s.id,day,0),absence='<details class="absence-menu '+(absent?'active':'')+'"><summary aria-label="Abwesenheit für '+esc(s.display_name)+'">'+(absent?'Abwesend':'+ Abwesend')+'</summary><div class="absence-options">'+(absentAllDay?'<button onclick="APP.toggleAbsence(\''+s.id+'\','+day+',0,true)">Ganzer Tag wieder anwesend</button>':'<button onclick="APP.toggleAbsence(\''+s.id+'\','+day+','+slot+',false)">'+(absent?'Diese Stunde wieder anwesend':'Diese Stunde abwesend')+'</button><button onclick="APP.toggleAbsence(\''+s.id+'\','+day+','+slot+',true)">Ganzer Tag abwesend</button>')+'</div></details>';
   return '<div class="today-child '+(absent?'is-absent':'')+'"><button type="button" class="today-child-name" onclick="APP.openStudent(\''+s.id+'\')"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><span><b>'+esc(s.display_name)+'</b></span></button>'+(self?'<span class="today-self" title="Selbsteinschätzung des Kindes">'+FACE[self.rating]+'</span>':'')+'<div class="today-child-actions">'+actions+absence+'</div><button type="button" class="today-note" aria-label="Notiz zu '+esc(s.display_name)+'" onclick="APP.todayNote(\''+s.id+'\')">✎</button></div>'
  }).join("")||(slot?'<div class="dev-empty">Für diesen Abschnitt sind keine Kinder eingetragen. Wähle einen anderen Abschnitt.</div>':'<div class="dev-empty">Tippe auf eine Stunde oder Pause, um Kinder und Ziele zu sehen.</div>');
@@ -1448,8 +1505,8 @@ function renderTodayPanel(){
 function renderStudentCards(){
  var rows=S.students.slice().sort(function(a,b){return (a.sort_order||0)-(b.sort_order||0)||a.display_name.localeCompare(b.display_name)}),day=Number(S.todayDay)||currentSchoolDay();
  el("studentGrid").innerHTML=rows.map(function(s){
-   var p=plan(s.id),sh=shells(s.id),x=stats(s.id),progress=x.total?Math.round(x.good/x.total*100):0,absent=isAbsent(s.id,day,0),dayName=DAYS[day-1];
-   return '<article class="student" draggable="true" data-student-id="'+esc(s.id)+'" onclick="if(!event.target.closest(\'button\'))APP.openStudent(\''+s.id+'\')" ondragstart="APP.dragStudentCard(event)" ondragover="APP.overStudentCard(event)" ondragleave="APP.leaveStudentCard(event)" ondrop="APP.dropStudentCard(event)" ondragend="APP.endStudentCardDrag(event)"><div class="student-top"><button type="button" class="student-name-open" aria-label="'+esc(s.display_name)+' öffnen" onclick="APP.openStudent(\''+s.id+'\')"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><span class="name">'+esc(s.display_name)+'</span></button><button type="button" class="student-absence-toggle '+(absent?'is-absent':'')+'" title="Anwesenheit für '+dayName+' umschalten" aria-label="'+(absent?'Kind am '+dayName+' als anwesend markieren':'Kind am '+dayName+' als abwesend markieren')+'" aria-pressed="'+absent+'" onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'absence\')"><span class="student-absence-dot" aria-hidden="true"></span><span>'+(absent?'Abwesend':'Anwesend')+'</span></button><span class="student-drag-handle" title="Zum Verschieben ziehen" aria-hidden="true"><svg viewBox="0 0 16 20"><circle cx="5" cy="5" r="1.5"/><circle cx="11" cy="5" r="1.5"/><circle cx="5" cy="10" r="1.5"/><circle cx="11" cy="10" r="1.5"/><circle cx="5" cy="15" r="1.5"/><circle cx="11" cy="15" r="1.5"/></svg></span></div><button type="button" class="student-open-area" aria-label="Wochenziel und Fortschritt von '+esc(s.display_name)+' öffnen" onclick="APP.openStudent(\''+s.id+'\')"><div class="goal">'+esc(p?p.goal:"Noch kein Wochenziel")+'</div><div class="student-progress" aria-label="'+x.good+' von '+x.total+' positive Bewertungen"><div class="student-progress-track"><span style="width:'+progress+'%"></span></div><span>'+(x.total?x.good+"/"+x.total+" positiv":"Noch keine Rückmeldung")+'</span></div></button><div class="student-card-foot"><span>🐚 '+sh+'</span><div class="student-card-actions"><button onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'goal\')">'+(p?'Ziel':'+ Ziel')+'</button><button onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'reward\')">Belohnung</button></div></div></article>';
+   var p=plan(s.id),sh=shells(s.id),x=stats(s.id),target=p&&p.checkin_completed?Number(p.weekly_shell_target)||0:0,progress=target?Math.min(100,Math.round(sh/target*100)):0,absent=isAbsent(s.id,day,0),dayName=DAYS[day-1];
+   return '<article class="student" draggable="true" data-student-id="'+esc(s.id)+'" onclick="if(!event.target.closest(\'button\'))APP.openStudent(\''+s.id+'\')" ondragstart="APP.dragStudentCard(event)" ondragover="APP.overStudentCard(event)" ondragleave="APP.leaveStudentCard(event)" ondrop="APP.dropStudentCard(event)" ondragend="APP.endStudentCardDrag(event)"><div class="student-top"><button type="button" class="student-name-open" aria-label="'+esc(s.display_name)+' öffnen" onclick="APP.openStudent(\''+s.id+'\')"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><span class="name">'+esc(s.display_name)+'</span></button><button type="button" class="student-absence-toggle '+(absent?'is-absent':'')+'" title="Anwesenheit für '+dayName+' umschalten" aria-label="'+(absent?'Kind am '+dayName+' als anwesend markieren':'Kind am '+dayName+' als abwesend markieren')+'" aria-pressed="'+absent+'" onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'absence\')"><span class="student-absence-dot" aria-hidden="true"></span><span>'+(absent?'Abwesend':'Anwesend')+'</span></button><span class="student-drag-handle" title="Zum Verschieben ziehen" aria-hidden="true"><svg viewBox="0 0 16 20"><circle cx="5" cy="5" r="1.5"/><circle cx="11" cy="5" r="1.5"/><circle cx="5" cy="10" r="1.5"/><circle cx="11" cy="10" r="1.5"/><circle cx="5" cy="15" r="1.5"/><circle cx="11" cy="15" r="1.5"/></svg></span></div><button type="button" class="student-open-area" aria-label="Wochenziel und Fortschritt von '+esc(s.display_name)+' öffnen" onclick="APP.openStudent(\''+s.id+'\')"><div class="goal">'+esc(p&&p.checkin_completed?p.goal:"Check-in offen")+'</div><div class="student-progress" aria-label="'+x.good+' von '+x.total+' positive Bewertungen"><div class="student-progress-track"><span style="width:'+progress+'%"></span></div><span>'+(target?sh+"/"+target+" Muscheln":"Check-in offen")+'</span></div></button><div class="student-card-foot"><span>🐚 '+sh+(target?'/'+target:'')+'</span><div class="student-card-actions"><button onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'goal\')">'+(p?'Ziel':'+ Ziel')+'</button><button onclick="event.stopPropagation();APP.classChildAction(\''+s.id+'\',\'reward\')">Belohnung</button></div></div></article>';
  }).join("")||(S.students.length?'<div class="student-empty"><h3>Keine Kinder</h3></div>':'<div class="student-empty"><h3>Noch keine Kinder</h3><p>Lege das erste Kind für diese Klasse an.</p><button class="btn" onclick="APP.addStudent()">Kind hinzufügen</button></div>');
 }
 function renderWeekRitual(){
@@ -1457,7 +1514,7 @@ function renderWeekRitual(){
  var day=new Date().getDay();
  if(S.role!=="teacher"||!S.classRow||S.teacherArea!=="class"||!isCurrentWeek()||(day!==1&&day!==5)){box.style.display="none";box.innerHTML="";return}
  var monday=day===1,rows=S.students;
- var completed=rows.filter(function(s){var p=plan(s.id);return !!(p&&(monday?p.checkin_completed:p.checkout_self))}).length;
+ var completed=rows.filter(function(s){var p=plan(s.id);return !!(p&&(monday?p.checkin_completed&&p.weekly_shell_target&&p.reward_title_snapshot:p.checkout_self))}).length;
  box.className="week-ritual"+(monday?"":" friday");box.style.display="inline-flex";box.disabled=!rows.length;
  box.setAttribute("aria-label",(monday?"Check-in":"Check-out")+" öffnen · "+completed+" von "+rows.length);
  box.textContent=(monday?"Check-in · ":"✓ Check-out · ")+completed+"/"+rows.length;
@@ -1465,10 +1522,10 @@ function renderWeekRitual(){
 }
 function openWeekStart(){
  var rows=S.students.slice().sort(function(a,b){return Number(!!(plan(a.id)&&plan(a.id).checkin_completed))-Number(!!(plan(b.id)&&plan(b.id).checkin_completed))});
- var completed=rows.filter(function(s){return !!(plan(s.id)&&plan(s.id).checkin_completed)}).length;
+ var completed=rows.filter(function(s){var p=plan(s.id);return !!(p&&p.checkin_completed&&p.weekly_shell_target&&p.reward_title_snapshot)}).length;
  el("weekStartText").textContent=completed+" von "+rows.length+" Check-ins erledigt · "+weekRangeLabel();
  el("weekStartList").innerHTML=rows.map(function(s){
-   var p=plan(s.id),done=!!(p&&p.checkin_completed);
+   var p=plan(s.id),done=!!(p&&p.checkin_completed&&p.weekly_shell_target&&p.reward_title_snapshot);
    return '<div class="list-row"><div class="list-main"><b>'+esc(s.avatar_emoji||"🦦")+' '+esc(s.display_name)+'</b><span>'+esc(p?p.goal:"Noch kein Wochenziel")+'</span></div><div class="toolbar"><span class="week-close-status">'+(done?"✓ erledigt":"○ offen")+'</span><button class="btn '+(done?'secondary ':'')+'small" onclick="APP.openWeekStartStudent(\''+s.id+'\')">'+(done?"Ansehen":"Check-in")+'</button></div></div>'
  }).join("")||'<div class="muted">Noch keine Kinder in dieser Klasse.</div>';
  modal("weekStartModal",true)
@@ -1488,13 +1545,20 @@ function openWeekClose(){
  modal("weekCloseModal",true)
 }
 function openWeekCloseStudent(id){
- modal("weekCloseModal",false);openStudent(id);if(plan(id))checkout();else checkin()
+ modal("weekCloseModal",false);openStudent(id);if(plan(id)&&plan(id).checkin_completed&&plan(id).weekly_shell_target&&plan(id).reward_title_snapshot)checkout();else checkin()
 }
 function openStudent(id){S.student=S.students.find(function(s){return s.id===id});if(!S.student)return;S.detailAbsenceDay=Number(S.detailAbsenceDay)||Number(S.todayDay)||currentSchoolDay()||1;S.studentTab="plan";S.developmentData=null;S.developmentStudentId=null;el("teacherHome").style.display="none";el("teacherDetail").style.display="block";renderTeacher();initObservation("plan");openStudentTab("plan")}
 function back(){S.student=null;S.developmentData=null;S.developmentStudentId=null;renderHome()}
-function renderTeacherReward(sid){var count=shells(sid),rewards=rs(sid),next=rewards.find(function(r){return r.shells_required>count}),target=next?next.shells_required:rewards.length?rewards[rewards.length-1].shells_required:0,p=plan(sid),weekCount=stats(sid).good;el("teacherRewardTitle").textContent=next?next.title:rewards.length?"Alle Belohnungen erreicht":"Noch keine Belohnung";el("teacherRewardCount").textContent=count;el("teacherRewardTarget").textContent=target||"–";el("teacherRewardWeek").textContent=p&&p.weekly_shell_target?"Diese Woche · "+weekCount+" / "+p.weekly_shell_target+" 🐚":"Diese Woche · "+weekCount+" 😊";el("teacherRewardProgress").style.width=target?Math.min(100,Math.round(count/target*100))+"%":"0%";el("teacherRewardProgress").parentElement.setAttribute("aria-valuenow",target?Math.min(100,Math.round(count/target*100)):0);el("teacherRewardRemaining").textContent=next?"Noch "+Math.max(0,target-count)+" Muscheln":rewards.length?"Belohnung erreicht":"Belohnung festlegen"}
+function renderTeacherReward(sid){var w=weeklyReward(sid),percent=w.target?Math.min(100,Math.round(w.count/w.target*100)):0;
+ el("teacherRewardTitle").textContent=w.title||"Beim Check-in auswählen";
+ el("teacherRewardCount").textContent=w.count;el("teacherRewardTarget").textContent=w.target||"–";
+ el("teacherRewardWeek").textContent=w.target?"Diese Woche · "+w.count+" / "+w.target+" 🐚":"Diese Woche · Check-in offen";
+ el("teacherRewardProgress").style.width=percent+"%";
+ el("teacherRewardProgress").parentElement.setAttribute("aria-valuenow",percent);
+ el("teacherRewardRemaining").textContent=w.status==="redeemed"?"Belohnung eingelöst":w.status==="earned"?"Ziel erreicht · Belohnung verfügbar":w.target?"Noch "+Math.max(0,w.target-w.count)+" Muscheln":"Neues Ziel und Belohnung wählen";
+}
 function updateDetailAbsenceAction(){var b=el("detailAbsenceAction"),label=el("detailAbsenceLabel");if(!b||!label||!S.student)return;var day=Number(S.detailAbsenceDay)||Number(S.todayDay)||1,absent=isAbsent(S.student.id,day,0);label.textContent=absent?"Anwesend":"Abwesend";b.classList.toggle("is-active",absent);b.setAttribute("aria-label",(absent?"Abwesenheit für ":"Kind für ")+DAYS[day-1]+(absent?" aufheben":" als abwesend markieren"));b.title=(absent?"Anwesenheit für ":"Für ")+DAYS[day-1]+(absent?" aufheben":" als abwesend markieren")}
-function renderTeacher(){var p=plan(S.student.id);el("teacherName").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name;el("teacherMeta").textContent=shells(S.student.id)+" Muscheln · "+(isCurrentWeek()?todayLong():"Woche "+weekRangeLabel());renderTeacherReward(S.student.id);updateDetailAbsenceAction();if(p){var ci=p.checkin_completed?" · "+(FACE[p.checkin_feeling]||""):"";var co=p.checkout_self?" · "+(FACE[p.checkout_self]||""):"";el("teacherGoal").innerHTML="<strong>"+esc(p.goal)+"</strong>"+(p.help_text?'<div class="muted" style="margin-top:6px">💡 '+esc(p.help_text)+"</div>":"")}else el("teacherGoal").textContent="Noch kein Ziel";var od=el("planObsDate");if(od&&!od.value)od.value=defaultObservationDate();renderWeek("teacherWeek",true)}
+function renderTeacher(){var p=plan(S.student.id);el("teacherName").textContent=(S.student.avatar_emoji||"🦦")+" "+S.student.display_name;el("teacherMeta").textContent=(isCurrentWeek()?todayLong():"Woche "+weekRangeLabel());renderTeacherReward(S.student.id);updateDetailAbsenceAction();if(p&&p.checkin_completed){var ci=p.checkin_completed?" · "+(FACE[p.checkin_feeling]||""):"";var co=p.checkout_self?" · "+(FACE[p.checkout_self]||""):"";el("teacherGoal").innerHTML="<strong>"+esc(p.goal)+"</strong>"+(p.help_text?'<div class="muted" style="margin-top:6px">💡 '+esc(p.help_text)+"</div>":"")}else el("teacherGoal").textContent="Noch kein Ziel";var od=el("planObsDate");if(od&&!od.value)od.value=defaultObservationDate();renderWeek("teacherWeek",true)}
 
 function renderWeek(target,click){
  var today=isCurrentWeek()?new Date().getDay():0,isTeacherWeek=target==="teacherWeek",selectedDay=Number(S.detailAbsenceDay)||0;
@@ -1517,7 +1581,7 @@ function renderWeek(target,click){
  }
  el(target).innerHTML=out
 }
-function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id);if(!p){toast("Lege zuerst ein Wochenziel an.");checkin();return}var isToday=isCurrentWeek()&&new Date().getDay()===S.entry.weekday;el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+segmentLabel(S.entry.lesson_no)+(isToday?" · Heute":"");el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
+function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id);if(!p||!p.checkin_completed||!p.weekly_shell_target||!p.reward_title_snapshot){toast("Bitte zuerst den Check-in dieser Woche abschließen.");checkin();return}var isToday=isCurrentWeek()&&new Date().getDay()===S.entry.weekday;el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+segmentLabel(S.entry.lesson_no)+(isToday?" · Heute":"");el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
 function ratingQueueKey(){return "otterplan-rating-queue-"+(S.user?S.user.id:"signed-out")}
 function offlineQueue(){try{
  var scoped=JSON.parse(localStorage.getItem(ratingQueueKey())||"[]"),legacy=JSON.parse(localStorage.getItem("otterplan-rating-queue")||"[]");
@@ -1625,6 +1689,18 @@ function moreExport(){modal("classMoreModal",false);openExport()}
 function moreClassSettings(){modal("classMoreModal",false);openClassAdmin()}
 function moreStudentQr(){modal("studentMoreModal",false);qr()}
 function moreStudentHours(){modal("studentMoreModal",false);openStudentSchedule()}
+async function openWeekHistory(){if(!S.student)return;var sid=S.student.id;
+ el("weekHistoryList").innerHTML='<div class="muted">Wird geladen …</div>';modal("studentMoreModal",false);modal("weekHistoryModal",true);
+ var results=await Promise.all([sb.rpc("weekly_reward_history",{p_student_id:sid}),sb.rpc("legacy_reward_history",{p_student_id:sid})]),weekly=results[0],legacy=results[1];
+ if(weekly.error){el("weekHistoryList").innerHTML='<div class="muted">Wochenverlauf konnte nicht geladen werden.</div>';return}
+ var rows=weekly.data||[],old=legacy.data||{};
+ el("weekHistoryList").innerHTML=rows.map(function(w){
+  var achieved=w.weekly_shell_target&&w.good_count>=w.weekly_shell_target;
+  return '<div class="week-history-item"><b>Woche ab '+esc(fmtDate(w.week_start))+'</b><span>Ziel: '+esc(w.goal||"–")+'</span><span>🐚 '+Number(w.good_count||0)+' / '+(w.weekly_shell_target||"–")+' · '+(w.weekly_shell_target?(achieved?"Ziel erreicht":"Ziel nicht erreicht"):"Alte Woche ohne Muschelziel")+'</span><span>Belohnung: '+esc(w.reward_title_snapshot||"Damals nicht festgelegt")+(w.reward_title_snapshot?' · '+(w.reward_redeemed_at?"eingelöst":achieved?"verfügbar":"nicht freigeschaltet"):"")+'</span><span>Check-out: '+(w.checkout_completed?"ja":"nein")+' · eingelöst: '+(w.reward_redeemed_at?"ja":"nein")+'</span></div>'
+ }).join("")||'<div class="muted">Noch keine Wochenpläne.</div>';
+ var legacyRows=old.redemptions||[],legacyCount=Number(old.legacy_shells||0);
+ if(!legacy.error&&(legacyRows.length||legacyCount)){el("weekHistoryList").innerHTML+='<details class="clean"><summary>Früheres Sammelsystem</summary><div class="muted">Alter Muschelstand: '+legacyCount+' · wird nicht in neue Wochen übernommen.</div>'+legacyRows.map(function(r){return '<div class="week-history-item"><b>'+esc(r.title)+'</b><span>'+esc(fmtDate(String(r.redeemed_at).slice(0,10)))+' · '+Number(r.shells_required||0)+' Muscheln eingelöst</span></div>'}).join("")+'</details>'}
+}
 function moreStudentHistory(){modal("studentMoreModal",false);openStudentTab("development")}
 function moreStudentPdf(){modal("studentMoreModal",false);exportStudent()}
 function moreStudentManage(){modal("studentMoreModal",false);manageStudent()}
@@ -1840,9 +1916,9 @@ function renderQuickRating(){
  var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value);
  el("quickLessonChips").innerHTML=SEGMENTS.map(function(n){return '<button class="quick-lesson '+(n===lesson?'active':'')+'" onclick="APP.setQuickLesson('+n+')">'+segmentLabel(n)+'</button>'}).join("");
  var kids=S.students.filter(function(s){return slotEnabled(s.id,day,lesson)});
- var withGoal=kids.filter(function(s){return !!plan(s.id)&&!isAbsent(s.id,day,lesson)});
+ var withGoal=kids.filter(function(s){var p=plan(s.id);return !!(p&&p.checkin_completed&&p.weekly_shell_target&&p.reward_title_snapshot)&&!isAbsent(s.id,day,lesson)});
  var done=withGoal.filter(function(s){return !!rating(s.id,day,lesson)}).length;
- var noGoal=kids.filter(function(s){return !plan(s.id)}).length,pct=withGoal.length?Math.round(done/withGoal.length*100):0;
+ var noGoal=kids.filter(function(s){var p=plan(s.id);return !p||!p.checkin_completed||!p.weekly_shell_target||!p.reward_title_snapshot}).length,pct=withGoal.length?Math.round(done/withGoal.length*100):0;
  el("quickRatingProgress").textContent=done+" von "+withGoal.length+" bewertet"+(noGoal?" · "+noGoal+" ohne Ziel":"");
  el("quickRatingContext").textContent=DAYS[day-1]+" · "+segmentLabel(lesson)+(day===new Date().getDay()&&isCurrentWeek()?" · "+currentSchoolPhase():"");
  el("quickRatingProgressBar").style.width=pct+"%";
@@ -1852,14 +1928,15 @@ function renderQuickRating(){
    var r=rating(s.id,day,lesson),p=plan(s.id);
    function b(v,face,label){return '<button class="quick-face '+(r&&r.rating===v?'selected':'')+'" aria-label="'+label+'" title="'+label+'" onclick="APP.quickRate(\''+s.id+'\',\''+v+'\')">'+face+'</button>'}
    var absent=isAbsent(s.id,day,lesson),whole=(S.absences||[]).some(function(x){return x.student_id===s.id&&x.absent_on===weekDayISO(day)&&Number(x.segment_no)===0});
-   var actions=absent?'<span class="status-chip">Abwesend'+(whole?' heute':'')+'</span>':p?'<div class="quick-rating-actions">'+b("good","😊","Geschafft")+b("partial","😐","Teilweise")+b("difficult","🙁","Noch nicht")+'</div>':'<button class="quick-missing-goal" onclick="APP.quickGoal(\''+s.id+'\')">🎯 Ziel fehlt</button>';
+   var ready=p&&p.checkin_completed&&p.weekly_shell_target&&p.reward_title_snapshot;
+   var actions=absent?'<span class="status-chip">Abwesend'+(whole?' heute':'')+'</span>':ready?'<div class="quick-rating-actions">'+b("good","😊","Geschafft")+b("partial","😐","Teilweise")+b("difficult","🙁","Noch nicht")+'</div>':'<button class="quick-missing-goal" onclick="APP.quickGoal(\''+s.id+'\')">🎯 Ziel fehlt</button>';
    actions+='<button type="button" class="btn secondary small" title="Abwesenheit umschalten" onclick="APP.toggleAbsence(\''+s.id+'\','+day+','+(whole?0:lesson)+','+(whole?'true':'false')+')">'+(absent?'Anwesend':'Abwesend')+'</button>';
    return '<div class="quick-rating-row '+(r?'done':'')+'"><div class="quick-rating-person"><span class="student-avatar">'+esc(s.avatar_emoji||"🦦")+'</span><div style="min-width:0"><div class="quick-rating-name">'+esc(s.display_name)+'</div><div class="quick-rating-goal">'+esc(p?p.goal:"Noch kein Wochenziel")+'</div></div></div>'+actions+'</div>'
  }).join("")||'<div class="dev-empty">Für diese Stunde sind keine Kinder eingetragen.</div>';
 }
 async function quickRate(sid,value){
  if(isAbsent(sid,Number(el("quickDay").value),Number(el("quickLesson").value))){toast("Kind ist als abwesend markiert");return}
- if(!plan(sid)){toast("Bitte zuerst ein Wochenziel vergeben");return}
+ if(!plan(sid)||!plan(sid).checkin_completed||!plan(sid).weekly_shell_target||!plan(sid).reward_title_snapshot){toast("Bitte zuerst den Check-in abschließen");return}
  var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value),old=rating(sid,day,lesson),previous=old?{rating:old.rating}:null;
  var row={student_id:sid,week_start:week(),weekday:day,lesson_no:lesson,rating:value,updated_by:S.user.id};
  if(!navigator.onLine){queueRating(row);if(old)old.rating=value;else S.ratings.push(row);renderQuickRating();renderHome();toast("Offline gespeichert");return}
@@ -1873,7 +1950,23 @@ async function quickRate(sid,value){
 function fillGoalSelect(id){var s=el(id),opts=['<option value="">Ohne Vorlage</option>'];BUILTIN_GOALS.forEach(function(g,i){opts.push('<option value="b:'+i+'">'+esc(g.title)+'</option>')});S.goalTemplates.forEach(function(g){opts.push('<option value="c:'+g.id+'">'+esc(g.title)+'</option>')});s.innerHTML=opts.join("")}
 function goalFromValue(v){if(!v)return null;if(v.indexOf("b:")===0)return BUILTIN_GOALS[Number(v.slice(2))];var id=v.slice(2),x=S.goalTemplates.find(function(g){return g.id===id});return x?{title:x.title,goal:x.goal,help:x.help_text}:null}
 function setSelected(prefix,value,values){values.forEach(function(v){var b=el(prefix+v);if(b)b.classList.toggle("selected",v===value)})}
-function checkin(){var p=plan(S.student.id);S.checkinFeeling=p&&p.checkin_feeling?p.checkin_feeling:"partial";el("checkinName").textContent=S.student.display_name;fillGoalSelect("checkinTemplate");el("checkinGoal").value=p?p.goal:"";el("checkinIcon").value=p&&p.goal_icon?p.goal_icon:"target";el("checkinHelp").value=p&&p.help_text?p.help_text:"";el("checkinShellTarget").value=p&&p.weekly_shell_target?p.weekly_shell_target:"";setSelected("ci-",S.checkinFeeling,["good","partial","difficult"]);modal("checkinModal",true)}
+function checkin(){var p=plan(S.student.id),count=stats(S.student.id).good;
+ if(p&&p.reward_redeemed_at){toast("Belohnung bereits eingelöst. Erst das Einlösen rückgängig machen.");return}
+ S.checkinFeeling=p&&p.checkin_feeling?p.checkin_feeling:"partial";
+ S.checkinRewardId=p&&p.reward_id?p.reward_id:null;
+ el("checkinName").textContent=S.student.display_name;fillGoalSelect("checkinTemplate");
+ el("checkinGoal").value=p?p.goal:"";el("checkinIcon").value=p&&p.goal_icon?p.goal_icon:"target";
+ el("checkinHelp").value=p&&p.help_text?p.help_text:"";
+ el("checkinShellTarget").value=p&&p.weekly_shell_target?p.weekly_shell_target:"";
+ var note=el("checkinEditNote");note.style.display=count||p&&p.checkout_self?"block":"none";
+ note.textContent=count?"Laufende Woche · "+count+" Muscheln sind bereits gesammelt und bleiben beim Ändern erhalten.":"Diese Woche wurde bereits abgeschlossen. Änderungen wirken nur auf diesen Wochenplan.";
+ renderCheckinRewards();setSelected("ci-",S.checkinFeeling,["good","partial","difficult"]);modal("checkinModal",true)
+}
+function renderCheckinRewards(){var list=rs(S.student.id),box=el("checkinRewardChoices");
+ box.innerHTML=list.map(function(r){return '<button type="button" class="'+(S.checkinRewardId===r.id?'selected':'')+'" aria-pressed="'+(S.checkinRewardId===r.id)+'" onclick="APP.pickCheckinReward(\''+r.id+'\')">'+esc(r.title)+'<span>Belohnung dieser Woche</span></button>'}).join("");
+ el("checkinRewardEmpty").style.display=list.length?"none":"block";
+}
+function pickCheckinReward(id){S.checkinRewardId=id;renderCheckinRewards()}
 function fillCheckinTemplate(){var g=goalFromValue(el("checkinTemplate").value);if(g){el("checkinGoal").value=g.goal;el("checkinHelp").value=g.help||""}}
 function pickCheckin(v){S.checkinFeeling=v;setSelected("ci-",v,["good","partial","difficult"])}
 async function afterGradeAction(sid,kind,wasDetail){
@@ -1886,25 +1979,52 @@ async function afterGradeAction(sid,kind,wasDetail){
  }
  await loadGradeStudent(sid)
 }
-async function saveCheckin(){var g=el("checkinGoal").value.trim(),h=el("checkinHelp").value.trim(),targetRaw=el("checkinShellTarget").value.trim(),weeklyTarget=targetRaw?Number(targetRaw):null;if(!g){toast("Ziel fehlt");return}if(weeklyTarget!==null&&(!Number.isInteger(weeklyTarget)||weeklyTarget<1||weeklyTarget>200)){toast("Muschelziel muss zwischen 1 und 200 liegen");return}
- if(S.teacherArea==="grade"){
-   var gradeSid=S.student.id,wasDetail=!!S.gradeStudentData;
-   var gr=await sb.rpc("grade_save_checkin",{p_student_id:gradeSid,p_week_start:week(),p_goal:g,p_help_text:h,p_feeling:S.checkinFeeling,p_icon:el("checkinIcon").value,p_weekly_shell_target:weeklyTarget});
-   if(gr.error){toast("Check-in konnte nicht gespeichert werden");return}
-   modal("checkinModal",false);await afterGradeAction(gradeSid,"checkin",wasDetail);toast("Check-in gespeichert");return
- }
- var row={student_id:S.student.id,week_start:week(),goal:g,goal_icon:el("checkinIcon").value,help_text:h,weekly_shell_target:weeklyTarget,checkin_feeling:S.checkinFeeling,checkin_completed:true};var r=await sb.from("weekly_plans").upsert(row,{onConflict:"student_id,week_start"});if(r.error){toast("Speichern fehlgeschlagen");return}modal("checkinModal",false);var sid=S.student.id;await load();openStudent(sid);toast("Check-in gespeichert")}
-function checkout(){var p=plan(S.student.id);if(!p){toast("Noch kein Wochenziel. Lege zuerst ein Ziel an.");checkin();return}S.checkoutSelf=p.checkout_self||"partial";S.checkoutDecision=p.checkout_decision||"continue";el("checkoutName").textContent=S.student.display_name;el("checkoutNote").value=p.checkout_note||"";setSelected("co-",S.checkoutSelf,["good","partial","difficult"]);setSelected("dec-",S.checkoutDecision,["done","continue","change"]);modal("checkoutModal",true)}
+async function saveCheckin(){var g=el("checkinGoal").value.trim(),h=el("checkinHelp").value.trim(),target=Number(el("checkinShellTarget").value),rewardId=S.checkinRewardId;
+ if(!g){toast("Wochenziel fehlt");return}
+ if(!Number.isInteger(target)||target<1||target>200){toast("Bitte 1 bis 200 Smileys wählen");return}
+ if(!rs(S.student.id).some(function(r){return r.id===rewardId})){toast("Bitte eine Belohnung auswählen");return}
+ var sid=S.student.id,wasDetail=!!S.gradeStudentData;
+ var r=await sb.rpc("save_weekly_checkin",{p_student_id:sid,p_week_start:week(),p_goal:g,p_help_text:h,p_feeling:S.checkinFeeling,p_icon:el("checkinIcon").value,p_weekly_shell_target:target,p_reward_id:rewardId});
+ if(r.error){toast(r.error.message||"Check-in konnte nicht gespeichert werden");return}
+ modal("checkinModal",false);
+ if(S.teacherArea==="grade"){await afterGradeAction(sid,"checkin",wasDetail)}
+ else{await load();openStudent(sid)}
+ toast("Check-in gespeichert")
+}
+function checkout(){var p=plan(S.student.id);
+ if(!p||!p.checkin_completed||!p.weekly_shell_target||!p.reward_title_snapshot){toast("Für diese Woche zuerst Ziel und Belohnung wählen.");checkin();return}
+ S.checkoutSelf=p.checkout_self||"partial";S.checkoutDecision=p.checkout_decision||"continue";
+ el("checkoutName").textContent=S.student.display_name;el("checkoutNote").value=p.checkout_note||"";
+ setSelected("co-",S.checkoutSelf,["good","partial","difficult"]);setSelected("dec-",S.checkoutDecision,["done","continue","change"]);
+ renderCheckoutResult();modal("checkoutModal",true)
+}
+function renderCheckoutResult(){var w=weeklyReward(S.student.id),pct=w.target?Math.min(100,Math.round(w.count/w.target*100)):0;
+ el("checkoutWeeklyResult").innerHTML='<strong>'+(w.status==="redeemed"?"🎉 Eingelöst":w.status==="earned"?"🎉 Geschafft!":"Weiter so!")+'</strong><p>🐚 '+w.count+' / '+w.target+' · '+(w.status==="pending"?"Ziel noch nicht erreicht":"Wochenziel erreicht")+'</p>'+(w.status!=="pending"?'<b>Deine Belohnung: '+esc(w.title)+'</b>':'<p>Deine Belohnung: '+esc(w.title)+'</p>')+'<div class="progress" role="progressbar" aria-label="Wochenfortschritt" aria-valuenow="'+pct+'" aria-valuemin="0" aria-valuemax="100"><span style="width:'+pct+'%"></span></div>';
+ el("checkoutRedeem").style.display=w.status==="earned"&&w.plan&&w.plan.checkout_self?"inline-flex":"none";
+ el("checkoutUndo").style.display=w.status==="redeemed"?"inline-flex":"none";
+ if(w.status==="earned"&&!w.plan.checkout_self)el("checkoutWeeklyResult").innerHTML+='<p>Check-out speichern, danach einlösen.</p>'
+}
+async function setWeeklyRewardRedemption(redeemed){var p=plan(S.student.id);if(!p)return;
+ var r=await sb.rpc("set_weekly_reward_redemption",{p_plan_id:p.id,p_redeemed:redeemed});
+ if(r.error){toast(r.error.message||"Einlösen konnte nicht gespeichert werden");return}
+ var sid=S.student.id,wasDetail=!!S.gradeStudentData;
+ if(S.teacherArea==="grade"){await afterGradeAction(sid,"checkout",wasDetail)}
+ else{await load();openStudent(sid)}
+ if(S.student&&S.student.id===sid)renderCheckoutResult();else modal("checkoutModal",false);
+ toast(redeemed?"Belohnung eingelöst":"Einlösen rückgängig gemacht")
+}
 function pickCheckoutSelf(v){S.checkoutSelf=v;setSelected("co-",v,["good","partial","difficult"])}
 function pickCheckoutDecision(v){S.checkoutDecision=v;setSelected("dec-",v,["done","continue","change"])}
-async function saveCheckout(){var p=plan(S.student.id);if(!p)return;
- if(S.teacherArea==="grade"){
-   var gradeSid=S.student.id,wasDetail=!!S.gradeStudentData;
-   var gr=await sb.rpc("grade_save_checkout",{p_student_id:gradeSid,p_week_start:week(),p_self:S.checkoutSelf,p_decision:S.checkoutDecision,p_note:el("checkoutNote").value.trim()});
-   if(gr.error){toast("Check-out konnte nicht gespeichert werden");return}
-   modal("checkoutModal",false);await afterGradeAction(gradeSid,"checkout",wasDetail);toast("Check-out gespeichert");return
- }
- var st=stats(S.student.id);var r=await sb.from("weekly_plans").update({checkout_self:S.checkoutSelf,checkout_decision:S.checkoutDecision,checkout_note:el("checkoutNote").value.trim(),checkout_published:false,published_good_count:st.good,published_rated_count:st.total}).eq("id",p.id);if(r.error){toast("Speichern fehlgeschlagen");return}modal("checkoutModal",false);var sid=S.student.id;await load();openStudent(sid);toast("Abschluss gespeichert")}
+async function saveCheckout(){var p=plan(S.student.id);if(!p||!p.checkin_completed)return;
+ var sid=S.student.id,wasDetail=!!S.gradeStudentData,st=stats(sid),r;
+ if(S.teacherArea==="grade")r=await sb.rpc("grade_save_checkout",{p_student_id:sid,p_week_start:week(),p_self:S.checkoutSelf,p_decision:S.checkoutDecision,p_note:el("checkoutNote").value.trim()});
+ else r=await sb.from("weekly_plans").update({checkout_self:S.checkoutSelf,checkout_decision:S.checkoutDecision,checkout_note:el("checkoutNote").value.trim(),checkout_published:false,published_good_count:st.good,published_rated_count:st.total}).eq("id",p.id);
+ if(r.error){toast("Check-out konnte nicht gespeichert werden");return}
+ modal("checkoutModal",false);
+ if(S.teacherArea==="grade")await afterGradeAction(sid,"checkout",wasDetail);
+ else{await load();openStudent(sid)}
+ toast(st.good>=Number(p.weekly_shell_target)?"Wochenziel erreicht":"Wochenabschluss gespeichert")
+}
 
 function addStudent(){if(!S.classRow){toast("Bitte zuerst Klasse anlegen");return}el("newStudentName").value="";el("newStudentAvatar").value="🦦";modal("addStudentModal",true)}
 async function saveStudent(){var name=el("newStudentName").value.trim(),av=el("newStudentAvatar").value.trim()||"🦦";if(!name){toast("Name fehlt");return}var r=await sb.rpc("create_student_for_class",{p_class_id:S.classRow.id,p_display_name:name,p_avatar_emoji:av});if(r.error){toast("Kind konnte nicht erstellt werden");return}modal("addStudentModal",false);await load();toast(name+" erstellt")}
@@ -1963,20 +2083,23 @@ async function restoreGoalTemplate(id){if(!S.archivedGoals||!S.archivedGoals.som
 }
 async function carryGoals(){if(!S.classRow)return;var r=await sb.rpc("carry_forward_weekly_goals",{p_class_id:S.classRow.id,p_week_start:week()});if(r.error){toast("Übernahme fehlgeschlagen");return}await load();toast((r.data||0)+" Ziele übernommen")}
 
-function reward(){S.rewardEditId=null;el("rewardName").textContent=S.student.display_name;el("manualShells").value=shells(S.student.id);el("rewardTitle").value="";el("rewardShells").value="";setRewardEditMode(false);fillRewardTemplates();renderRewardList();modal("rewardModal",true)}
+function reward(){S.rewardEditId=null;el("rewardName").textContent=S.student.display_name;el("rewardTitle").value="";el("rewardShells").value="";setRewardEditMode(false);fillRewardTemplates();renderRewardList();modal("rewardModal",true)}
 function fillRewardTemplates(){var o=['<option value="">Ohne Vorlage</option>'];BUILTIN_REWARDS.forEach(function(r,i){o.push('<option value="b:'+i+'">'+esc(r.title)+" · "+r.shells+" 🐚</option>")});S.rewardTemplates.forEach(function(r){o.push('<option value="c:'+r.id+'">'+esc(r.title)+" · "+r.shells_required+" 🐚</option>")});el("rewardTemplate").innerHTML=o.join("")}
 function fillRewardTemplate(){var v=el("rewardTemplate").value,r=null;if(v.indexOf("b:")===0)r=BUILTIN_REWARDS[Number(v.slice(2))];else if(v.indexOf("c:")===0)r=S.rewardTemplates.find(function(x){return x.id===v.slice(2)});if(r){el("rewardTitle").value=r.title;el("rewardShells").value=r.shells||r.shells_required}}
-function renderRewardList(){el("rewardList").innerHTML=rs(S.student.id).map(function(r){var can=shells(S.student.id)>=r.shells_required;return '<div class="list-row"><div class="list-main"><b>'+esc(r.title)+'</b><span>'+r.shells_required+' Muscheln'+(r.redeemed_count?" · "+r.redeemed_count+"× eingelöst":"")+'</span></div><div class="toolbar"><button class="btn secondary small" onclick="APP.editReward(\''+r.id+'\')">Bearbeiten</button><button class="btn small '+(can?'':'secondary')+'" onclick="APP.redeemReward(\''+r.id+'\')" '+(can?'':'disabled')+'>Einlösen</button><button class="btn secondary small" onclick="APP.removeReward(\''+r.id+'\')">Archivieren</button></div></div>'}).join("")||'<div class="muted">Noch keine Belohnungen.</div>';
- el("rewardArchivedList").innerHTML=S.rewards.filter(function(r){return r.student_id===S.student.id&&r.active===false}).map(function(r){return '<div class="list-row"><div class="list-main"><b>'+esc(r.title)+'</b><span>'+r.shells_required+' Muscheln</span></div><button class="btn secondary small" onclick="APP.restoreReward(\''+r.id+'\')">Wiederherstellen</button></div>'}).join("")||'<div class="muted">Keine archivierten Belohnungen.</div>'}
+function renderRewardList(){var w=weeklyReward(S.student.id);
+ el("rewardWeekInfo").innerHTML='<strong>'+(w.title?esc(w.title):"Check-in offen")+'</strong><p>'+(w.target?"Diese Woche · 🐚 "+w.count+" / "+w.target+" · "+(w.status==="redeemed"?"eingelöst":w.status==="earned"?"verfügbar":"noch offen"):"Ziel und Belohnung beim Check-in auswählen")+'</p>';
+ el("rewardList").innerHTML=rs(S.student.id).map(function(r){return '<div class="list-row"><div class="list-main"><b>'+esc(r.title)+'</b><span>Beim Check-in auswählbar'+(w.plan&&w.plan.reward_id===r.id?" · diese Woche gewählt":"")+'</span></div><div class="toolbar"><button class="btn secondary small" onclick="APP.editReward(\''+r.id+'\')">Bearbeiten</button><button class="btn secondary small" onclick="APP.removeReward(\''+r.id+'\')">Archivieren</button></div></div>'}).join("")||'<div class="muted">Noch keine Belohnungen.</div>';
+ el("rewardArchivedList").innerHTML=S.rewards.filter(function(r){return r.student_id===S.student.id&&r.active===false}).map(function(r){return '<div class="list-row"><div class="list-main"><b>'+esc(r.title)+'</b></div><button class="btn secondary small" onclick="APP.restoreReward(\''+r.id+'\')">Wiederherstellen</button></div>'}).join("")||'<div class="muted">Keine archivierten Belohnungen.</div>'
+}
 async function restoreReward(id){if(!S.student||!S.rewards.some(function(r){return r.id===id&&r.student_id===S.student.id&&r.active===false}))return;var r=await sb.from("rewards").update({active:true}).eq("id",id).eq("student_id",S.student.id);if(r.error){toast("Wiederherstellen fehlgeschlagen");return}var sid=S.student.id;await load();openStudent(sid);reward();toast("Belohnung wiederhergestellt")}
-async function setShells(){var n=Number(el("manualShells").value);if(!Number.isFinite(n)||n<0)return;var r=await sb.rpc("set_student_shells",{p_student_id:S.student.id,p_shells:Math.round(n)});if(r.error){toast("Muschelstand konnte nicht geändert werden");return}var id=S.student.id;await load();openStudent(id);reward();toast("Muschelstand gesetzt")}
+async function setShells(){toast("Muscheln werden jetzt aus den positiven Smileys dieser Woche gezählt.")}
 function setRewardEditMode(editing){el("rewardAddBtn").style.display=editing?"none":"";el("rewardSaveBtn").style.display=editing?"":"none";el("rewardCancelBtn").style.display=editing?"":"none";el("rewardSaveTemplateBtn").style.display=editing?"none":""}
 function editReward(id){var r=rs(S.student.id).find(function(x){return x.id===id});if(!r)return;S.rewardEditId=r.id;el("rewardTitle").value=r.title;el("rewardShells").value=r.shells_required;setRewardEditMode(true);el("rewardTitle").focus()}
 function cancelRewardEdit(){S.rewardEditId=null;el("rewardTitle").value="";el("rewardShells").value="";setRewardEditMode(false)}
 async function saveRewardEdit(){var id=S.rewardEditId,title=el("rewardTitle").value.trim(),needed=Number(el("rewardShells").value);if(!id||!title||!Number.isInteger(needed)||needed<1){toast("Belohnung und Muschelzahl prüfen");return}var sid=S.student.id,r=await sb.from("rewards").update({title:title,shells_required:needed}).eq("id",id).eq("student_id",sid).eq("active",true).select("id");if(r.error||!r.data||!r.data.length){toast("Belohnung konnte nicht geändert werden");return}await load();openStudent(sid);reward();toast("Belohnung aktualisiert")}
 async function addReward(){var t=el("rewardTitle").value.trim(),n=Number(el("rewardShells").value);if(!t||!Number.isInteger(n)||n<1){toast("Belohnung und Muschelzahl prüfen");return}var r=await sb.from("rewards").insert({student_id:S.student.id,title:t,shells_required:n,sort_order:n});if(r.error){toast("Belohnung konnte nicht gespeichert werden");return}var id=S.student.id;await load();openStudent(id);reward();toast("Belohnung hinzugefügt")}
 async function saveRewardTemplate(){var t=el("rewardTitle").value.trim(),n=Number(el("rewardShells").value);if(!t||!n)return;var r=await sb.from("reward_templates").insert({teacher_id:S.user.id,title:t,shells_required:n});if(r.error){toast("Vorlage konnte nicht gespeichert werden");return}await load();reward();toast("Vorlage gespeichert")}
-async function redeemReward(id){if(!confirm("Belohnung als eingelöst markieren?"))return;var r=await sb.rpc("redeem_reward",{p_reward_id:id});if(r.error){toast("Einlösen fehlgeschlagen");return}var sid=S.student.id;await load();openStudent(sid);reward();toast("Belohnung eingelöst")}
+async function redeemReward(id){var p=plan(S.student.id);if(!p||p.reward_id!==id){toast("Belohnung beim Check-in auswählen");return}await setWeeklyRewardRedemption(true)}
 async function removeReward(id){var r=await sb.from("rewards").update({active:false}).eq("id",id).eq("student_id",S.student.id);if(r.error){toast("Archivieren fehlgeschlagen");return}var sid=S.student.id;await load();openStudent(sid);reward();toast("Belohnung archiviert")}
 function qr(){el("qrName").textContent=S.student.display_name;el("newQrBtn").style.display="block";el("qrResult").style.display="none";el("teacherQr").innerHTML="";modal("qrModal",true)}
 async function createQr(){var r=await sb.rpc("get_or_create_child_qr_code",{p_student_id:S.student.id});if(r.error){toast("QR-Code konnte nicht geladen werden");return}var row=Array.isArray(r.data)?r.data[0]:r.data;if(!row||!row.qr_token)return;el("newQrBtn").style.display="none";el("qrResult").style.display="block";el("teacherQr").innerHTML="";new QRCode(el("teacherQr"),{text:childAccessUrl(row.qr_token),width:220,height:220,correctLevel:QRCode.CorrectLevel.H});el("teacherQr").dataset.token=row.qr_token}
@@ -2261,25 +2384,29 @@ function backFromChildPreview(){if(S.role!=="teacher")return;el("previewBack").s
 function speakGoal(){if(!("speechSynthesis" in window)){toast("Vorlesen wird auf diesem Gerät nicht unterstützt");return}var goal=el("childGoal").textContent;if(!goal)return;window.speechSynthesis.cancel();var utterance=new SpeechSynthesisUtterance(goal);utterance.lang="de-DE";utterance.rate=.85;window.speechSynthesis.speak(utterance)}
 function selfEligibleSlots(s){var now=new Date(),day=now.getDay(),minutes=now.getHours()*60+now.getMinutes(),starts={1:495,2:540,7:585,3:615,4:660,8:705,5:720,6:765};if(!isCurrentWeek()||day<1||day>5)return[];return SEGMENTS.filter(function(n){return minutes>=starts[n]&&slotEnabled(s.id,day,n)})}
 function setChildSelfSlot(value){S.childSelfSlot=Number(value);renderChild()}
-async function saveSelfRating(value){if(S.role!=="student"||!S.student)return;var day=new Date().getDay(),lesson=Number(el("childSelfSlot").value);if(day<1||day>5||!selfEligibleSlots(S.student).includes(lesson)||!plan(S.student.id))return;
+async function saveSelfRating(value){if(S.role!=="student"||!S.student)return;var day=new Date().getDay(),lesson=Number(el("childSelfSlot").value);if(day<1||day>5||!selfEligibleSlots(S.student).includes(lesson)||!plan(S.student.id)||!plan(S.student.id).checkin_completed)return;
  var row={student_id:S.student.id,week_start:week(),weekday:day,lesson_no:lesson,rating:value,created_by:S.user.id,updated_at:new Date().toISOString()};
  var r=await sb.from("student_self_ratings").upsert(row,{onConflict:"student_id,week_start,weekday,lesson_no"});if(r.error){toast("Einschätzung konnte nicht gespeichert werden");return}
  var old=selfRating(S.student.id,day,lesson);if(old)old.rating=value;else S.selfRatings.push(row);renderChild();toast("Danke, gespeichert")
 }
 function renderChild(){
- updateDateUI();
- var s=S.previewStudent||S.student,p=plan(s.id),sh=shells(s.id),rewards=rs(s.id),next=rewards.find(function(r){return r.shells_required>sh});
+ updateDateUI();var s=S.previewStudent||S.student,w=weeklyReward(s.id),p=w.plan,sh=w.count;
  el("childTitle").textContent=(s.avatar_emoji||"🦦")+" "+s.display_name;
  if(S.lastChildShells!==null&&sh>S.lastChildShells){el("childShellBadge").classList.remove("shell-pop");void el("childShellBadge").offsetWidth;el("childShellBadge").classList.add("shell-pop")}S.lastChildShells=sh;
- el("childShells").textContent=sh;el("childGoalIcon").innerHTML=goalIconSvg(p&&p.goal_icon);el("childGoal").textContent=p?p.goal:"Noch kein Ziel";el("childHelp").textContent=p&&p.help_text?"💡 "+p.help_text:"";
- if(next){el("childRewardTitle").textContent=next.title;el("childReward").textContent=sh+" / "+next.shells_required;el("childBar").style.width=Math.min(100,Math.round(sh/next.shells_required*100))+"%";var left=next.shells_required-sh;el("childRewardHint").textContent="Noch "+left+" "+(left===1?"Muschel":"Muscheln")}else if(rewards.length){el("childRewardTitle").textContent="Stark!";el("childReward").textContent="🐚 "+sh;el("childBar").style.width="100%";el("childRewardHint").textContent="Geschafft"}else{el("childRewardTitle").textContent="Noch offen";el("childReward").textContent="🐚 "+sh;el("childBar").style.width="0%";el("childRewardHint").textContent=""}
- var rewardGoal=next?next.shells_required:Math.max(sh,1),dots=Math.min(rewardGoal,12),filled=Math.round(Math.min(1,sh/rewardGoal)*dots);el("childRewardDots").innerHTML=Array.from({length:dots},function(_,i){return '<span class="'+(i<filled?'filled':'')+'"></span>'}).join("");
- var dow=new Date().getDay();
- var selfBox=el("childSelfCard"),eligible=S.role==="student"?selfEligibleSlots(s):[];selfBox.style.display=eligible.length&&p?"block":"none";if(selfBox.style.display==="block"){
-  var selected=eligible.includes(S.childSelfSlot)?S.childSelfSlot:currentTeachingSlot()&&eligible.includes(currentTeachingSlot())?currentTeachingSlot():eligible[eligible.length-1];S.childSelfSlot=selected;
-  el("childSelfTitle").textContent="Wie lief es für dich?";el("childSelfSlot").innerHTML=eligible.map(function(n){return '<option value="'+n+'">'+segmentLabel(n)+'</option>'}).join("");el("childSelfSlot").value=String(selected);
-  var sr=selfRating(s.id,dow,selected);["good","partial","difficult"].forEach(function(v){el("self-"+v).classList.toggle("selected",!!(sr&&sr.rating===v))})
- }
+ el("childShells").textContent=sh;el("childGoalIcon").innerHTML=goalIconSvg(p&&p.goal_icon);
+ el("childGoal").textContent=p&&p.checkin_completed?p.goal:"Neues Wochenziel kommt noch";
+ el("childHelp").textContent=p&&p.checkin_completed&&p.help_text?"💡 "+p.help_text:"";
+ el("childRewardTitle").textContent=w.title||"Beim Check-in auswählen";
+ el("childReward").textContent=w.target?sh+" / "+w.target:"0 / –";
+ el("childBar").style.width=(w.target?Math.min(100,Math.round(sh/w.target*100)):0)+"%";
+ el("childRewardHint").textContent=w.status==="redeemed"?"🎉 Belohnung eingelöst":w.status==="earned"?"🎉 Geschafft! Deine Belohnung ist bereit":w.target?"Noch "+Math.max(0,w.target-sh)+" "+(w.target-sh===1?"Muschel":"Muscheln"):"Neue Woche · bald geht es los";
+ var dots=w.target?Math.min(w.target,12):0,filled=w.target?Math.round(Math.min(1,sh/w.target)*dots):0;
+ el("childRewardDots").innerHTML=Array.from({length:dots},function(_,i){return '<span class="'+(i<filled?'filled':'')+'"></span>'}).join("");
+ var dow=new Date().getDay(),selfBox=el("childSelfCard"),eligible=S.role==="student"?selfEligibleSlots(s):[];
+ selfBox.style.display=eligible.length&&p&&p.checkin_completed?"block":"none";
+ if(selfBox.style.display==="block"){var selected=eligible.includes(S.childSelfSlot)?S.childSelfSlot:currentTeachingSlot()&&eligible.includes(currentTeachingSlot())?currentTeachingSlot():eligible[eligible.length-1];S.childSelfSlot=selected;
+ el("childSelfTitle").textContent="Wie lief es für dich?";el("childSelfSlot").innerHTML=eligible.map(function(n){return '<option value="'+n+'">'+segmentLabel(n)+'</option>'}).join("");el("childSelfSlot").value=String(selected);
+ var sr=selfRating(s.id,dow,selected);["good","partial","difficult"].forEach(function(v){el("self-"+v).classList.toggle("selected",!!(sr&&sr.rating===v))})}
  renderWeek("childWeek",false)
 }
 
@@ -2302,8 +2429,8 @@ window.APP={
  showTeacherArea:showTeacherArea,switchClass:switchClass,openClassChooser:openClassChooser,chooseClass:chooseClass,openGradeOverview:openGradeOverview,loadGradeOverview:loadGradeOverview,setGradeFilter:setGradeFilter,setGradeClassFilter:setGradeClassFilter,startGradeQuickMode:startGradeQuickMode,gradeOpenStudent:gradeOpenStudent,gradeBackToOverview:gradeBackToOverview,gradeDetailCheckin:gradeDetailCheckin,gradeDetailCheckout:gradeDetailCheckout,gradeQuickNext:gradeQuickNext,gradeCheckin:gradeCheckin,gradeCheckout:gradeCheckout,backFromGrade:backFromGrade,openQuickRating:openQuickRating,renderQuickRating:renderQuickRating,setQuickLesson:setQuickLesson,quickNextLesson:quickNextLesson,quickPrevLesson:quickPrevLesson,quickGoal:quickGoal,quickRate:quickRate,openClassMore:openClassMore,openStudentMore:openStudentMore,moreCarryGoals:moreCarryGoals,moreQrCards:moreQrCards,moreExport:moreExport,moreClassSettings:moreClassSettings,moreStudentQr:moreStudentQr,moreStudentHours:moreStudentHours,moreStudentHistory:moreStudentHistory,moreStudentPdf:moreStudentPdf,moreStudentManage:moreStudentManage,
  addStudent:addStudent,saveStudent:saveStudent,manageStudent:manageStudent,saveStudentManage:saveStudentManage,moveStudent:moveStudent,archiveStudent:archiveStudent,openArchive:openArchive,restoreArchivedStudent:restoreArchivedStudent,openArchivedClasses:openArchivedClasses,restoreArchivedClass:restoreArchivedClass,openYearTransition:openYearTransition,loadYearTransitionStudents:loadYearTransitionStudents,applyYearTransition:applyYearTransition,deleteStudent:deleteStudent,
  dragClass:dragClass,dropClass:dropClass,dragStudentCard:dragStudentCard,overStudentCard:overStudentCard,leaveStudentCard:leaveStudentCard,dropStudentCard:dropStudentCard,endStudentCardDrag:endStudentCardDrag,setTodayDay:setTodayDay,setTodaySlot:setTodaySlot,todayRate:todayRate,todayNote:todayNote,toggleAbsence:toggleAbsence,markStudentAbsentToday:markStudentAbsentToday,selectDetailAbsenceDay:selectDetailAbsenceDay,classChildAction:classChildAction,dictateObservation:dictateObservation,renderNoteTemplates:renderNoteTemplates,useNoteTemplate:useNoteTemplate,saveNoteTemplate:saveNoteTemplate,filterObservations:filterObservations,openStudent:openStudent,back:back,openStudentTab:openStudentTab,saveObservation:saveObservation,deleteObservation:deleteObservation,setDevelopmentPreset:setDevelopmentPreset,refreshTeacherDevelopment:refreshTeacherDevelopment,openGradeDevelopment:openGradeDevelopment,refreshGradeDevelopment:refreshGradeDevelopment,openGradeNote:openGradeNote,runAiDevelopment:runAiDevelopment,exportDevelopmentPdf:exportDevelopmentPdf,loadNotesTab:loadNotesTab,openRating:openRating,saveRating:saveRating,clearRating:clearRating,undoLastRating:undoLastRating,openWeekStart:openWeekStart,openWeekStartStudent:openWeekStartStudent,openWeekClose:openWeekClose,openWeekCloseStudent:openWeekCloseStudent,
- checkin:checkin,fillCheckinTemplate:fillCheckinTemplate,pickCheckin:pickCheckin,saveCheckin:saveCheckin,
- checkout:checkout,pickCheckoutSelf:pickCheckoutSelf,pickCheckoutDecision:pickCheckoutDecision,saveCheckout:saveCheckout,
+ checkin:checkin,fillCheckinTemplate:fillCheckinTemplate,pickCheckin:pickCheckin,pickCheckinReward:pickCheckinReward,saveCheckin:saveCheckin,
+ checkout:checkout,pickCheckoutSelf:pickCheckoutSelf,pickCheckoutDecision:pickCheckoutDecision,saveCheckout:saveCheckout,setWeeklyRewardRedemption:setWeeklyRewardRedemption,openWeekHistory:openWeekHistory,
  openBatchGoals:openBatchGoals,fillBatchTemplate:fillBatchTemplate,applyBatchGoal:applyBatchGoal,saveGoalTemplate:saveGoalTemplate,deleteGoalTemplate:deleteGoalTemplate,openGoalTemplateArchive:openGoalTemplateArchive,restoreGoalTemplate:restoreGoalTemplate,carryGoals:carryGoals,
  reward:reward,fillRewardTemplate:fillRewardTemplate,setShells:setShells,editReward:editReward,saveRewardEdit:saveRewardEdit,cancelRewardEdit:cancelRewardEdit,addReward:addReward,saveRewardTemplate:saveRewardTemplate,redeemReward:redeemReward,removeReward:removeReward,restoreReward:restoreReward,
  previewChild:previewChild,backFromChildPreview:backFromChildPreview,speakGoal:speakGoal,saveSelfRating:saveSelfRating,setChildSelfSlot:setChildSelfSlot,qr:qr,createQr:createQr,resetQr:resetQr,revoke:revoke,downloadSingleQr:downloadSingleQr,downloadCodes:downloadCodes,
