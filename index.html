@@ -2111,10 +2111,15 @@ async function saveCheckout(){var p=plan(S.student.id);if(!p||!p.checkin_complet
  if(S.teacherArea==="grade")r=await sb.rpc("grade_save_checkout",{p_student_id:sid,p_week_start:week(),p_self:S.checkoutSelf,p_decision:S.checkoutDecision,p_note:el("checkoutNote").value.trim()});
  else r=await sb.from("weekly_plans").update({checkout_self:S.checkoutSelf,checkout_decision:S.checkoutDecision,checkout_note:el("checkoutNote").value.trim(),checkout_published:false,published_good_count:st.good,published_rated_count:st.total}).eq("id",p.id);
  if(r.error){toast("Check-out konnte nicht gespeichert werden");return}
+ p.checkout_self=S.checkoutSelf;p.checkout_decision=S.checkoutDecision;p.checkout_note=el("checkoutNote").value.trim();
+ p.checkout_published=false;p.published_good_count=st.good;p.published_rated_count=st.total;
+ if(st.good>=Number(p.weekly_shell_target)&&p.reward_title_snapshot&&!p.reward_redeemed_at){
+   renderCheckoutResult();toast("Check-out gespeichert · Belohnung verfügbar");return
+ }
  modal("checkoutModal",false);
  if(S.teacherArea==="grade")await afterGradeAction(sid,"checkout",wasDetail);
  else{await load();openStudent(sid)}
- toast(st.good>=Number(p.weekly_shell_target)?"Wochenziel erreicht":"Wochenabschluss gespeichert")
+ toast("Wochenabschluss gespeichert")
 }
 
 function addStudent(){if(!S.classRow){toast("Bitte zuerst Klasse anlegen");return}el("newStudentName").value="";el("newStudentAvatar").value="🦦";modal("addStudentModal",true)}
