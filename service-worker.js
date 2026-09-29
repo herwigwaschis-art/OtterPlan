@@ -1,4 +1,4 @@
-const CACHE="milo-v70";
+const CACHE="milo-v71";
 const STATIC=["./","./?menu=1","./index.html","./manifest.webmanifest","./milo-icon.svg","./milo-icon.svg?v=40","./milo-icon-180.png","./milo-icon-192.png","./milo-icon-512.png","./milo-wordmark.svg","./plant-seed.svg","./plant-sprout.svg","./plant-sunflower.svg"];
 const LIBRARIES=new Set([
   "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
@@ -25,6 +25,8 @@ self.addEventListener("fetch",event=>{
   if(event.request.method!=="GET")return;
   const url=new URL(event.request.url);
   const local=url.origin===self.location.origin;
+  // A QR link contains a bearer token. Never put that URL into CacheStorage.
+  if(local&&url.searchParams.has("child"))return;
   if(!local&&!LIBRARIES.has(url.href))return;
   event.respondWith(
     fetch(event.request,local?{cache:"no-store"}:undefined)
