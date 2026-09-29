@@ -583,6 +583,16 @@ body:has(#childView.active) #todayBadge{display:none}
 #childReward .plant-icon{width:25px;height:25px;margin-right:5px}
 
 .feeling-choice-row .choice{min-height:64px;padding:9px 6px;background:#f8faf9;border:1px solid #e7eeeb;display:grid;place-items:center}.feeling-face{width:39px;height:39px;color:#607c76}.feeling-choice-row .choice.selected .feeling-face{color:#237f72}
+
+/* iPad: put the child's weekly table higher and keep utility chrome quiet. */
+#pilotBanner{display:none!important}
+.today-badge{padding:4px 2px;border:0;border-radius:0;background:transparent;box-shadow:none;color:#879397;font-size:11px;font-weight:600}
+body:has(#childView.active) main{padding-top:20px}
+#childView{position:relative}
+#childView #previewBack{position:absolute;top:0;left:0;align-items:center;justify-content:center;width:40px;height:40px;min-height:40px;padding:0;border:0;border-radius:12px;background:transparent;box-shadow:none;color:#657a74;font-size:24px;line-height:1}
+#childView #previewBack:hover{background:#eaf2ee}
+#childView .child-top{margin-bottom:8px}
+#childView .child-goal-card{gap:3px;margin-bottom:8px;padding:9px 15px 10px}
 </style>
 </head>
 <body>
@@ -771,7 +781,7 @@ body:has(#childView.active) #todayBadge{display:none}
   </div>
 </section>
 
-<section id="childView" class="screen"><button id="previewBack" class="btn secondary" style="display:none;margin-bottom:14px" onclick="APP.backFromChildPreview()">← Zur Lehrkraftansicht</button>
+<section id="childView" class="screen"><button id="previewBack" class="btn secondary" style="display:none" aria-label="Zur Lehrkraftansicht" title="Zur Lehrkraftansicht" onclick="APP.backFromChildPreview()">←</button>
   <div id="parentSwitch" style="display:none;margin-bottom:12px"><label for="parentStudentSelect">Mein Kind</label><select id="parentStudentSelect" onchange="APP.selectParentStudent()"></select></div>
   <div class="child-top"><h2 id="childTitle" class="child-name"></h2></div>
   <div class="kid-card child-goal-card"><div class="kid-label">Mein Ziel</div><div class="toolbar" style="align-items:center"><span id="childGoalIcon" class="goal-symbol" aria-hidden="true"></span><div id="childGoal" class="kid-goal" style="flex:1"></div><button class="btn secondary child-goal-speak" aria-label="Ziel vorlesen" title="Ziel vorlesen" onclick="APP.speakGoal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button></div><div id="childHelp" class="kid-tip"></div></div>
