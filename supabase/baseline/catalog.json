@@ -1,0 +1,2070 @@
+{
+  "schema": {
+    "tables": [
+      {
+        "name": "schools",
+        "ddl": "CREATE TABLE public.schools (id uuid NOT NULL DEFAULT gen_random_uuid(), name text NOT NULL, created_by uuid NOT NULL, created_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "anon=Dxtm/postgres",
+          "authenticated=rDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "school_members",
+        "ddl": "CREATE TABLE public.school_members (school_id uuid NOT NULL, user_id uuid NOT NULL, role text NOT NULL DEFAULT 'teacher'::text, created_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "anon=Dxtm/postgres",
+          "authenticated=rDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "class_year_transitions",
+        "ddl": "CREATE TABLE public.class_year_transitions (source_class_id uuid NOT NULL, target_class_id uuid NOT NULL, created_by uuid NOT NULL, created_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "class_schedule_slots",
+        "ddl": "CREATE TABLE public.class_schedule_slots (class_id uuid NOT NULL, weekday smallint NOT NULL, lesson_no smallint NOT NULL, enabled boolean NOT NULL DEFAULT true, updated_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "anon=Dxtm/postgres",
+          "authenticated=Dxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "school_settings",
+        "ddl": "CREATE TABLE public.school_settings (school_id uuid NOT NULL, default_school_year text NOT NULL DEFAULT '2026/27'::text, default_retention_days integer NOT NULL DEFAULT 90, teachers_can_create_classes boolean NOT NULL DEFAULT false, updated_at timestamp with time zone NOT NULL DEFAULT now(), admin_access_hash text, pilot_mode boolean NOT NULL DEFAULT true, ai_analysis_enabled boolean NOT NULL DEFAULT false);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "anon=Dxtm/postgres",
+          "authenticated=rDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "student_observations",
+        "ddl": "CREATE TABLE public.student_observations (id uuid NOT NULL DEFAULT gen_random_uuid(), student_id uuid NOT NULL, observed_on date NOT NULL DEFAULT CURRENT_DATE, week_start date NOT NULL, goal_snapshot text NOT NULL DEFAULT ''::text, category text NOT NULL DEFAULT 'observation'::text, note text NOT NULL, created_by uuid NOT NULL, created_at timestamp with time zone NOT NULL DEFAULT now(), updated_at timestamp with time zone NOT NULL DEFAULT now(), segment_no smallint, client_ref uuid);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "profiles",
+        "ddl": "CREATE TABLE public.profiles (id uuid NOT NULL, role text NOT NULL DEFAULT 'student'::text, display_name text NOT NULL DEFAULT ''::text, created_at timestamp with time zone NOT NULL DEFAULT now(), must_change_password boolean NOT NULL DEFAULT false);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres",
+          "authenticated=r/postgres"
+        ]
+      },
+      {
+        "name": "parent_student_links",
+        "ddl": "CREATE TABLE public.parent_student_links (parent_user_id uuid NOT NULL, student_id uuid NOT NULL);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres",
+          "authenticated=ard/postgres"
+        ]
+      },
+      {
+        "name": "timetable_entries",
+        "ddl": "CREATE TABLE public.timetable_entries (id uuid NOT NULL DEFAULT gen_random_uuid(), class_id uuid NOT NULL, weekday smallint NOT NULL, lesson_no smallint NOT NULL, subject text NOT NULL);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres",
+          "authenticated=arwd/postgres"
+        ]
+      },
+      {
+        "name": "classes",
+        "ddl": "CREATE TABLE public.classes (id uuid NOT NULL DEFAULT gen_random_uuid(), name text NOT NULL, teacher_id uuid NOT NULL, created_at timestamp with time zone NOT NULL DEFAULT now(), school_year text NOT NULL DEFAULT '2026/27'::text, archived_at timestamp with time zone, school_id uuid, grade_level smallint);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres",
+          "authenticated=arwd/postgres"
+        ]
+      },
+      {
+        "name": "student_progress",
+        "ddl": "CREATE TABLE public.student_progress (student_id uuid NOT NULL, shells integer NOT NULL DEFAULT 0, updated_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres",
+          "authenticated=arw/postgres"
+        ]
+      },
+      {
+        "name": "parent_acknowledgements",
+        "ddl": "CREATE TABLE public.parent_acknowledgements (id uuid NOT NULL DEFAULT gen_random_uuid(), weekly_plan_id uuid NOT NULL, parent_user_id uuid NOT NULL, acknowledged_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres",
+          "authenticated=arw/postgres"
+        ]
+      },
+      {
+        "name": "child_access_codes",
+        "ddl": "CREATE TABLE public.child_access_codes (id uuid NOT NULL DEFAULT gen_random_uuid(), student_id uuid NOT NULL, token_hash text NOT NULL, pin_hash text NOT NULL, active boolean NOT NULL DEFAULT true, expires_at timestamp with time zone, created_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "ratings",
+        "ddl": "CREATE TABLE public.ratings (id uuid NOT NULL DEFAULT gen_random_uuid(), student_id uuid NOT NULL, week_start date NOT NULL, timetable_entry_id uuid, rating text NOT NULL, updated_by uuid NOT NULL, updated_at timestamp with time zone NOT NULL DEFAULT now(), weekday smallint NOT NULL, lesson_no smallint NOT NULL);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres",
+          "authenticated=arwd/postgres"
+        ]
+      },
+      {
+        "name": "weekly_plans",
+        "ddl": "CREATE TABLE public.weekly_plans (id uuid NOT NULL DEFAULT gen_random_uuid(), student_id uuid NOT NULL, week_start date NOT NULL, goal text NOT NULL, help_text text NOT NULL DEFAULT ''::text, checkin_feeling text, checkin_completed boolean NOT NULL DEFAULT false, checkout_self text, checkout_decision text, checkout_note text NOT NULL DEFAULT ''::text, checkout_published boolean NOT NULL DEFAULT false, published_good_count integer NOT NULL DEFAULT 0, published_rated_count integer NOT NULL DEFAULT 0, created_at timestamp with time zone NOT NULL DEFAULT now(), updated_at timestamp with time zone NOT NULL DEFAULT now(), goal_icon text NOT NULL DEFAULT 'target'::text, weekly_shell_target integer, reward_id uuid, reward_title_snapshot text, reward_redeemed_at timestamp with time zone, reward_redeemed_by uuid, reward_template_id uuid, reward_icon_snapshot text);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres",
+          "authenticated=arwd/postgres"
+        ]
+      },
+      {
+        "name": "student_device_links",
+        "ddl": "CREATE TABLE public.student_device_links (user_id uuid NOT NULL, student_id uuid NOT NULL, linked_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres",
+          "authenticated=r/postgres"
+        ]
+      },
+      {
+        "name": "student_schedule_slots",
+        "ddl": "CREATE TABLE public.student_schedule_slots (student_id uuid NOT NULL, weekday smallint NOT NULL, lesson_no smallint NOT NULL, enabled boolean NOT NULL DEFAULT true, updated_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "anon=Dxtm/postgres",
+          "authenticated=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "student_absences",
+        "ddl": "CREATE TABLE public.student_absences (student_id uuid NOT NULL, absent_on date NOT NULL, segment_no smallint NOT NULL, created_by uuid NOT NULL DEFAULT auth.uid(), created_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "authenticated=ardDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "students",
+        "ddl": "CREATE TABLE public.students (id uuid NOT NULL DEFAULT gen_random_uuid(), class_id uuid NOT NULL, display_name text NOT NULL, child_user_id uuid, created_at timestamp with time zone NOT NULL DEFAULT now(), avatar_emoji text NOT NULL DEFAULT '🦦'::text, sort_order integer NOT NULL DEFAULT 0, archived_at timestamp with time zone, is_demo boolean NOT NULL DEFAULT false);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres",
+          "authenticated=arwd/postgres"
+        ]
+      },
+      {
+        "name": "stable_child_qr_codes",
+        "ddl": "CREATE TABLE public.stable_child_qr_codes (student_id uuid NOT NULL, code uuid NOT NULL DEFAULT gen_random_uuid(), active boolean NOT NULL DEFAULT true, created_at timestamp with time zone NOT NULL DEFAULT now(), updated_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "student_self_ratings",
+        "ddl": "CREATE TABLE public.student_self_ratings (student_id uuid NOT NULL, week_start date NOT NULL, weekday smallint NOT NULL, lesson_no smallint NOT NULL, rating text NOT NULL, created_by uuid NOT NULL DEFAULT auth.uid(), updated_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "authenticated=arwDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "rewards",
+        "ddl": "CREATE TABLE public.rewards (id uuid NOT NULL DEFAULT gen_random_uuid(), student_id uuid NOT NULL, shells_required integer NOT NULL, title text NOT NULL, active boolean NOT NULL DEFAULT true, sort_order integer NOT NULL DEFAULT 0, created_at timestamp with time zone NOT NULL DEFAULT now(), redeemed_count integer NOT NULL DEFAULT 0, last_redeemed_at timestamp with time zone);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres",
+          "authenticated=arwd/postgres"
+        ]
+      },
+      {
+        "name": "grade_teacher_links",
+        "ddl": "CREATE TABLE public.grade_teacher_links (school_id uuid NOT NULL, grade_level smallint NOT NULL, user_id uuid NOT NULL, created_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "anon=Dxtm/postgres",
+          "authenticated=rDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "goal_templates",
+        "ddl": "CREATE TABLE public.goal_templates (id uuid NOT NULL DEFAULT gen_random_uuid(), teacher_id uuid NOT NULL, title text NOT NULL, goal text NOT NULL, help_text text NOT NULL DEFAULT ''::text, created_at timestamp with time zone NOT NULL DEFAULT now(), archived_at timestamp with time zone);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "anon=Dxtm/postgres",
+          "authenticated=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "class_teacher_links",
+        "ddl": "CREATE TABLE public.class_teacher_links (class_id uuid NOT NULL, user_id uuid NOT NULL, role text NOT NULL DEFAULT 'teacher'::text, created_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "anon=Dxtm/postgres",
+          "authenticated=rDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "reward_redemptions",
+        "ddl": "CREATE TABLE public.reward_redemptions (id uuid NOT NULL DEFAULT gen_random_uuid(), student_id uuid NOT NULL, reward_id uuid, title text NOT NULL, shells_required integer NOT NULL DEFAULT 0, redeemed_at timestamp with time zone NOT NULL DEFAULT now(), created_by uuid NOT NULL);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "anon=Dxtm/postgres",
+          "authenticated=rDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "teacher_settings",
+        "ddl": "CREATE TABLE public.teacher_settings (user_id uuid NOT NULL, retention_days integer NOT NULL DEFAULT 90, created_at timestamp with time zone NOT NULL DEFAULT now(), updated_at timestamp with time zone NOT NULL DEFAULT now());",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "anon=Dxtm/postgres",
+          "authenticated=arwDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      },
+      {
+        "name": "reward_templates",
+        "ddl": "CREATE TABLE public.reward_templates (id uuid NOT NULL DEFAULT gen_random_uuid(), teacher_id uuid NOT NULL, title text NOT NULL, shells_required integer NOT NULL DEFAULT 1, created_at timestamp with time zone NOT NULL DEFAULT now(), archived_at timestamp with time zone, template_key text, icon_key text NOT NULL DEFAULT 'gift'::text, sort_order integer NOT NULL DEFAULT 100);",
+        "rls": true,
+        "acl": [
+          "postgres=arwdDxtm/postgres",
+          "anon=Dxtm/postgres",
+          "authenticated=arwdDxtm/postgres",
+          "service_role=Dxtm/postgres"
+        ]
+      }
+    ],
+    "constraints": [
+      {
+        "table": "students",
+        "name": "students_child_user_id_key",
+        "type": "u",
+        "definition": "UNIQUE (child_user_id)"
+      },
+      {
+        "table": "profiles",
+        "name": "profiles_role_check",
+        "type": "c",
+        "definition": "CHECK ((role = ANY (ARRAY['teacher'::text, 'student'::text, 'parent'::text])))"
+      },
+      {
+        "table": "profiles",
+        "name": "profiles_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "profiles",
+        "name": "profiles_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "classes",
+        "name": "classes_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "classes",
+        "name": "classes_teacher_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (teacher_id) REFERENCES auth.users(id) ON DELETE RESTRICT"
+      },
+      {
+        "table": "students",
+        "name": "students_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "students",
+        "name": "students_class_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "students",
+        "name": "students_child_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (child_user_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+      },
+      {
+        "table": "parent_student_links",
+        "name": "parent_student_links_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (parent_user_id, student_id)"
+      },
+      {
+        "table": "parent_student_links",
+        "name": "parent_student_links_parent_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (parent_user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "parent_student_links",
+        "name": "parent_student_links_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "timetable_entries",
+        "name": "timetable_entries_weekday_check",
+        "type": "c",
+        "definition": "CHECK (((weekday >= 1) AND (weekday <= 5)))"
+      },
+      {
+        "table": "timetable_entries",
+        "name": "timetable_entries_lesson_no_check",
+        "type": "c",
+        "definition": "CHECK (((lesson_no >= 1) AND (lesson_no <= 12)))"
+      },
+      {
+        "table": "timetable_entries",
+        "name": "timetable_entries_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "timetable_entries",
+        "name": "timetable_entries_class_id_weekday_lesson_no_key",
+        "type": "u",
+        "definition": "UNIQUE (class_id, weekday, lesson_no)"
+      },
+      {
+        "table": "timetable_entries",
+        "name": "timetable_entries_class_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "weekly_plans",
+        "name": "weekly_plans_checkin_feeling_check",
+        "type": "c",
+        "definition": "CHECK ((checkin_feeling = ANY (ARRAY['good'::text, 'partial'::text, 'difficult'::text])))"
+      },
+      {
+        "table": "weekly_plans",
+        "name": "weekly_plans_checkout_self_check",
+        "type": "c",
+        "definition": "CHECK ((checkout_self = ANY (ARRAY['good'::text, 'partial'::text, 'difficult'::text])))"
+      },
+      {
+        "table": "weekly_plans",
+        "name": "weekly_plans_checkout_decision_check",
+        "type": "c",
+        "definition": "CHECK ((checkout_decision = ANY (ARRAY['done'::text, 'continue'::text, 'change'::text])))"
+      },
+      {
+        "table": "weekly_plans",
+        "name": "weekly_plans_published_good_count_check",
+        "type": "c",
+        "definition": "CHECK ((published_good_count >= 0))"
+      },
+      {
+        "table": "weekly_plans",
+        "name": "weekly_plans_published_rated_count_check",
+        "type": "c",
+        "definition": "CHECK ((published_rated_count >= 0))"
+      },
+      {
+        "table": "weekly_plans",
+        "name": "weekly_plans_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "weekly_plans",
+        "name": "weekly_plans_student_id_week_start_key",
+        "type": "u",
+        "definition": "UNIQUE (student_id, week_start)"
+      },
+      {
+        "table": "weekly_plans",
+        "name": "weekly_plans_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "ratings",
+        "name": "ratings_rating_check",
+        "type": "c",
+        "definition": "CHECK ((rating = ANY (ARRAY['good'::text, 'partial'::text, 'difficult'::text])))"
+      },
+      {
+        "table": "ratings",
+        "name": "ratings_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "ratings",
+        "name": "ratings_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "ratings",
+        "name": "ratings_timetable_entry_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (timetable_entry_id) REFERENCES timetable_entries(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "ratings",
+        "name": "ratings_updated_by_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (updated_by) REFERENCES auth.users(id) ON DELETE RESTRICT"
+      },
+      {
+        "table": "rewards",
+        "name": "rewards_shells_required_check",
+        "type": "c",
+        "definition": "CHECK ((shells_required > 0))"
+      },
+      {
+        "table": "rewards",
+        "name": "rewards_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "rewards",
+        "name": "rewards_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "student_progress",
+        "name": "student_progress_shells_check",
+        "type": "c",
+        "definition": "CHECK ((shells >= 0))"
+      },
+      {
+        "table": "student_progress",
+        "name": "student_progress_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (student_id)"
+      },
+      {
+        "table": "student_progress",
+        "name": "student_progress_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "parent_acknowledgements",
+        "name": "parent_acknowledgements_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "parent_acknowledgements",
+        "name": "parent_acknowledgements_weekly_plan_id_parent_user_id_key",
+        "type": "u",
+        "definition": "UNIQUE (weekly_plan_id, parent_user_id)"
+      },
+      {
+        "table": "parent_acknowledgements",
+        "name": "parent_acknowledgements_weekly_plan_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (weekly_plan_id) REFERENCES weekly_plans(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "parent_acknowledgements",
+        "name": "parent_acknowledgements_parent_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (parent_user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "child_access_codes",
+        "name": "child_access_codes_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "child_access_codes",
+        "name": "child_access_codes_token_hash_key",
+        "type": "u",
+        "definition": "UNIQUE (token_hash)"
+      },
+      {
+        "table": "child_access_codes",
+        "name": "child_access_codes_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "class_teacher_links",
+        "name": "class_teacher_links_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (class_id, user_id)"
+      },
+      {
+        "table": "class_teacher_links",
+        "name": "class_teacher_links_class_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "class_teacher_links",
+        "name": "class_teacher_links_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "goal_templates",
+        "name": "goal_templates_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "goal_templates",
+        "name": "goal_templates_teacher_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (teacher_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "reward_templates",
+        "name": "reward_templates_shells_required_check",
+        "type": "c",
+        "definition": "CHECK ((shells_required > 0))"
+      },
+      {
+        "table": "reward_templates",
+        "name": "reward_templates_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "reward_templates",
+        "name": "reward_templates_teacher_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (teacher_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "reward_redemptions",
+        "name": "reward_redemptions_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "reward_redemptions",
+        "name": "reward_redemptions_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "reward_redemptions",
+        "name": "reward_redemptions_reward_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (reward_id) REFERENCES rewards(id) ON DELETE SET NULL"
+      },
+      {
+        "table": "reward_redemptions",
+        "name": "reward_redemptions_created_by_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE RESTRICT"
+      },
+      {
+        "table": "student_device_links",
+        "name": "student_device_links_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (user_id)"
+      },
+      {
+        "table": "student_device_links",
+        "name": "student_device_links_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "student_device_links",
+        "name": "student_device_links_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "stable_child_qr_codes",
+        "name": "stable_child_qr_codes_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (student_id)"
+      },
+      {
+        "table": "stable_child_qr_codes",
+        "name": "stable_child_qr_codes_code_key",
+        "type": "u",
+        "definition": "UNIQUE (code)"
+      },
+      {
+        "table": "stable_child_qr_codes",
+        "name": "stable_child_qr_codes_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "class_teacher_links",
+        "name": "class_teacher_links_role_check",
+        "type": "c",
+        "definition": "CHECK ((role = 'teacher'::text))"
+      },
+      {
+        "table": "teacher_settings",
+        "name": "teacher_settings_retention_days_check",
+        "type": "c",
+        "definition": "CHECK (((retention_days >= 7) AND (retention_days <= 1095)))"
+      },
+      {
+        "table": "teacher_settings",
+        "name": "teacher_settings_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (user_id)"
+      },
+      {
+        "table": "teacher_settings",
+        "name": "teacher_settings_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "schools",
+        "name": "schools_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "schools",
+        "name": "schools_created_by_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE RESTRICT"
+      },
+      {
+        "table": "school_members",
+        "name": "school_members_role_check",
+        "type": "c",
+        "definition": "CHECK ((role = ANY (ARRAY['admin'::text, 'teacher'::text])))"
+      },
+      {
+        "table": "school_members",
+        "name": "school_members_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (school_id, user_id)"
+      },
+      {
+        "table": "school_members",
+        "name": "school_members_school_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "school_members",
+        "name": "school_members_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "classes",
+        "name": "classes_school_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE SET NULL"
+      },
+      {
+        "table": "school_settings",
+        "name": "school_settings_default_retention_days_check",
+        "type": "c",
+        "definition": "CHECK (((default_retention_days >= 7) AND (default_retention_days <= 1095)))"
+      },
+      {
+        "table": "school_settings",
+        "name": "school_settings_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (school_id)"
+      },
+      {
+        "table": "school_settings",
+        "name": "school_settings_school_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "ratings",
+        "name": "ratings_weekday_check",
+        "type": "c",
+        "definition": "CHECK (((weekday >= 1) AND (weekday <= 5)))"
+      },
+      {
+        "table": "student_schedule_slots",
+        "name": "student_schedule_slots_weekday_check",
+        "type": "c",
+        "definition": "CHECK (((weekday >= 1) AND (weekday <= 5)))"
+      },
+      {
+        "table": "student_schedule_slots",
+        "name": "student_schedule_slots_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (student_id, weekday, lesson_no)"
+      },
+      {
+        "table": "student_schedule_slots",
+        "name": "student_schedule_slots_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "classes",
+        "name": "classes_grade_level_check",
+        "type": "c",
+        "definition": "CHECK (((grade_level IS NULL) OR ((grade_level >= 1) AND (grade_level <= 4))))"
+      },
+      {
+        "table": "grade_teacher_links",
+        "name": "grade_teacher_links_grade_level_check",
+        "type": "c",
+        "definition": "CHECK (((grade_level >= 1) AND (grade_level <= 4)))"
+      },
+      {
+        "table": "grade_teacher_links",
+        "name": "grade_teacher_links_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (school_id, grade_level, user_id)"
+      },
+      {
+        "table": "grade_teacher_links",
+        "name": "grade_teacher_links_school_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "grade_teacher_links",
+        "name": "grade_teacher_links_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "student_observations",
+        "name": "student_observations_category_check",
+        "type": "c",
+        "definition": "CHECK ((category = ANY (ARRAY['observation'::text, 'progress'::text, 'challenge'::text, 'strategy'::text])))"
+      },
+      {
+        "table": "student_observations",
+        "name": "student_observations_note_check",
+        "type": "c",
+        "definition": "CHECK (((length(note) >= 1) AND (length(note) <= 2000)))"
+      },
+      {
+        "table": "student_observations",
+        "name": "student_observations_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "table": "student_observations",
+        "name": "student_observations_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "student_observations",
+        "name": "student_observations_created_by_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE RESTRICT"
+      },
+      {
+        "table": "ratings",
+        "name": "ratings_lesson_no_check",
+        "type": "c",
+        "definition": "CHECK (((lesson_no >= 1) AND (lesson_no <= 8)))"
+      },
+      {
+        "table": "student_schedule_slots",
+        "name": "student_schedule_slots_lesson_no_check",
+        "type": "c",
+        "definition": "CHECK (((lesson_no >= 1) AND (lesson_no <= 8)))"
+      },
+      {
+        "table": "student_absences",
+        "name": "student_absences_segment_no_check",
+        "type": "c",
+        "definition": "CHECK (((segment_no >= 0) AND (segment_no <= 8)))"
+      },
+      {
+        "table": "student_absences",
+        "name": "student_absences_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (student_id, absent_on, segment_no)"
+      },
+      {
+        "table": "student_absences",
+        "name": "student_absences_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "student_observations",
+        "name": "student_observations_segment_no_check",
+        "type": "c",
+        "definition": "CHECK (((segment_no >= 1) AND (segment_no <= 8)))"
+      },
+      {
+        "table": "student_self_ratings",
+        "name": "student_self_ratings_weekday_check",
+        "type": "c",
+        "definition": "CHECK (((weekday >= 1) AND (weekday <= 5)))"
+      },
+      {
+        "table": "student_self_ratings",
+        "name": "student_self_ratings_lesson_no_check",
+        "type": "c",
+        "definition": "CHECK (((lesson_no >= 1) AND (lesson_no <= 8)))"
+      },
+      {
+        "table": "student_self_ratings",
+        "name": "student_self_ratings_rating_check",
+        "type": "c",
+        "definition": "CHECK ((rating = ANY (ARRAY['good'::text, 'partial'::text, 'difficult'::text])))"
+      },
+      {
+        "table": "student_self_ratings",
+        "name": "student_self_ratings_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (student_id, week_start, weekday, lesson_no)"
+      },
+      {
+        "table": "student_self_ratings",
+        "name": "student_self_ratings_student_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "class_year_transitions",
+        "name": "class_year_transitions_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (source_class_id)"
+      },
+      {
+        "table": "class_year_transitions",
+        "name": "class_year_transitions_target_class_id_key",
+        "type": "u",
+        "definition": "UNIQUE (target_class_id)"
+      },
+      {
+        "table": "class_year_transitions",
+        "name": "class_year_transitions_source_class_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (source_class_id) REFERENCES classes(id) ON DELETE RESTRICT"
+      },
+      {
+        "table": "class_year_transitions",
+        "name": "class_year_transitions_target_class_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (target_class_id) REFERENCES classes(id) ON DELETE RESTRICT"
+      },
+      {
+        "table": "class_year_transitions",
+        "name": "class_year_transitions_created_by_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id)"
+      },
+      {
+        "table": "weekly_plans",
+        "name": "weekly_plans_goal_icon_check",
+        "type": "c",
+        "definition": "CHECK ((goal_icon = ANY (ARRAY['target'::text, 'ear'::text, 'hand'::text, 'clock'::text, 'peace'::text])))"
+      },
+      {
+        "table": "class_schedule_slots",
+        "name": "class_schedule_slots_weekday_check",
+        "type": "c",
+        "definition": "CHECK (((weekday >= 1) AND (weekday <= 5)))"
+      },
+      {
+        "table": "class_schedule_slots",
+        "name": "class_schedule_slots_lesson_no_check",
+        "type": "c",
+        "definition": "CHECK (((lesson_no >= 1) AND (lesson_no <= 8)))"
+      },
+      {
+        "table": "class_schedule_slots",
+        "name": "class_schedule_slots_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (class_id, weekday, lesson_no)"
+      },
+      {
+        "table": "class_schedule_slots",
+        "name": "class_schedule_slots_class_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+      },
+      {
+        "table": "weekly_plans",
+        "name": "weekly_plans_weekly_shell_target_check",
+        "type": "c",
+        "definition": "CHECK (((weekly_shell_target IS NULL) OR ((weekly_shell_target >= 1) AND (weekly_shell_target <= 200))))"
+      },
+      {
+        "table": "weekly_plans",
+        "name": "weekly_plans_reward_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (reward_id) REFERENCES rewards(id) ON DELETE SET NULL"
+      },
+      {
+        "table": "weekly_plans",
+        "name": "weekly_plans_reward_template_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (reward_template_id) REFERENCES reward_templates(id) ON DELETE SET NULL"
+      }
+    ],
+    "triggers": [
+      "CREATE TRIGGER weekly_plans_touch BEFORE UPDATE ON public.weekly_plans FOR EACH ROW EXECUTE FUNCTION touch_updated_at()",
+      "CREATE TRIGGER progress_touch BEFORE UPDATE ON public.student_progress FOR EACH ROW EXECUTE FUNCTION touch_updated_at()",
+      "CREATE TRIGGER student_progress_on_insert AFTER INSERT ON public.students FOR EACH ROW EXECUTE FUNCTION create_student_progress()",
+      "CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_auth_user()"
+    ]
+  },
+  "functions": [
+    {
+      "name": "is_teacher_of_class",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_teacher_of_class(target_class uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select exists(\n    select 1\n    from public.classes c\n    where c.id=target_class\n      and (\n        c.teacher_id=auth.uid()\n        or exists(\n          select 1 from public.class_teacher_links l\n          where l.class_id=c.id and l.user_id=auth.uid()\n        )\n      )\n  );\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "is_child_student",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_child_student(target_student uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select\n    exists (\n      select 1\n      from public.student_device_links l\n      where l.student_id = target_student\n        and l.user_id = auth.uid()\n    )\n    or exists (\n      select 1\n      from public.students s\n      where s.id = target_student\n        and s.child_user_id = auth.uid()\n    );\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "create_student_progress",
+      "definition": "CREATE OR REPLACE FUNCTION public.create_student_progress()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\r\nbegin\r\n  insert into public.student_progress(student_id, shells)\r\n  values (new.id, 0)\r\n  on conflict (student_id) do nothing;\r\n  return new;\r\nend;\r\n$function$\n",
+      "acl": "{postgres=X/postgres}"
+    },
+    {
+      "name": "touch_updated_at",
+      "definition": "CREATE OR REPLACE FUNCTION public.touch_updated_at()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\r\nbegin\r\n  new.updated_at = now();\r\n  return new;\r\nend;\r\n$function$\n",
+      "acl": "{postgres=X/postgres}"
+    },
+    {
+      "name": "is_teacher_role",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_teacher_role()\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\r\n  select exists (\r\n    select 1\r\n    from public.profiles p\r\n    where p.id = auth.uid()\r\n      and p.role = 'teacher'\r\n  );\r\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "adjust_shells_from_rating",
+      "definition": "CREATE OR REPLACE FUNCTION public.adjust_shells_from_rating()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\r\ndeclare\r\n  delta integer := 0;\r\n  sid uuid;\r\nbegin\r\n  if tg_op = 'INSERT' then\r\n    sid := new.student_id;\r\n    if new.rating = 'good' then delta := 1; end if;\r\n  elsif tg_op = 'UPDATE' then\r\n    sid := new.student_id;\r\n    if old.rating <> 'good' and new.rating = 'good' then delta := 1; end if;\r\n    if old.rating = 'good' and new.rating <> 'good' then delta := -1; end if;\r\n  elsif tg_op = 'DELETE' then\r\n    sid := old.student_id;\r\n    if old.rating = 'good' then delta := -1; end if;\r\n  end if;\r\n\r\n  if delta <> 0 then\r\n    insert into public.student_progress(student_id, shells)\r\n    values (sid, greatest(0, delta))\r\n    on conflict (student_id)\r\n    do update set shells = greatest(0, public.student_progress.shells + delta),\r\n                  updated_at = now();\r\n  end if;\r\n\r\n  return coalesce(new, old);\r\nend;\r\n$function$\n",
+      "acl": "{postgres=X/postgres}"
+    },
+    {
+      "name": "rls_auto_enable",
+      "definition": "CREATE OR REPLACE FUNCTION public.rls_auto_enable()\n RETURNS event_trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog'\nAS $function$\nDECLARE\n  cmd record;\nBEGIN\n  FOR cmd IN\n    SELECT *\n    FROM pg_event_trigger_ddl_commands()\n    WHERE command_tag IN ('CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO')\n      AND object_type IN ('table','partitioned table')\n  LOOP\n     IF cmd.schema_name IS NOT NULL AND cmd.schema_name IN ('public') AND cmd.schema_name NOT IN ('pg_catalog','information_schema') AND cmd.schema_name NOT LIKE 'pg_toast%' AND cmd.schema_name NOT LIKE 'pg_temp%' THEN\n      BEGIN\n        EXECUTE format('alter table if exists %s enable row level security', cmd.object_identity);\n        RAISE LOG 'rls_auto_enable: enabled RLS on %', cmd.object_identity;\n      EXCEPTION\n        WHEN OTHERS THEN\n          RAISE LOG 'rls_auto_enable: failed to enable RLS on %', cmd.object_identity;\n      END;\n     ELSE\n        RAISE LOG 'rls_auto_enable: skip % (either system schema or not in enforced list: %.)', cmd.object_identity, cmd.schema_name;\n     END IF;\n  END LOOP;\nEND;\n$function$\n",
+      "acl": "{postgres=X/postgres}"
+    },
+    {
+      "name": "handle_new_auth_user",
+      "definition": "CREATE OR REPLACE FUNCTION public.handle_new_auth_user()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_teacher boolean;\nbegin\n  v_teacher := coalesce(new.raw_user_meta_data ->> 'account_type','') = 'teacher';\n\n  insert into public.profiles(id, role, display_name, must_change_password)\n  values (\n    new.id,\n    case when v_teacher then 'teacher' else 'student' end,\n    coalesce(new.raw_user_meta_data ->> 'display_name', ''),\n    v_teacher\n  )\n  on conflict (id) do nothing;\n\n  return new;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres}"
+    },
+    {
+      "name": "is_parent_of_student",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_parent_of_student(target_student uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\r\n  select exists (\r\n    select 1\r\n    from public.parent_student_links l\r\n    where l.student_id = target_student\r\n      and l.parent_user_id = auth.uid()\r\n  );\r\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "can_access_student",
+      "definition": "CREATE OR REPLACE FUNCTION public.can_access_student(target_student uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\r\n  select\r\n    public.is_teacher_of_student(target_student)\r\n    or public.is_parent_of_student(target_student)\r\n    or public.is_child_student(target_student);\r\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "can_access_class",
+      "definition": "CREATE OR REPLACE FUNCTION public.can_access_class(target_class uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select\n    public.is_teacher_of_class(target_class)\n    or exists(\n      select 1\n      from public.students s\n      where s.class_id=target_class\n        and (\n          public.is_child_student(s.id)\n          or exists(\n            select 1 from public.parent_student_links l\n            where l.student_id=s.id and l.parent_user_id=auth.uid()\n          )\n        )\n    );\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "is_teacher_of_student",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_teacher_of_student(target_student uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select exists(\n    select 1\n    from public.students s\n    where s.id=target_student\n      and public.is_teacher_of_class(s.class_id)\n  );\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "create_child_access_code",
+      "definition": "CREATE OR REPLACE FUNCTION public.create_child_access_code(p_student_id uuid, p_valid_days integer DEFAULT 365)\n RETURNS TABLE(qr_token text, pin text, expires_at timestamp with time zone)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_token text;\n  v_pin text;\n  v_pin_bytes bytea;\n  v_expires timestamptz;\n  v_days integer;\nbegin\n  if auth.uid() is null then\n    raise exception 'Keine Anmeldung vorhanden';\n  end if;\n\n  if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = true then\n    raise exception 'Nur Lehrkräfte dürfen QR-Zugänge erzeugen';\n  end if;\n\n  if not public.is_teacher_of_student(p_student_id) then\n    raise exception 'Keine Berechtigung für dieses Kind';\n  end if;\n\n  v_days := greatest(1, least(coalesce(p_valid_days, 365), 3650));\n  v_token := encode(extensions.gen_random_bytes(32), 'hex');\n  v_pin_bytes := extensions.gen_random_bytes(4);\n\n  v_pin := (\n    100000 + (\n      (\n        get_byte(v_pin_bytes,0)::bigint * 16777216 +\n        get_byte(v_pin_bytes,1)::bigint * 65536 +\n        get_byte(v_pin_bytes,2)::bigint * 256 +\n        get_byte(v_pin_bytes,3)::bigint\n      ) % 900000\n    )\n  )::text;\n\n  v_expires := now() + make_interval(days => v_days);\n\n  update public.child_access_codes\n  set active = false\n  where student_id = p_student_id\n    and active = true;\n\n  insert into public.child_access_codes(\n    student_id, token_hash, pin_hash, active, expires_at\n  )\n  values (\n    p_student_id,\n    encode(extensions.digest(v_token, 'sha256'), 'hex'),\n    extensions.crypt(v_pin, extensions.gen_salt('bf', 10)),\n    true,\n    v_expires\n  );\n\n  return query select v_token, v_pin, v_expires;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "revoke_child_devices",
+      "definition": "CREATE OR REPLACE FUNCTION public.revoke_child_devices(p_student_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if auth.uid() is null or not public.is_teacher_of_student(p_student_id) then\n    raise exception 'Keine Berechtigung für dieses Kind';\n  end if;\n\n  delete from public.student_device_links\n  where student_id = p_student_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "add_school_member",
+      "definition": "CREATE OR REPLACE FUNCTION public.add_school_member(p_school_id uuid, p_email text, p_role text DEFAULT 'teacher'::text)\n RETURNS text\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_user uuid; v_name text; v_role text;\nbegin\n  if not exists(\n    select 1 from public.school_members\n    where school_id=p_school_id and user_id=auth.uid() and role='admin'\n  ) then raise exception 'Keine Berechtigung'; end if;\n\n  v_role:=case when p_role='admin' then 'admin' else 'teacher' end;\n\n  select u.id,coalesce(p.display_name,u.email)\n  into v_user,v_name\n  from auth.users u\n  left join public.profiles p on p.id=u.id\n  where lower(u.email)=lower(btrim(p_email))\n    and coalesce(p.role,'')='teacher'\n  limit 1;\n\n  if v_user is null then raise exception 'Lehrkraft nicht gefunden'; end if;\n\n  insert into public.school_members(school_id,user_id,role)\n  values(p_school_id,v_user,v_role)\n  on conflict(school_id,user_id) do update set role=excluded.role;\n\n  return v_name;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "create_school",
+      "definition": "CREATE OR REPLACE FUNCTION public.create_school(p_name text)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_id uuid;\nbegin\n  if auth.uid() is null or not public.is_teacher_role() then\n    raise exception 'Nur Lehrkräfte';\n  end if;\n  if btrim(coalesce(p_name,''))='' then raise exception 'Name fehlt'; end if;\n\n  insert into public.schools(name,created_by)\n  values(btrim(p_name),auth.uid())\n  returning id into v_id;\n\n  insert into public.school_members(school_id,user_id,role)\n  values(v_id,auth.uid(),'admin');\n\n  insert into public.school_settings(school_id)\n  values(v_id)\n  on conflict(school_id) do nothing;\n\n  return v_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "redeem_child_access",
+      "definition": "CREATE OR REPLACE FUNCTION public.redeem_child_access(p_qr_token text, p_pin text)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_student_id uuid;\n  v_student_name text;\nbegin\n  if auth.uid() is null then\n    raise exception 'Keine Anmeldung vorhanden';\n  end if;\n\n  if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = false then\n    raise exception 'Dieser Zugang ist nur für Kindergeräte vorgesehen';\n  end if;\n\n  select c.student_id, s.display_name\n  into v_student_id, v_student_name\n  from public.child_access_codes c\n  join public.students s on s.id = c.student_id\n  where c.active = true\n    and c.token_hash = encode(extensions.digest(p_qr_token, 'sha256'), 'hex')\n    and c.pin_hash = extensions.crypt(p_pin, c.pin_hash)\n    and (c.expires_at is null or c.expires_at > now())\n  limit 1;\n\n  if v_student_id is null then\n    raise exception 'QR-Code oder PIN ist ungültig';\n  end if;\n\n  insert into public.student_device_links(user_id, student_id, linked_at)\n  values (auth.uid(), v_student_id, now())\n  on conflict (user_id)\n  do update set\n    student_id = excluded.student_id,\n    linked_at = now();\n\n  update public.profiles\n  set role = 'student',\n      display_name = v_student_name\n  where id = auth.uid();\n\n  return v_student_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "redeem_child_access_qr",
+      "definition": "CREATE OR REPLACE FUNCTION public.redeem_child_access_qr(p_qr_token text)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_student_id uuid;\n  v_student_name text;\nbegin\n  if auth.uid() is null then\n    raise exception 'Keine Anmeldung vorhanden';\n  end if;\n\n  if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = false then\n    raise exception 'Dieser Zugang ist nur für Kindergeräte vorgesehen';\n  end if;\n\n  select c.student_id, s.display_name\n  into v_student_id, v_student_name\n  from public.child_access_codes c\n  join public.students s on s.id = c.student_id\n  where c.active = true\n    and c.token_hash = encode(extensions.digest(p_qr_token, 'sha256'), 'hex')\n    and (c.expires_at is null or c.expires_at > now())\n  limit 1;\n\n  if v_student_id is null then\n    raise exception 'QR-Code ist ungültig';\n  end if;\n\n  insert into public.student_device_links(user_id, student_id, linked_at)\n  values (auth.uid(), v_student_id, now())\n  on conflict (user_id)\n  do update set\n    student_id = excluded.student_id,\n    linked_at = now();\n\n  update public.profiles\n  set role = 'student',\n      display_name = v_student_name\n  where id = auth.uid();\n\n  return v_student_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "create_class_child_access_codes_qr",
+      "definition": "CREATE OR REPLACE FUNCTION public.create_class_child_access_codes_qr(p_class_id uuid, p_valid_days integer DEFAULT 365)\n RETURNS TABLE(student_id uuid, display_name text, qr_token text, expires_at timestamp with time zone)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  r record;\n  v_token text;\n  v_dummy_pin text;\n  v_pin_bytes bytea;\n  v_expires timestamptz;\n  v_days integer;\nbegin\n  if auth.uid() is null then\n    raise exception 'Keine Anmeldung vorhanden';\n  end if;\n\n  if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = true then\n    raise exception 'Nur Lehrkräfte dürfen QR-Zugänge erzeugen';\n  end if;\n\n  if not public.is_teacher_of_class(p_class_id) then\n    raise exception 'Keine Berechtigung für diese Klasse';\n  end if;\n\n  v_days := greatest(1, least(coalesce(p_valid_days, 365), 3650));\n\n  for r in\n    select s.id, s.display_name\n    from public.students s\n    where s.class_id = p_class_id\n    order by s.display_name\n  loop\n    v_token := encode(extensions.gen_random_bytes(32), 'hex');\n    v_pin_bytes := extensions.gen_random_bytes(4);\n    v_dummy_pin := (\n      100000 + (\n        (\n          get_byte(v_pin_bytes,0)::bigint * 16777216 +\n          get_byte(v_pin_bytes,1)::bigint * 65536 +\n          get_byte(v_pin_bytes,2)::bigint * 256 +\n          get_byte(v_pin_bytes,3)::bigint\n        ) % 900000\n      )\n    )::text;\n    v_expires := now() + make_interval(days => v_days);\n\n    update public.child_access_codes\n    set active = false\n    where child_access_codes.student_id = r.id\n      and active = true;\n\n    insert into public.child_access_codes(\n      student_id, token_hash, pin_hash, active, expires_at\n    )\n    values (\n      r.id,\n      encode(extensions.digest(v_token, 'sha256'), 'hex'),\n      extensions.crypt(v_dummy_pin, extensions.gen_salt('bf', 10)),\n      true,\n      v_expires\n    );\n\n    student_id := r.id;\n    display_name := r.display_name;\n    qr_token := v_token;\n    expires_at := v_expires;\n    return next;\n  end loop;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "get_or_create_child_qr_code",
+      "definition": "CREATE OR REPLACE FUNCTION public.get_or_create_child_qr_code(p_student_id uuid)\n RETURNS TABLE(qr_token text)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if auth.uid() is null then\n    raise exception 'Keine Anmeldung vorhanden';\n  end if;\n\n  if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = true then\n    raise exception 'Nur Lehrkräfte dürfen QR-Codes anzeigen';\n  end if;\n\n  if not public.is_teacher_of_student(p_student_id) then\n    raise exception 'Keine Berechtigung für dieses Kind';\n  end if;\n\n  insert into public.stable_child_qr_codes(student_id)\n  values (p_student_id)\n  on conflict (student_id) do nothing;\n\n  return query\n  select q.code::text\n  from public.stable_child_qr_codes q\n  where q.student_id = p_student_id\n    and q.active = true;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "create_child_qr_code",
+      "definition": "CREATE OR REPLACE FUNCTION public.create_child_qr_code(p_student_id uuid, p_valid_days integer DEFAULT 365)\n RETURNS TABLE(qr_token text, expires_at timestamp with time zone)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_token text;\n  v_expires timestamptz;\n  v_days integer;\nbegin\n  if auth.uid() is null then\n    raise exception 'Keine Anmeldung vorhanden';\n  end if;\n\n  if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = true then\n    raise exception 'Nur Lehrkräfte dürfen QR-Zugänge erzeugen';\n  end if;\n\n  if not public.is_teacher_of_student(p_student_id) then\n    raise exception 'Keine Berechtigung für dieses Kind';\n  end if;\n\n  v_days := greatest(1, least(coalesce(p_valid_days, 365), 3650));\n  v_token := encode(extensions.gen_random_bytes(32), 'hex');\n  v_expires := now() + make_interval(days => v_days);\n\n  insert into public.child_access_codes(\n    student_id, token_hash, pin_hash, active, expires_at\n  )\n  values (\n    p_student_id,\n    encode(extensions.digest(v_token, 'sha256'), 'hex'),\n    extensions.crypt('', extensions.gen_salt('bf', 10)),\n    true,\n    v_expires\n  );\n\n  return query select v_token, v_expires;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "redeem_child_qr",
+      "definition": "CREATE OR REPLACE FUNCTION public.redeem_child_qr(p_qr_token text)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_student_id uuid;\n  v_student_name text;\nbegin\n  if auth.uid() is null then\n    raise exception 'Keine Anmeldung vorhanden';\n  end if;\n\n  if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = false then\n    raise exception 'Dieser Zugang ist nur für Kindergeräte vorgesehen';\n  end if;\n\n  select q.student_id, s.display_name\n  into v_student_id, v_student_name\n  from public.stable_child_qr_codes q\n  join public.students s on s.id = q.student_id\n  where q.active = true\n    and q.code::text = p_qr_token\n  limit 1;\n\n  if v_student_id is null then\n    select c.student_id, s.display_name\n    into v_student_id, v_student_name\n    from public.child_access_codes c\n    join public.students s on s.id = c.student_id\n    where c.active = true\n      and c.token_hash = encode(extensions.digest(p_qr_token, 'sha256'), 'hex')\n      and (c.expires_at is null or c.expires_at > now())\n    limit 1;\n  end if;\n\n  if v_student_id is null then\n    raise exception 'QR-Code ist ungültig';\n  end if;\n\n  insert into public.student_device_links(user_id, student_id, linked_at)\n  values (auth.uid(), v_student_id, now())\n  on conflict (user_id)\n  do update set\n    student_id = excluded.student_id,\n    linked_at = now();\n\n  update public.profiles\n  set role = 'student',\n      display_name = v_student_name\n  where id = auth.uid();\n\n  return v_student_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "create_child_access_code_qr",
+      "definition": "CREATE OR REPLACE FUNCTION public.create_child_access_code_qr(p_student_id uuid, p_valid_days integer DEFAULT 365)\n RETURNS TABLE(qr_token text, expires_at timestamp with time zone)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_token text;\n  v_dummy_pin text;\n  v_pin_bytes bytea;\n  v_expires timestamptz;\n  v_days integer;\nbegin\n  if auth.uid() is null then\n    raise exception 'Keine Anmeldung vorhanden';\n  end if;\n\n  if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = true then\n    raise exception 'Nur Lehrkräfte dürfen QR-Zugänge erzeugen';\n  end if;\n\n  if not public.is_teacher_of_student(p_student_id) then\n    raise exception 'Keine Berechtigung für dieses Kind';\n  end if;\n\n  v_days := greatest(1, least(coalesce(p_valid_days, 365), 3650));\n  v_token := encode(extensions.gen_random_bytes(32), 'hex');\n  v_pin_bytes := extensions.gen_random_bytes(4);\n  v_dummy_pin := (\n    100000 + (\n      (\n        get_byte(v_pin_bytes,0)::bigint * 16777216 +\n        get_byte(v_pin_bytes,1)::bigint * 65536 +\n        get_byte(v_pin_bytes,2)::bigint * 256 +\n        get_byte(v_pin_bytes,3)::bigint\n      ) % 900000\n    )\n  )::text;\n  v_expires := now() + make_interval(days => v_days);\n\n  update public.child_access_codes\n  set active = false\n  where student_id = p_student_id\n    and active = true;\n\n  insert into public.child_access_codes(\n    student_id, token_hash, pin_hash, active, expires_at\n  )\n  values (\n    p_student_id,\n    encode(extensions.digest(v_token, 'sha256'), 'hex'),\n    extensions.crypt(v_dummy_pin, extensions.gen_salt('bf', 10)),\n    true,\n    v_expires\n  );\n\n  return query select v_token, v_expires;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "create_student_for_class",
+      "definition": "CREATE OR REPLACE FUNCTION public.create_student_for_class(p_class_id uuid, p_display_name text)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_name text;\n  v_student_id uuid;\nbegin\n  if auth.uid() is null then\n    raise exception 'Keine Anmeldung vorhanden';\n  end if;\n\n  if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = true then\n    raise exception 'Nur Lehrkräfte dürfen Kinder anlegen';\n  end if;\n\n  if not public.is_teacher_of_class(p_class_id) then\n    raise exception 'Keine Berechtigung für diese Klasse';\n  end if;\n\n  v_name := btrim(coalesce(p_display_name, ''));\n  if char_length(v_name) < 1 then\n    raise exception 'Name fehlt';\n  end if;\n  if char_length(v_name) > 60 then\n    raise exception 'Name ist zu lang';\n  end if;\n\n  insert into public.students(class_id, display_name)\n  values (p_class_id, v_name)\n  returning id into v_student_id;\n\n  return v_student_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "is_class_admin",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_class_admin(target_class uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select exists(\n    select 1\n    from public.classes c\n    where c.id=target_class\n      and (\n        c.teacher_id=auth.uid()\n        or (\n          c.school_id is not null\n          and exists(\n            select 1\n            from public.school_members sm\n            where sm.school_id=c.school_id\n              and sm.user_id=auth.uid()\n              and sm.role='admin'\n          )\n        )\n      )\n  );\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "update_class_settings",
+      "definition": "CREATE OR REPLACE FUNCTION public.update_class_settings(p_class_id uuid, p_name text, p_school_year text, p_grade_level smallint)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not public.is_class_admin(p_class_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n  if btrim(coalesce(p_name,''))='' then raise exception 'Name fehlt'; end if;\n\n  update public.classes\n  set name=btrim(p_name),\n      school_year=coalesce(nullif(btrim(p_school_year),''),school_year),\n      grade_level=p_grade_level\n  where id=p_class_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "list_school_members",
+      "definition": "CREATE OR REPLACE FUNCTION public.list_school_members(p_school_id uuid)\n RETURNS TABLE(user_id uuid, display_name text, email text, role text)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not exists(\n    select 1\n    from public.school_members sm\n    where sm.school_id=p_school_id\n      and sm.user_id=auth.uid()\n  ) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  return query\n  select\n    u.id,\n    coalesce(nullif(p.display_name,''),u.email)::text,\n    u.email::text,\n    sm.role::text\n  from public.school_members sm\n  join auth.users u on u.id=sm.user_id\n  left join public.profiles p on p.id=u.id\n  where sm.school_id=p_school_id\n  order by sm.role,coalesce(nullif(p.display_name,''),u.email);\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "update_school_admin_settings",
+      "definition": "CREATE OR REPLACE FUNCTION public.update_school_admin_settings(p_school_id uuid, p_name text, p_default_school_year text, p_default_retention_days integer, p_teachers_can_create_classes boolean)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not public.is_school_admin(p_school_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  if btrim(coalesce(p_name,''))='' then raise exception 'Name fehlt'; end if;\n  if p_default_retention_days < 7 or p_default_retention_days > 1095 then\n    raise exception 'Ungültige Löschfrist';\n  end if;\n\n  update public.schools\n  set name=btrim(p_name)\n  where id=p_school_id;\n\n  insert into public.school_settings(\n    school_id,default_school_year,default_retention_days,teachers_can_create_classes,updated_at\n  )\n  values(\n    p_school_id,\n    coalesce(nullif(btrim(p_default_school_year),''),'2026/27'),\n    p_default_retention_days,\n    coalesce(p_teachers_can_create_classes,false),\n    now()\n  )\n  on conflict(school_id)\n  do update set\n    default_school_year=excluded.default_school_year,\n    default_retention_days=excluded.default_retention_days,\n    teachers_can_create_classes=excluded.teachers_can_create_classes,\n    updated_at=now();\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "get_or_create_class_child_qr_codes",
+      "definition": "CREATE OR REPLACE FUNCTION public.get_or_create_class_child_qr_codes(p_class_id uuid)\n RETURNS TABLE(student_id uuid, display_name text, qr_token text)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if auth.uid() is null then\n    raise exception 'Keine Anmeldung vorhanden';\n  end if;\n\n  if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = true then\n    raise exception 'Nur Lehrkräfte dürfen QR-Codes anzeigen';\n  end if;\n\n  if not public.is_teacher_of_class(p_class_id) then\n    raise exception 'Keine Berechtigung für diese Klasse';\n  end if;\n\n  insert into public.stable_child_qr_codes(student_id)\n  select s.id\n  from public.students s\n  where s.class_id = p_class_id\n  on conflict on constraint stable_child_qr_codes_pkey do nothing;\n\n  return query\n  select s.id, s.display_name, q.code::text\n  from public.students s\n  join public.stable_child_qr_codes q on q.student_id = s.id\n  where s.class_id = p_class_id\n    and q.active = true\n  order by s.display_name;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "remove_school_member",
+      "definition": "CREATE OR REPLACE FUNCTION public.remove_school_member(p_school_id uuid, p_user_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not public.is_school_admin(p_school_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n  if p_user_id=auth.uid() then\n    raise exception 'Eigenes Admin-Konto kann hier nicht entfernt werden';\n  end if;\n\n  delete from public.class_teacher_links ctl\n  using public.classes c\n  where ctl.class_id=c.id\n    and c.school_id=p_school_id\n    and ctl.user_id=p_user_id;\n\n  delete from public.school_members\n  where school_id=p_school_id and user_id=p_user_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "activate_teacher_account",
+      "definition": "CREATE OR REPLACE FUNCTION public.activate_teacher_account(p_user_id uuid, p_school_id uuid, p_display_name text, p_role text DEFAULT 'teacher'::text, p_class_ids uuid[] DEFAULT '{}'::uuid[])\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_class uuid;\n  v_role text;\nbegin\n  if not public.is_school_admin(p_school_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  v_role:=case when p_role='admin' then 'admin' else 'teacher' end;\n\n  update public.profiles\n  set role='teacher',\n      display_name=coalesce(nullif(btrim(p_display_name),''),display_name),\n      must_change_password=true\n  where id=p_user_id;\n\n  if not found then\n    raise exception 'Benutzerprofil fehlt';\n  end if;\n\n  insert into public.school_members(school_id,user_id,role)\n  values(p_school_id,p_user_id,v_role)\n  on conflict(school_id,user_id)\n  do update set role=excluded.role;\n\n  foreach v_class in array coalesce(p_class_ids,'{}'::uuid[]) loop\n    if exists(\n      select 1 from public.classes c\n      where c.id=v_class and c.school_id=p_school_id\n    ) then\n      insert into public.class_teacher_links(class_id,user_id)\n      values(v_class,p_user_id)\n      on conflict do nothing;\n    end if;\n  end loop;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "mark_password_changed",
+      "definition": "CREATE OR REPLACE FUNCTION public.mark_password_changed()\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if auth.uid() is null then raise exception 'Nicht angemeldet'; end if;\n  update public.profiles\n  set must_change_password=false\n  where id=auth.uid();\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "reset_child_qr_code",
+      "definition": "CREATE OR REPLACE FUNCTION public.reset_child_qr_code(p_student_id uuid)\n RETURNS TABLE(qr_token text)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if auth.uid() is null then\n    raise exception 'Keine Anmeldung vorhanden';\n  end if;\n\n  if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) = true then\n    raise exception 'Nur Lehrkräfte dürfen QR-Codes erneuern';\n  end if;\n\n  if not public.is_teacher_of_student(p_student_id) then\n    raise exception 'Keine Berechtigung für dieses Kind';\n  end if;\n\n  insert into public.stable_child_qr_codes(student_id, code, active, updated_at)\n  values (p_student_id, gen_random_uuid(), true, now())\n  on conflict (student_id)\n  do update set\n    code = gen_random_uuid(),\n    active = true,\n    updated_at = now();\n\n  update public.child_access_codes\n  set active = false\n  where student_id = p_student_id\n    and active = true;\n\n  return query\n  select q.code::text\n  from public.stable_child_qr_codes q\n  where q.student_id = p_student_id\n    and q.active = true;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "create_student_for_class",
+      "definition": "CREATE OR REPLACE FUNCTION public.create_student_for_class(p_class_id uuid, p_display_name text, p_avatar_emoji text DEFAULT '🦦'::text)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_name text;\n  v_student_id uuid;\n  v_order integer;\nbegin\n  if auth.uid() is null or coalesce((auth.jwt()->>'is_anonymous')::boolean,false) then\n    raise exception 'Nur Lehrkräfte dürfen Kinder anlegen';\n  end if;\n  if not public.is_teacher_of_class(p_class_id) then\n    raise exception 'Keine Berechtigung für diese Klasse';\n  end if;\n  v_name:=btrim(coalesce(p_display_name,''));\n  if char_length(v_name)<1 or char_length(v_name)>60 then\n    raise exception 'Ungültiger Name';\n  end if;\n  select coalesce(max(sort_order),0)+10 into v_order\n  from public.students where class_id=p_class_id;\n  insert into public.students(class_id,display_name,avatar_emoji,sort_order)\n  values(p_class_id,v_name,coalesce(nullif(btrim(p_avatar_emoji),''),'🦦'),v_order)\n  returning id into v_student_id;\n  return v_student_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "apply_goal_to_students",
+      "definition": "CREATE OR REPLACE FUNCTION public.apply_goal_to_students(p_student_ids uuid[], p_week_start date, p_goal text, p_help_text text DEFAULT ''::text)\n RETURNS integer\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_id uuid;\n  v_count integer:=0;\nbegin\n  if auth.uid() is null or coalesce((auth.jwt()->>'is_anonymous')::boolean,false) then\n    raise exception 'Nur Lehrkräfte';\n  end if;\n  if btrim(coalesce(p_goal,''))='' then\n    raise exception 'Ziel fehlt';\n  end if;\n  foreach v_id in array p_student_ids loop\n    if not public.is_teacher_of_student(v_id) then\n      raise exception 'Keine Berechtigung';\n    end if;\n    insert into public.weekly_plans(student_id,week_start,goal,help_text,checkin_completed)\n    values(v_id,p_week_start,btrim(p_goal),coalesce(p_help_text,''),false)\n    on conflict(student_id,week_start)\n    do update set goal=excluded.goal,help_text=excluded.help_text,updated_at=now();\n    v_count:=v_count+1;\n  end loop;\n  return v_count;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "create_class_for_teacher",
+      "definition": "CREATE OR REPLACE FUNCTION public.create_class_for_teacher(p_name text, p_school_year text DEFAULT '2026/27'::text)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_id uuid;\nbegin\n  if auth.uid() is null or not public.is_teacher_role() then\n    raise exception 'Nur Lehrkräfte';\n  end if;\n  if btrim(coalesce(p_name,''))='' then raise exception 'Name fehlt'; end if;\n  insert into public.classes(name,teacher_id,school_year)\n  values(btrim(p_name),auth.uid(),coalesce(nullif(btrim(p_school_year),''),'2026/27'))\n  returning id into v_id;\n  return v_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "assign_teacher_to_class",
+      "definition": "CREATE OR REPLACE FUNCTION public.assign_teacher_to_class(p_class_id uuid, p_email text)\n RETURNS text\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_user uuid;\n  v_name text;\nbegin\n  if not public.is_class_admin(p_class_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  select u.id,coalesce(p.display_name,u.email)\n  into v_user,v_name\n  from auth.users u\n  left join public.profiles p on p.id=u.id\n  where lower(u.email)=lower(btrim(p_email))\n    and coalesce(p.role,'')='teacher'\n  limit 1;\n\n  if v_user is null then\n    raise exception 'Lehrkraft nicht gefunden';\n  end if;\n\n  if v_user=(select teacher_id from public.classes where id=p_class_id) then\n    return v_name;\n  end if;\n\n  insert into public.class_teacher_links(class_id,user_id)\n  values(p_class_id,v_user)\n  on conflict do nothing;\n\n  return v_name;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "remove_teacher_from_class",
+      "definition": "CREATE OR REPLACE FUNCTION public.remove_teacher_from_class(p_class_id uuid, p_user_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not public.is_class_admin(p_class_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  delete from public.class_teacher_links\n  where class_id=p_class_id and user_id=p_user_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "archive_class_year",
+      "definition": "CREATE OR REPLACE FUNCTION public.archive_class_year(p_class_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not public.is_class_admin(p_class_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  update public.classes set archived_at=now() where id=p_class_id;\n  update public.students\n  set archived_at=coalesce(archived_at,now())\n  where class_id=p_class_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "redeem_reward",
+      "definition": "CREATE OR REPLACE FUNCTION public.redeem_reward(p_reward_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  r record;\nbegin\n  select * into r from public.rewards where id=p_reward_id;\n  if r.id is null or not public.is_teacher_of_student(r.student_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n  insert into public.reward_redemptions(student_id,reward_id,title,shells_required,created_by)\n  values(r.student_id,r.id,r.title,r.shells_required,auth.uid());\n  update public.rewards\n  set redeemed_count=redeemed_count+1,last_redeemed_at=now()\n  where id=r.id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres}"
+    },
+    {
+      "name": "set_student_shells",
+      "definition": "CREATE OR REPLACE FUNCTION public.set_student_shells(p_student_id uuid, p_shells integer)\n RETURNS integer\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not public.is_teacher_of_student(p_student_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n  if p_shells<0 or p_shells>9999 then\n    raise exception 'Ungültiger Muschelstand';\n  end if;\n  insert into public.student_progress(student_id,shells,updated_at)\n  values(p_student_id,p_shells,now())\n  on conflict(student_id)\n  do update set shells=excluded.shells,updated_at=now();\n  return p_shells;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres}"
+    },
+    {
+      "name": "list_class_teachers",
+      "definition": "CREATE OR REPLACE FUNCTION public.list_class_teachers(p_class_id uuid)\n RETURNS TABLE(user_id uuid, display_name text, email text, is_owner boolean)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not public.is_teacher_of_class(p_class_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  return query\n  select u.id,\n         coalesce(p.display_name,u.email::text)::text,\n         u.email::text,\n         (u.id=c.teacher_id)\n  from public.classes c\n  join auth.users u on u.id=c.teacher_id\n  left join public.profiles p on p.id=u.id\n  where c.id=p_class_id\n\n  union all\n\n  select u.id,\n         coalesce(p.display_name,u.email::text)::text,\n         u.email::text,\n         false\n  from public.class_teacher_links l\n  join auth.users u on u.id=l.user_id\n  left join public.profiles p on p.id=u.id\n  where l.class_id=p_class_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "list_school_structure",
+      "definition": "CREATE OR REPLACE FUNCTION public.list_school_structure(p_school_id uuid)\n RETURNS TABLE(class_id uuid, class_name text, grade_level smallint, school_year text, student_count bigint, has_access boolean)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not exists(\n    select 1 from public.school_members\n    where school_id=p_school_id and user_id=auth.uid()\n  ) then raise exception 'Keine Berechtigung'; end if;\n\n  return query\n  select c.id,c.name,c.grade_level,c.school_year,\n         (select count(*) from public.students s where s.class_id=c.id and s.archived_at is null),\n         public.is_teacher_of_class(c.id)\n  from public.classes c\n  where c.school_id=p_school_id and c.archived_at is null\n  order by c.grade_level nulls last,c.name;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "attach_class_to_school",
+      "definition": "CREATE OR REPLACE FUNCTION public.attach_class_to_school(p_class_id uuid, p_school_id uuid, p_grade_level smallint)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not public.is_teacher_of_class(p_class_id) then raise exception 'Keine Berechtigung'; end if;\n  if not exists(\n    select 1 from public.school_members\n    where school_id=p_school_id and user_id=auth.uid() and role='admin'\n  ) then raise exception 'Keine Berechtigung'; end if;\n\n  update public.classes\n  set school_id=p_school_id,grade_level=p_grade_level\n  where id=p_class_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "carry_forward_weekly_goals",
+      "definition": "CREATE OR REPLACE FUNCTION public.carry_forward_weekly_goals(p_class_id uuid, p_week_start date)\n RETURNS integer\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  r record;\n  prev record;\n  v_count integer:=0;\nbegin\n  if not public.is_teacher_of_class(p_class_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  for r in\n    select id from public.students\n    where class_id=p_class_id and archived_at is null\n  loop\n    if not exists(\n      select 1 from public.weekly_plans\n      where student_id=r.id and week_start=p_week_start\n    ) then\n      select goal,help_text,checkout_decision\n      into prev\n      from public.weekly_plans\n      where student_id=r.id and week_start<p_week_start\n      order by week_start desc limit 1;\n\n      if prev.goal is not null\n         and coalesce(prev.checkout_decision,'continue')='continue' then\n        insert into public.weekly_plans(\n          student_id,week_start,goal,help_text,checkin_completed\n        )\n        values(\n          r.id,p_week_start,prev.goal,coalesce(prev.help_text,''),false\n        );\n        v_count:=v_count+1;\n      end if;\n    end if;\n  end loop;\n\n  return v_count;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "is_school_member",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_school_member(target_school uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select exists(\n    select 1 from public.school_members m\n    where m.school_id=target_school and m.user_id=auth.uid()\n  );\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "is_school_admin",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_school_admin(target_school uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select exists(\n    select 1 from public.school_members sm\n    where sm.school_id=target_school\n      and sm.user_id=auth.uid()\n      and sm.role='admin'\n  );\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "create_class_for_school",
+      "definition": "CREATE OR REPLACE FUNCTION public.create_class_for_school(p_school_id uuid, p_name text, p_grade_level smallint, p_school_year text DEFAULT NULL::text)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_id uuid;\n  v_year text;\n  v_allowed boolean;\nbegin\n  select\n    public.is_school_admin(p_school_id)\n    or (\n      exists(\n        select 1 from public.school_members sm\n        where sm.school_id=p_school_id and sm.user_id=auth.uid()\n      )\n      and coalesce(\n        (select ss.teachers_can_create_classes from public.school_settings ss where ss.school_id=p_school_id),\n        false\n      )\n    )\n  into v_allowed;\n\n  if not coalesce(v_allowed,false) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  if btrim(coalesce(p_name,''))='' then raise exception 'Name fehlt'; end if;\n\n  v_year:=coalesce(\n    nullif(btrim(p_school_year),''),\n    (select ss.default_school_year from public.school_settings ss where ss.school_id=p_school_id),\n    '2026/27'\n  );\n\n  insert into public.classes(name,teacher_id,school_year,school_id,grade_level)\n  values(btrim(p_name),auth.uid(),v_year,p_school_id,p_grade_level)\n  returning id into v_id;\n\n  return v_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "create_demo_student_for_class",
+      "definition": "CREATE OR REPLACE FUNCTION public.create_demo_student_for_class(p_class_id uuid, p_week_start date)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_school uuid;\n  v_id uuid;\n  v_num integer;\nbegin\n  select c.school_id into v_school\n  from public.classes c\n  where c.id=p_class_id\n    and c.archived_at is null;\n\n  if v_school is null then\n    raise exception 'Klasse nicht gefunden';\n  end if;\n\n  if not public.is_teacher_of_class(p_class_id)\n     and not public.is_school_admin(v_school) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  select count(*)+1 into v_num\n  from public.students s\n  where s.class_id=p_class_id\n    and s.is_demo=true;\n\n  insert into public.students(class_id,display_name,avatar_emoji,sort_order,is_demo)\n  values(\n    p_class_id,\n    'MILO Testkind '||v_num,\n    '🧪',\n    9000+v_num,\n    true\n  )\n  returning id into v_id;\n\n  insert into public.weekly_plans(\n    student_id,week_start,goal,help_text,checkin_feeling,checkin_completed\n  )\n  values(\n    v_id,p_week_start,\n    'Ich starte zügig mit meiner Arbeit.',\n    'Ich lege mein Material bereit und beginne direkt.',\n    'partial',\n    true\n  );\n\n  return v_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "has_grade_access",
+      "definition": "CREATE OR REPLACE FUNCTION public.has_grade_access(p_school_id uuid, p_grade_level smallint)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select exists(\n    select 1\n    from public.grade_teacher_links g\n    where g.school_id=p_school_id\n      and g.grade_level=p_grade_level\n      and g.user_id=auth.uid()\n  );\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "cleanup_archived_students",
+      "definition": "CREATE OR REPLACE FUNCTION public.cleanup_archived_students()\n RETURNS integer\n LANGUAGE sql\n SET search_path TO ''\nAS $function$ select 0::integer $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "list_grade_plan_students",
+      "definition": "CREATE OR REPLACE FUNCTION public.list_grade_plan_students(p_school_id uuid, p_grade_level smallint, p_week_start date)\n RETURNS TABLE(student_id uuid, display_name text, avatar_emoji text, class_id uuid, class_name text, goal text, help_text text, checkin_completed boolean, checkin_feeling text, checkout_self text, checkout_decision text, checkout_note text)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not public.has_grade_access(p_school_id,p_grade_level) then\n    raise exception 'Keine Berechtigung für diese Stufe';\n  end if;\n\n  return query\n  select\n    s.id,\n    s.display_name,\n    s.avatar_emoji,\n    c.id,\n    c.name,\n    wp.goal,\n    wp.help_text,\n    wp.checkin_completed,\n    wp.checkin_feeling,\n    wp.checkout_self,\n    wp.checkout_decision,\n    wp.checkout_note\n  from public.classes c\n  join public.students s\n    on s.class_id=c.id\n   and s.archived_at is null\n  join public.weekly_plans wp\n    on wp.student_id=s.id\n   and wp.week_start=p_week_start\n  where c.school_id=p_school_id\n    and c.grade_level=p_grade_level\n    and c.archived_at is null\n  order by c.name,s.sort_order,s.display_name;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "can_teacher_access_student",
+      "definition": "CREATE OR REPLACE FUNCTION public.can_teacher_access_student(p_student_id uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select exists(\n    select 1\n    from public.students s\n    join public.classes c on c.id=s.class_id\n    where s.id=p_student_id\n      and s.archived_at is null\n      and c.archived_at is null\n      and (\n        public.is_teacher_of_class(c.id)\n        or (c.school_id is not null and public.is_school_admin(c.school_id))\n        or (\n          c.school_id is not null\n          and c.grade_level is not null\n          and public.has_grade_access(c.school_id,c.grade_level)\n        )\n      )\n  );\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "save_student_observation",
+      "definition": "CREATE OR REPLACE FUNCTION public.save_student_observation(p_student_id uuid, p_observed_on date, p_category text, p_note text)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_id uuid;\n  v_week date;\n  v_goal text;\nbegin\n  if not public.can_teacher_access_student(p_student_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  if p_observed_on is null\n     or p_observed_on < current_date - 730\n     or p_observed_on > current_date + 7 then\n    raise exception 'Ungültiges Datum';\n  end if;\n\n  if p_category not in ('observation','progress','challenge','strategy') then\n    raise exception 'Ungültige Kategorie';\n  end if;\n\n  if length(btrim(coalesce(p_note,''))) < 1\n     or length(btrim(p_note)) > 2000 then\n    raise exception 'Ungültige Notiz';\n  end if;\n\n  v_week := p_observed_on - (extract(isodow from p_observed_on)::integer - 1);\n\n  select wp.goal into v_goal\n  from public.weekly_plans wp\n  where wp.student_id=p_student_id\n    and wp.week_start=v_week\n  limit 1;\n\n  insert into public.student_observations(\n    student_id,observed_on,week_start,goal_snapshot,category,note,created_by\n  )\n  values(\n    p_student_id,p_observed_on,v_week,coalesce(v_goal,''),p_category,btrim(p_note),auth.uid()\n  )\n  returning id into v_id;\n\n  return v_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "delete_student_observation",
+      "definition": "CREATE OR REPLACE FUNCTION public.delete_student_observation(p_observation_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_student uuid;\n  v_created_by uuid;\n  v_school uuid;\nbegin\n  select o.student_id,o.created_by,c.school_id\n    into v_student,v_created_by,v_school\n  from public.student_observations o\n  join public.students s on s.id=o.student_id\n  join public.classes c on c.id=s.class_id\n  where o.id=p_observation_id;\n\n  if v_student is null\n     or not public.can_teacher_access_student(v_student)\n     or (\n       v_created_by<>auth.uid()\n       and (v_school is null or not public.is_school_admin(v_school))\n     ) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  delete from public.student_observations where id=p_observation_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "student_ai_analysis_allowed",
+      "definition": "CREATE OR REPLACE FUNCTION public.student_ai_analysis_allowed(p_student_id uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select coalesce(ss.ai_analysis_enabled,false)\n  from public.students s\n  join public.classes c on c.id=s.class_id\n  left join public.school_settings ss on ss.school_id=c.school_id\n  where s.id=p_student_id\n    and public.can_teacher_access_student(s.id);\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "set_school_ai_analysis",
+      "definition": "CREATE OR REPLACE FUNCTION public.set_school_ai_analysis(p_school_id uuid, p_enabled boolean)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not public.is_school_admin(p_school_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  insert into public.school_settings(school_id,ai_analysis_enabled,updated_at)\n  values(p_school_id,p_enabled,now())\n  on conflict(school_id)\n  do update set ai_analysis_enabled=excluded.ai_analysis_enabled,updated_at=now();\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "verify_school_admin_code",
+      "definition": "CREATE OR REPLACE FUNCTION public.verify_school_admin_code(p_school_id uuid, p_code text)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select\n    public.is_school_admin(p_school_id)\n    and exists(\n      select 1\n      from public.school_settings s\n      where s.school_id=p_school_id\n        and s.admin_access_hash is not null\n        and s.admin_access_hash=extensions.crypt(coalesce(p_code,''),s.admin_access_hash)\n    );\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "school_admin_can_manage_user",
+      "definition": "CREATE OR REPLACE FUNCTION public.school_admin_can_manage_user(p_school_id uuid, p_user_id uuid)\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO ''\nAS $function$\n  select\n    public.is_school_admin(p_school_id)\n    and exists(\n      select 1\n      from public.school_members sm\n      where sm.school_id=p_school_id\n        and sm.user_id=p_user_id\n    );\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "grade_save_checkout",
+      "definition": "CREATE OR REPLACE FUNCTION public.grade_save_checkout(p_student_id uuid, p_week_start date, p_self text, p_decision text, p_note text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_school uuid;v_grade smallint;v_good integer;v_rated integer;\nbegin\n select c.school_id,c.grade_level into v_school,v_grade from public.students s join public.classes c on c.id=s.class_id\n where s.id=p_student_id and s.archived_at is null and c.archived_at is null;\n if auth.uid() is null or v_school is null or v_grade is null or not public.has_grade_access(v_school,v_grade) then raise exception 'Keine Berechtigung für diese Stufe'; end if;\n if p_self not in ('good','partial','difficult') or p_decision not in ('done','continue','change') then raise exception 'Ungültige Auswahl'; end if;\n select count(*) filter(where rating='good')::integer,count(*)::integer into v_good,v_rated from public.ratings where student_id=p_student_id and week_start=p_week_start;\n update public.weekly_plans set checkout_self=p_self,checkout_decision=p_decision,checkout_note=coalesce(p_note,''),\n checkout_published=false,published_good_count=v_good,published_rated_count=v_rated,updated_at=now()\n where student_id=p_student_id and week_start=p_week_start;\n if not found then raise exception 'Für dieses Kind gibt es in dieser Woche noch keinen Plan'; end if;\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "configure_teacher_account",
+      "definition": "CREATE OR REPLACE FUNCTION public.configure_teacher_account(p_user_id uuid, p_school_id uuid, p_display_name text, p_role text DEFAULT 'teacher'::text, p_class_ids uuid[] DEFAULT '{}'::uuid[], p_grade_levels smallint[] DEFAULT '{}'::smallint[], p_must_change_password boolean DEFAULT true)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_class uuid;\n  v_grade smallint;\n  v_role text;\nbegin\n  if not public.is_school_admin(p_school_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  v_role:=case when p_role='admin' then 'admin' else 'teacher' end;\n\n  insert into public.profiles(id,role,display_name,must_change_password)\n  values(\n    p_user_id,\n    'teacher',\n    coalesce(nullif(btrim(p_display_name),''),'Lehrkraft'),\n    coalesce(p_must_change_password,false)\n  )\n  on conflict(id)\n  do update set\n    role='teacher',\n    display_name=excluded.display_name,\n    must_change_password=case\n      when excluded.must_change_password then true\n      else public.profiles.must_change_password\n    end;\n\n  insert into public.school_members(school_id,user_id,role)\n  values(p_school_id,p_user_id,v_role)\n  on conflict(school_id,user_id)\n  do update set role=excluded.role;\n\n  delete from public.class_teacher_links ctl\n  using public.classes c\n  where ctl.class_id=c.id\n    and c.school_id=p_school_id\n    and ctl.user_id=p_user_id;\n\n  foreach v_class in array coalesce(p_class_ids,'{}'::uuid[]) loop\n    if exists(\n      select 1 from public.classes c\n      where c.id=v_class\n        and c.school_id=p_school_id\n        and c.archived_at is null\n    ) then\n      insert into public.class_teacher_links(class_id,user_id)\n      values(v_class,p_user_id)\n      on conflict do nothing;\n    end if;\n  end loop;\n\n  delete from public.grade_teacher_links\n  where school_id=p_school_id\n    and user_id=p_user_id;\n\n  foreach v_grade in array coalesce(p_grade_levels,'{}'::smallint[]) loop\n    if v_grade between 1 and 4 then\n      insert into public.grade_teacher_links(school_id,grade_level,user_id)\n      values(p_school_id,v_grade,p_user_id)\n      on conflict do nothing;\n    end if;\n  end loop;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "mark_teacher_password_reset",
+      "definition": "CREATE OR REPLACE FUNCTION public.mark_teacher_password_reset(p_school_id uuid, p_user_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not public.school_admin_can_manage_user(p_school_id,p_user_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  update public.profiles\n  set must_change_password=true\n  where id=p_user_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "grade_clear_rating",
+      "definition": "CREATE OR REPLACE FUNCTION public.grade_clear_rating(p_student_id uuid, p_week_start date, p_weekday smallint, p_lesson_no smallint)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_school uuid;\n  v_grade smallint;\nbegin\n  select c.school_id,c.grade_level\n    into v_school,v_grade\n  from public.students s\n  join public.classes c on c.id=s.class_id\n  where s.id=p_student_id\n    and s.archived_at is null\n    and c.archived_at is null;\n\n  if v_school is null\n     or v_grade is null\n     or not public.has_grade_access(v_school,v_grade) then\n    raise exception 'Keine Berechtigung für diese Stufe';\n  end if;\n\n  delete from public.ratings\n  where student_id=p_student_id\n    and week_start=p_week_start\n    and weekday=p_weekday\n    and lesson_no=p_lesson_no;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "grade_save_rating",
+      "definition": "CREATE OR REPLACE FUNCTION public.grade_save_rating(p_student_id uuid, p_week_start date, p_weekday smallint, p_lesson_no smallint, p_rating text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_school uuid;\n  v_grade smallint;\nbegin\n  select c.school_id,c.grade_level\n    into v_school,v_grade\n  from public.students s\n  join public.classes c on c.id=s.class_id\n  where s.id=p_student_id\n    and s.archived_at is null\n    and c.archived_at is null;\n\n  if v_school is null\n     or v_grade is null\n     or not public.has_grade_access(v_school,v_grade) then\n    raise exception 'Keine Berechtigung für diese Stufe';\n  end if;\n\n  if p_weekday not between 1 and 5\n     or p_lesson_no not between 1 and 8\n     or p_rating not in ('good','partial','difficult') then\n    raise exception 'Ungültige Bewertung';\n  end if;\n\n  if not exists(\n    select 1 from public.weekly_plans wp\n    where wp.student_id=p_student_id\n      and wp.week_start=p_week_start\n  ) then\n    raise exception 'Für dieses Kind gibt es in dieser Woche noch keinen Plan';\n  end if;\n\n  if exists(\n    select 1\n    from public.student_schedule_slots ss\n    where ss.student_id=p_student_id\n      and ss.weekday=p_weekday\n      and ss.lesson_no=p_lesson_no\n      and ss.enabled=false\n  ) then\n    raise exception 'Diese Stunde ist für das Kind deaktiviert';\n  end if;\n\n  insert into public.ratings(\n    student_id,week_start,weekday,lesson_no,rating,updated_by,updated_at\n  )\n  values(\n    p_student_id,p_week_start,p_weekday,p_lesson_no,p_rating,auth.uid(),now()\n  )\n  on conflict(student_id,week_start,weekday,lesson_no)\n  do update set\n    rating=excluded.rating,\n    updated_by=auth.uid(),\n    updated_at=now();\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "set_school_pilot_mode",
+      "definition": "CREATE OR REPLACE FUNCTION public.set_school_pilot_mode(p_school_id uuid, p_pilot_mode boolean)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if not public.is_school_admin(p_school_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  insert into public.school_settings(school_id,pilot_mode,updated_at)\n  values(p_school_id,p_pilot_mode,now())\n  on conflict(school_id)\n  do update set\n    pilot_mode=excluded.pilot_mode,\n    updated_at=now();\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "get_teacher_permissions",
+      "definition": "CREATE OR REPLACE FUNCTION public.get_teacher_permissions(p_school_id uuid, p_user_id uuid)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_role text;\n  v_name text;\n  v_classes jsonb;\n  v_grades jsonb;\nbegin\n  if not public.is_school_admin(p_school_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  select sm.role,coalesce(nullif(p.display_name,''),'Lehrkraft')\n    into v_role,v_name\n  from public.school_members sm\n  left join public.profiles p on p.id=sm.user_id\n  where sm.school_id=p_school_id\n    and sm.user_id=p_user_id;\n\n  if v_role is null then\n    raise exception 'Lehrkraft nicht gefunden';\n  end if;\n\n  select coalesce(jsonb_agg(ctl.class_id order by ctl.class_id),'[]'::jsonb)\n    into v_classes\n  from public.class_teacher_links ctl\n  join public.classes c on c.id=ctl.class_id\n  where ctl.user_id=p_user_id\n    and c.school_id=p_school_id\n    and c.archived_at is null;\n\n  select coalesce(jsonb_agg(gtl.grade_level order by gtl.grade_level),'[]'::jsonb)\n    into v_grades\n  from public.grade_teacher_links gtl\n  where gtl.user_id=p_user_id\n    and gtl.school_id=p_school_id;\n\n  return jsonb_build_object(\n    'user_id',p_user_id,\n    'display_name',v_name,\n    'role',v_role,\n    'class_ids',v_classes,\n    'grade_levels',v_grades\n  );\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "delete_demo_students_for_school",
+      "definition": "CREATE OR REPLACE FUNCTION public.delete_demo_students_for_school(p_school_id uuid)\n RETURNS integer\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_count integer;\nbegin\n  if not public.is_school_admin(p_school_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  with deleted as (\n    delete from public.students s\n    using public.classes c\n    where s.class_id=c.id\n      and c.school_id=p_school_id\n      and s.is_demo=true\n    returning s.id\n  )\n  select count(*) into v_count from deleted;\n\n  return v_count;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "list_grade_plan_students_v2",
+      "definition": "CREATE OR REPLACE FUNCTION public.list_grade_plan_students_v2(p_school_id uuid, p_grade_level smallint, p_week_start date, p_weekday smallint)\n RETURNS TABLE(student_id uuid, display_name text, avatar_emoji text, class_id uuid, class_name text, goal text, help_text text, checkin_completed boolean, checkin_feeling text, checkout_self text, checkout_decision text, checkout_note text, today_rated_count integer, today_enabled_count integer)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n  if auth.uid() is null or not public.has_grade_access(p_school_id,p_grade_level) then\n    raise exception 'Keine Berechtigung für diese Stufe';\n  end if;\n\n  return query\n  select\n    s.id,\n    s.display_name,\n    s.avatar_emoji,\n    c.id,\n    c.name,\n    wp.goal,\n    wp.help_text,\n    wp.checkin_completed,\n    wp.checkin_feeling,\n    wp.checkout_self,\n    wp.checkout_decision,\n    wp.checkout_note,\n    case\n      when p_weekday between 1 and 5 then\n        (\n          select count(*)::integer\n          from public.ratings r\n          where r.student_id=s.id\n            and r.week_start=p_week_start\n            and r.weekday=p_weekday\n        )\n      else 0\n    end as today_rated_count,\n    case\n      when p_weekday between 1 and 5 then\n        (\n          select count(*)::integer\n          from generate_series(1,8) g(lesson_no)\n          where not exists(\n            select 1\n            from public.student_schedule_slots ss\n            where ss.student_id=s.id\n              and ss.weekday=p_weekday\n              and ss.lesson_no=g.lesson_no\n              and ss.enabled=false\n          )\n        )\n      else 0\n    end as today_enabled_count\n  from public.classes c\n  join public.students s\n    on s.class_id=c.id\n   and s.archived_at is null\n  left join public.weekly_plans wp\n    on wp.student_id=s.id\n   and wp.week_start=p_week_start\n  where c.school_id=p_school_id\n    and c.grade_level=p_grade_level\n    and c.archived_at is null\n  order by c.name,s.sort_order,s.display_name;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "save_student_observation_v2",
+      "definition": "CREATE OR REPLACE FUNCTION public.save_student_observation_v2(p_student_id uuid, p_observed_on date, p_category text, p_note text, p_segment_no smallint)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_id uuid;\n  v_week date;\n  v_goal text;\nbegin\n  if not public.can_teacher_access_student(p_student_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  if p_observed_on is null\n     or p_observed_on < current_date - 730\n     or p_observed_on > current_date + 7 then\n    raise exception 'Ungültiges Datum';\n  end if;\n\n  if p_category not in ('observation','progress','challenge','strategy') then\n    raise exception 'Ungültige Kategorie';\n  end if;\n\n  if length(btrim(coalesce(p_note,''))) < 1\n     or length(btrim(p_note)) > 2000 then\n    raise exception 'Ungültige Notiz';\n  end if;\n\n  if p_segment_no is not null and p_segment_no not between 1 and 8 then raise exception 'Ungültiger Abschnitt'; end if;\n\n  v_week := p_observed_on - (extract(isodow from p_observed_on)::integer - 1);\n\n  select wp.goal into v_goal\n  from public.weekly_plans wp\n  where wp.student_id=p_student_id\n    and wp.week_start=v_week\n  limit 1;\n\n  insert into public.student_observations(\n    student_id,observed_on,week_start,goal_snapshot,category,note,created_by,segment_no\n  )\n  values(\n    p_student_id,p_observed_on,v_week,coalesce(v_goal,''),p_category,btrim(p_note),auth.uid(),p_segment_no\n  )\n  returning id into v_id;\n\n  return v_id;\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "get_student_development",
+      "definition": "CREATE OR REPLACE FUNCTION public.get_student_development(p_student_id uuid, p_from date, p_to date)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_student jsonb;\n  v_weeks jsonb;\n  v_observations jsonb;\n  v_goal_summary jsonb;\n  v_totals jsonb;\nbegin\n  if not public.can_teacher_access_student(p_student_id) then\n    raise exception 'Keine Berechtigung';\n  end if;\n\n  if p_from is null or p_to is null or p_from>p_to or p_to-p_from>400 then\n    raise exception 'Ungültiger Zeitraum';\n  end if;\n\n  select jsonb_build_object(\n    'id',s.id,\n    'display_name',s.display_name,\n    'avatar_emoji',s.avatar_emoji,\n    'class_name',c.name,\n    'grade_level',c.grade_level,\n    'school_id',c.school_id\n  )\n  into v_student\n  from public.students s\n  join public.classes c on c.id=s.class_id\n  where s.id=p_student_id;\n\n  select coalesce(jsonb_agg(row_data order by (row_data->>'week_start')::date),'[]'::jsonb)\n  into v_weeks\n  from (\n    select jsonb_build_object(\n      'week_start',wp.week_start,\n      'goal',wp.goal,\n      'help_text',wp.help_text,\n      'checkin_feeling',wp.checkin_feeling,\n      'checkin_completed',wp.checkin_completed,\n      'checkout_self',wp.checkout_self,\n      'checkout_decision',wp.checkout_decision,\n      'checkout_note',wp.checkout_note,\n      'good_count',(select count(*) from public.ratings r where r.student_id=wp.student_id and r.week_start=wp.week_start and r.rating='good'),\n      'partial_count',(select count(*) from public.ratings r where r.student_id=wp.student_id and r.week_start=wp.week_start and r.rating='partial'),\n      'difficult_count',(select count(*) from public.ratings r where r.student_id=wp.student_id and r.week_start=wp.week_start and r.rating='difficult'),\n      'rated_count',(select count(*) from public.ratings r where r.student_id=wp.student_id and r.week_start=wp.week_start)\n    ) as row_data\n    from public.weekly_plans wp\n    where wp.student_id=p_student_id\n      and wp.week_start between p_from - 6 and p_to\n  ) q;\n\n  select coalesce(jsonb_agg(\n    jsonb_build_object(\n      'id',o.id,\n      'observed_on',o.observed_on,\n      'week_start',o.week_start,\n      'goal_snapshot',o.goal_snapshot,\n      'category',o.category,\n      'segment_no',o.segment_no,\n      'note',o.note,\n      'created_at',o.created_at,\n      'can_delete',(o.created_by=auth.uid() or (c.school_id is not null and public.is_school_admin(c.school_id)))\n    )\n    order by o.observed_on desc,o.created_at desc\n  ),'[]'::jsonb)\n  into v_observations\n  from public.student_observations o\n  join public.students s on s.id=o.student_id\n  join public.classes c on c.id=s.class_id\n  where o.student_id=p_student_id\n    and o.observed_on between p_from and p_to;\n\n  select coalesce(jsonb_agg(\n    jsonb_build_object('goal',goal,'weeks',weeks)\n    order by weeks desc,goal\n  ),'[]'::jsonb)\n  into v_goal_summary\n  from (\n    select wp.goal,count(*)::integer weeks\n    from public.weekly_plans wp\n    where wp.student_id=p_student_id\n      and wp.week_start between p_from - 6 and p_to\n    group by wp.goal\n  ) g;\n\n  select jsonb_build_object(\n    'good_count',count(*) filter(where r.rating='good'),\n    'partial_count',count(*) filter(where r.rating='partial'),\n    'difficult_count',count(*) filter(where r.rating='difficult'),\n    'rated_count',count(r.id),\n    'weeks_with_plan',(\n      select count(*)\n      from public.weekly_plans wp\n      where wp.student_id=p_student_id\n        and wp.week_start between p_from - 6 and p_to\n    ),\n    'checkouts',(\n      select count(*)\n      from public.weekly_plans wp\n      where wp.student_id=p_student_id\n        and wp.week_start between p_from - 6 and p_to\n        and wp.checkout_self is not null\n    ),\n    'observations',(\n      select count(*)\n      from public.student_observations o\n      where o.student_id=p_student_id\n        and o.observed_on between p_from and p_to\n    )\n  )\n  into v_totals\n  from public.ratings r\n  where r.student_id=p_student_id\n    and r.week_start between p_from - 6 and p_to;\n\n  return jsonb_build_object(\n    'student',v_student,\n    'from',p_from,\n    'to',p_to,\n    'weeks',v_weeks,\n    'observations',v_observations,\n    'goal_summary',v_goal_summary,\n    'totals',v_totals\n  );\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "save_student_observation_v3",
+      "definition": "CREATE OR REPLACE FUNCTION public.save_student_observation_v3(p_student_id uuid, p_observed_on date, p_category text, p_note text, p_segment_no smallint, p_client_ref uuid)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_id uuid;\nbegin\n if auth.uid() is null or coalesce((auth.jwt()->>'is_anonymous')::boolean,false) then raise exception 'Nur Lehrkräfte'; end if;\n if not public.can_teacher_access_student(p_student_id) then raise exception 'Keine Berechtigung'; end if;\n if p_client_ref is null then raise exception 'Referenz fehlt'; end if;\n select o.id into v_id from public.student_observations o where o.created_by=auth.uid() and o.client_ref=p_client_ref;\n if v_id is not null then return v_id; end if;\n v_id := public.save_student_observation_v2(p_student_id,p_observed_on,p_category,p_note,p_segment_no);\n update public.student_observations set client_ref=p_client_ref where id=v_id and created_by=auth.uid();\n return v_id;\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "grade_get_student_week",
+      "definition": "CREATE OR REPLACE FUNCTION public.grade_get_student_week(p_student_id uuid, p_week_start date)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_school uuid;v_grade smallint;v_class_id uuid;v_class_name text;v_name text;v_avatar text;v_plan jsonb;\nbegin\n select c.school_id,c.grade_level,c.id,c.name,s.display_name,s.avatar_emoji\n into v_school,v_grade,v_class_id,v_class_name,v_avatar\n from public.students s join public.classes c on c.id=s.class_id\n where s.id=p_student_id and s.archived_at is null and c.archived_at is null;\n if auth.uid() is null or v_school is null or v_grade is null or not public.has_grade_access(v_school,v_grade) then raise exception 'Keine Berechtigung für diese Stufe'; end if;\n select to_jsonb(wp) into v_plan from public.weekly_plans wp where wp.student_id=p_student_id and wp.week_start=p_week_start;\n return jsonb_build_object(\n 'student',jsonb_build_object('id',p_student_id,'display_name',v_name,'avatar_emoji',v_avatar,'class_id',v_class_id,'class_name',v_class_name,'grade_level',v_grade),\n 'plan',v_plan,\n 'rewards',coalesce((select jsonb_agg(to_jsonb(rw) order by rw.sort_order,rw.title) from public.rewards rw where rw.student_id=p_student_id and rw.active=true),'[]'::jsonb),\n 'ratings',coalesce((select jsonb_agg(jsonb_build_object('student_id',r.student_id,'weekday',r.weekday,'lesson_no',r.lesson_no,'rating',r.rating) order by r.weekday,r.lesson_no)\n from public.ratings r where r.student_id=p_student_id and r.week_start=p_week_start),'[]'::jsonb),\n 'class_schedule_slots',coalesce((select jsonb_agg(to_jsonb(cs)) from public.class_schedule_slots cs where cs.class_id=v_class_id),'[]'::jsonb),\n 'schedule_slots',coalesce((select jsonb_agg(jsonb_build_object('student_id',ss.student_id,'weekday',ss.weekday,'lesson_no',ss.lesson_no,'enabled',ss.enabled) order by ss.weekday,ss.lesson_no)\n from public.student_schedule_slots ss where ss.student_id=p_student_id),'[]'::jsonb));\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "transition_class_school_year",
+      "definition": "CREATE OR REPLACE FUNCTION public.transition_class_school_year(p_class_id uuid, p_new_name text, p_new_school_year text, p_new_grade smallint, p_student_ids uuid[])\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_old public.classes%rowtype;v_new uuid;v_invalid int;\nbegin\n if auth.uid() is null or coalesce((auth.jwt()->>'is_anonymous')::boolean,false) then raise exception 'Nur Schuladmins'; end if;\n select * into v_old from public.classes where id=p_class_id for update;\n if not found or v_old.school_id is null or not public.is_school_admin(v_old.school_id) then raise exception 'Keine Berechtigung'; end if;\n select target_class_id into v_new from public.class_year_transitions where source_class_id=p_class_id;\n if v_new is not null then return v_new; end if;\n if v_old.archived_at is not null then raise exception 'Die Ausgangsklasse ist bereits archiviert'; end if;\n if length(btrim(coalesce(p_new_name,''))) not between 1 and 80 or p_new_school_year !~ '^20[0-9]{2}/[0-9]{2}$' or p_new_grade not between 1 and 4 then raise exception 'Ungültige Angaben zum neuen Schuljahr'; end if;\n select count(*) into v_invalid from (select distinct unnest(coalesce(p_student_ids,array[]::uuid[])) sid) i left join public.students s on s.id=i.sid and s.class_id=p_class_id and s.archived_at is null where s.id is null;\n if v_invalid>0 then raise exception 'Ungültige Kinderauswahl'; end if;\n insert into public.classes(name,teacher_id,school_id,grade_level,school_year) values(btrim(p_new_name),v_old.teacher_id,v_old.school_id,p_new_grade,p_new_school_year) returning id into v_new;\n insert into public.class_teacher_links(class_id,user_id,role) select v_new,user_id,role from public.class_teacher_links where class_id=p_class_id on conflict do nothing;\n insert into public.students(class_id,display_name,avatar_emoji,sort_order,is_demo) select v_new,display_name,avatar_emoji,sort_order,is_demo from public.students where class_id=p_class_id and archived_at is null and id=any(coalesce(p_student_ids,array[]::uuid[]));\n update public.students set archived_at=now() where class_id=p_class_id and archived_at is null;\n update public.classes set archived_at=now() where id=p_class_id;\n insert into public.class_year_transitions(source_class_id,target_class_id,created_by) values(p_class_id,v_new,auth.uid());\n return v_new;\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "list_school_year_source_students",
+      "definition": "CREATE OR REPLACE FUNCTION public.list_school_year_source_students(p_class_id uuid)\n RETURNS TABLE(student_id uuid, display_name text, avatar_emoji text, school_year text, grade_level smallint)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_school uuid;\nbegin\n if auth.uid() is null or coalesce((auth.jwt()->>'is_anonymous')::boolean,false) then raise exception 'Nur Schuladmins'; end if;\n select c.school_id into v_school from public.classes c where c.id=p_class_id and c.archived_at is null;\n if v_school is null or not public.is_school_admin(v_school) then raise exception 'Keine Berechtigung'; end if;\n return query select s.id,s.display_name,s.avatar_emoji,c.school_year,c.grade_level from public.students s join public.classes c on c.id=s.class_id where s.class_id=p_class_id and s.archived_at is null order by s.sort_order,s.display_name;\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "set_weekly_goal_icon",
+      "definition": "CREATE OR REPLACE FUNCTION public.set_weekly_goal_icon(p_student_id uuid, p_week_start date, p_icon text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n if auth.uid() is null or coalesce((auth.jwt()->>'is_anonymous')::boolean,false) or not public.can_teacher_access_student(p_student_id) then raise exception 'Keine Berechtigung'; end if;\n if p_icon not in ('target','ear','hand','clock','peace') then raise exception 'Ungültiges Symbol'; end if;\n update public.weekly_plans set goal_icon=p_icon where student_id=p_student_id and week_start=p_week_start;\n if not found then raise exception 'Wochenziel fehlt'; end if;\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "grade_save_checkin",
+      "definition": "CREATE OR REPLACE FUNCTION public.grade_save_checkin(p_student_id uuid, p_week_start date, p_goal text, p_help_text text, p_feeling text, p_icon text, p_weekly_shell_target integer)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare\n  v_school uuid;\n  v_grade smallint;\nbegin\n  select c.school_id,c.grade_level\n    into v_school,v_grade\n  from public.students s\n  join public.classes c on c.id=s.class_id\n  where s.id=p_student_id\n    and s.archived_at is null\n    and c.archived_at is null;\n\n  if auth.uid() is null\n     or v_school is null\n     or v_grade is null\n     or not public.has_grade_access(v_school,v_grade) then\n    raise exception 'Keine Berechtigung für diese Stufe';\n  end if;\n\n  if btrim(coalesce(p_goal,''))='' then\n    raise exception 'Ziel fehlt';\n  end if;\n  if p_feeling not in ('good','partial','difficult') then\n    raise exception 'Ungültiges Startgefühl';\n  end if;\n  if p_icon not in ('target','ear','hand','clock','peace') then\n    raise exception 'Ungültiges Zielsymbol';\n  end if;\n  if p_weekly_shell_target is not null\n     and p_weekly_shell_target not between 1 and 200 then\n    raise exception 'Muschelziel muss zwischen 1 und 200 liegen';\n  end if;\n\n  insert into public.weekly_plans(\n    student_id,week_start,goal,goal_icon,help_text,checkin_feeling,\n    checkin_completed,weekly_shell_target\n  )\n  values(\n    p_student_id,p_week_start,btrim(p_goal),p_icon,coalesce(p_help_text,''),\n    p_feeling,true,p_weekly_shell_target\n  )\n  on conflict(student_id,week_start)\n  do update set\n    goal=excluded.goal,\n    goal_icon=excluded.goal_icon,\n    help_text=excluded.help_text,\n    checkin_feeling=excluded.checkin_feeling,\n    checkin_completed=true,\n    weekly_shell_target=excluded.weekly_shell_target,\n    updated_at=now();\nend;\n$function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "save_weekly_checkin",
+      "definition": "CREATE OR REPLACE FUNCTION public.save_weekly_checkin(p_student_id uuid, p_week_start date, p_goal text, p_help_text text, p_feeling text, p_icon text, p_weekly_shell_target integer, p_reward_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_title text; v_school uuid; v_grade smallint; v_old public.weekly_plans%rowtype;\nbegin\n select c.school_id,c.grade_level into v_school,v_grade\n from public.students s join public.classes c on c.id=s.class_id\n where s.id=p_student_id and s.archived_at is null and c.archived_at is null;\n if auth.uid() is null or not (public.is_teacher_of_student(p_student_id) or\n   (v_school is not null and v_grade is not null and public.has_grade_access(v_school,v_grade))) then\n   raise exception 'Keine Berechtigung für dieses Kind';\n end if;\n if p_week_start is null or extract(isodow from p_week_start)<>1 then raise exception 'Ungültige Kalenderwoche'; end if;\n if btrim(coalesce(p_goal,''))='' then raise exception 'Wochenziel fehlt'; end if;\n if p_weekly_shell_target is null or p_weekly_shell_target not between 1 and 200 then raise exception 'Muschelziel muss zwischen 1 und 200 liegen'; end if;\n if p_feeling not in ('good','partial','difficult') or p_icon not in ('target','ear','hand','clock','peace') then raise exception 'Ungültige Auswahl'; end if;\n select title into v_title from public.rewards where id=p_reward_id and student_id=p_student_id and active=true;\n if v_title is null then raise exception 'Bitte eine aktive Belohnung dieses Kindes auswählen'; end if;\n select * into v_old from public.weekly_plans where student_id=p_student_id and week_start=p_week_start for update;\n if v_old.reward_redeemed_at is not null then raise exception 'Eingelöste Belohnung zuerst rückgängig machen'; end if;\n insert into public.weekly_plans(student_id,week_start,goal,help_text,checkin_feeling,goal_icon,checkin_completed,weekly_shell_target,reward_id,reward_title_snapshot)\n values(p_student_id,p_week_start,btrim(p_goal),coalesce(p_help_text,''),p_feeling,p_icon,true,p_weekly_shell_target,p_reward_id,v_title)\n on conflict(student_id,week_start) do update set goal=excluded.goal,help_text=excluded.help_text,\n checkin_feeling=excluded.checkin_feeling,goal_icon=excluded.goal_icon,checkin_completed=true,\n weekly_shell_target=excluded.weekly_shell_target,reward_id=excluded.reward_id,\n reward_title_snapshot=excluded.reward_title_snapshot,\n checkout_self=case when public.weekly_plans.weekly_shell_target is distinct from excluded.weekly_shell_target or public.weekly_plans.reward_id is distinct from excluded.reward_id then null else public.weekly_plans.checkout_self end,\n checkout_decision=case when public.weekly_plans.weekly_shell_target is distinct from excluded.weekly_shell_target or public.weekly_plans.reward_id is distinct from excluded.reward_id then null else public.weekly_plans.checkout_decision end,\n checkout_published=false;\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "weekly_reward_history",
+      "definition": "CREATE OR REPLACE FUNCTION public.weekly_reward_history(p_student_id uuid)\n RETURNS TABLE(week_start date, goal text, weekly_shell_target integer, reward_title_snapshot text, checkin_completed boolean, checkout_completed boolean, good_count integer, rated_count integer, reward_redeemed_at timestamp with time zone)\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_school uuid;v_grade smallint;\nbegin\n select c.school_id,c.grade_level into v_school,v_grade\n from public.students s join public.classes c on c.id=s.class_id where s.id=p_student_id;\n if auth.uid() is null or not (public.is_teacher_of_student(p_student_id) or\n  (v_school is not null and v_grade is not null and public.has_grade_access(v_school,v_grade))) then raise exception 'Keine Berechtigung'; end if;\n return query\n select w.week_start,w.goal,w.weekly_shell_target,w.reward_title_snapshot,w.checkin_completed,\n   (w.checkout_self is not null),case when w.checkout_self is not null then coalesce(w.published_good_count,count(r.id) filter(where r.rating='good')::integer) else count(r.id) filter(where r.rating='good')::integer end,\n   case when w.checkout_self is not null then coalesce(w.published_rated_count,count(r.id)::integer) else count(r.id)::integer end,w.reward_redeemed_at\n from public.weekly_plans w left join public.ratings r on r.student_id=w.student_id and r.week_start=w.week_start\n where w.student_id=p_student_id\n group by w.id order by w.week_start desc;\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "legacy_reward_history",
+      "definition": "CREATE OR REPLACE FUNCTION public.legacy_reward_history(p_student_id uuid)\n RETURNS jsonb\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_school uuid;v_grade smallint;\nbegin\n select c.school_id,c.grade_level into v_school,v_grade from public.students s join public.classes c on c.id=s.class_id where s.id=p_student_id;\n if auth.uid() is null or not(public.is_teacher_of_student(p_student_id) or (v_school is not null and v_grade is not null and public.has_grade_access(v_school,v_grade))) then raise exception 'Keine Berechtigung'; end if;\n return jsonb_build_object(\n 'legacy_shells',coalesce((select shells from public.student_progress where student_id=p_student_id),0),\n 'redemptions',coalesce((select jsonb_agg(jsonb_build_object('title',title,'shells_required',shells_required,'redeemed_at',redeemed_at) order by redeemed_at desc)\n from public.reward_redemptions where student_id=p_student_id),'[]'::jsonb));\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "ensure_reward_templates",
+      "definition": "CREATE OR REPLACE FUNCTION public.ensure_reward_templates()\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\nbegin\n if auth.uid() is null or not exists(select 1 from public.profiles where id=auth.uid() and role='teacher') then raise exception 'Nur für Lehrkräfte'; end if;\n insert into public.reward_templates(teacher_id,template_key,title,icon_key,shells_required,sort_order)\n select auth.uid(),v.template_key,v.title,v.icon_key,1,v.sort_order\n from (values ('ipad','iPad spielen','tablet',1),\n('football','Fußball spielen','ball',2),\n('drink','Durstlöscher','drink',3),\n('game','Ein Spiel auswählen','game',4),\n('paint','Freie Malzeit','paint',5),\n('reading','Lesezeit am Lieblingsplatz','book',6),\n('free_play','Freie Spielzeit','play',7),\n('song','Ein Lied auswählen','music',8),\n('help','Lehrkraft helfen','help',9),\n('seat','Besonderen Sitzplatz auswählen','chair',10),\n('friend','Mit einem Freund/einer Freundin arbeiten','friends',11),\n('movement','Bewegungspause auswählen','move',12),\n('class_activity','Klassenaktivität auswählen','group',13),\n('wish_time','5 Minuten Wunschzeit','time',14),\n('material','Lieblingsmaterial benutzen','star',15)) as v(template_key,title,icon_key,sort_order)\n on conflict (teacher_id,template_key) where template_key is not null do nothing;\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "set_weekly_reward_redemption",
+      "definition": "CREATE OR REPLACE FUNCTION public.set_weekly_reward_redemption(p_plan_id uuid, p_redeemed boolean)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_plan public.weekly_plans%rowtype; v_school uuid; v_grade smallint; v_good integer;\nbegin\n select * into v_plan from public.weekly_plans where id=p_plan_id for update;\n if not found then raise exception 'Wochenplan nicht gefunden'; end if;\n select c.school_id,c.grade_level into v_school,v_grade\n from public.students s join public.classes c on c.id=s.class_id where s.id=v_plan.student_id and s.archived_at is null and c.archived_at is null;\n if auth.uid() is null or not (public.is_teacher_of_student(v_plan.student_id) or\n   (v_school is not null and v_grade is not null and public.has_grade_access(v_school,v_grade))) then\n   raise exception 'Keine Berechtigung';\n end if;\n if p_redeemed then\n   if v_plan.reward_redeemed_at is not null then raise exception 'Belohnung bereits eingelöst'; end if;\n   if v_plan.checkout_self is null then raise exception 'Bitte zuerst Check-out speichern'; end if;\n   if not v_plan.checkin_completed or v_plan.weekly_shell_target is null or v_plan.reward_title_snapshot is null then raise exception 'Check-in fehlt'; end if;\n   select count(*)::integer into v_good from public.ratings\n   where student_id=v_plan.student_id and week_start=v_plan.week_start and rating='good';\n   if v_good<v_plan.weekly_shell_target then raise exception 'Wochenziel noch nicht erreicht'; end if;\n   update public.weekly_plans set reward_redeemed_at=now(),reward_redeemed_by=auth.uid(),\n     published_good_count=v_good where id=p_plan_id;\n else\n   if v_plan.reward_redeemed_at is null then raise exception 'Belohnung nicht eingelöst'; end if;\n   update public.weekly_plans set reward_redeemed_at=null,reward_redeemed_by=null where id=p_plan_id;\n end if;\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "save_weekly_checkin_v2",
+      "definition": "CREATE OR REPLACE FUNCTION public.save_weekly_checkin_v2(p_student_id uuid, p_week_start date, p_goal text, p_help_text text, p_feeling text, p_icon text, p_weekly_shell_target integer, p_reward_template_id uuid, p_free_reward_title text, p_reward_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_title text;v_icon text;v_school uuid;v_grade smallint;v_old public.weekly_plans%rowtype;v_choices integer;\nbegin\n select c.school_id,c.grade_level into v_school,v_grade\n from public.students s join public.classes c on c.id=s.class_id\n where s.id=p_student_id and s.archived_at is null and c.archived_at is null;\n if auth.uid() is null or not(public.is_teacher_of_student(p_student_id) or\n  (v_school is not null and v_grade is not null and public.has_grade_access(v_school,v_grade))) then raise exception 'Keine Berechtigung für dieses Kind'; end if;\n if p_week_start is null or extract(isodow from p_week_start)<>1 then raise exception 'Ungültige Kalenderwoche';end if;\n if btrim(coalesce(p_goal,''))='' then raise exception 'Wochenziel fehlt';end if;\n if p_weekly_shell_target is null or p_weekly_shell_target not between 1 and 200 then raise exception 'Muschelziel muss zwischen 1 und 200 liegen';end if;\n if p_feeling not in ('good','partial','difficult') or p_icon not in ('target','ear','hand','clock','peace') then raise exception 'Ungültige Auswahl';end if;\n v_choices=(p_reward_template_id is not null)::integer+(p_reward_id is not null)::integer+(nullif(btrim(coalesce(p_free_reward_title,'')),'') is not null)::integer;\n if v_choices<>1 then raise exception 'Bitte genau eine Belohnung auswählen';end if;\n if p_reward_template_id is not null then\n   select title,icon_key into v_title,v_icon from public.reward_templates\n   where id=p_reward_template_id and teacher_id=auth.uid() and archived_at is null;\n elsif p_reward_id is not null then\n   select title,'gift' into v_title,v_icon from public.rewards\n   where id=p_reward_id and student_id=p_student_id and active=true;\n else\n   v_title=btrim(p_free_reward_title);v_icon='gift';\n end if;\n if v_title is null or length(v_title)<2 or length(v_title)>80 then raise exception 'Belohnung prüfen (2 bis 80 Zeichen)';end if;\n select * into v_old from public.weekly_plans where student_id=p_student_id and week_start=p_week_start for update;\n if v_old.reward_redeemed_at is not null then raise exception 'Eingelöste Belohnung zuerst rückgängig machen';end if;\n insert into public.weekly_plans(student_id,week_start,goal,help_text,checkin_feeling,goal_icon,checkin_completed,weekly_shell_target,reward_id,reward_template_id,reward_title_snapshot,reward_icon_snapshot)\n values(p_student_id,p_week_start,btrim(p_goal),coalesce(p_help_text,''),p_feeling,p_icon,true,p_weekly_shell_target,p_reward_id,p_reward_template_id,v_title,v_icon)\n on conflict(student_id,week_start) do update set goal=excluded.goal,help_text=excluded.help_text,checkin_feeling=excluded.checkin_feeling,\n goal_icon=excluded.goal_icon,checkin_completed=true,weekly_shell_target=excluded.weekly_shell_target,reward_id=excluded.reward_id,\n reward_template_id=excluded.reward_template_id,reward_title_snapshot=excluded.reward_title_snapshot,reward_icon_snapshot=excluded.reward_icon_snapshot,\n checkout_self=case when public.weekly_plans.weekly_shell_target is distinct from excluded.weekly_shell_target or\n public.weekly_plans.reward_title_snapshot is distinct from excluded.reward_title_snapshot then null else public.weekly_plans.checkout_self end,\n checkout_decision=case when public.weekly_plans.weekly_shell_target is distinct from excluded.weekly_shell_target or\n public.weekly_plans.reward_title_snapshot is distinct from excluded.reward_title_snapshot then null else public.weekly_plans.checkout_decision end,\n checkout_published=false;\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    },
+    {
+      "name": "save_weekly_checkin_v3",
+      "definition": "CREATE OR REPLACE FUNCTION public.save_weekly_checkin_v3(p_student_id uuid, p_week_start date, p_goal text, p_help_text text, p_feeling text, p_icon text, p_weekly_shell_target integer, p_reward_template_id uuid, p_free_reward_title text, p_reward_id uuid, p_save_as_template boolean)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO ''\nAS $function$\ndeclare v_title text;\nbegin\n perform public.save_weekly_checkin_v2(p_student_id,p_week_start,p_goal,p_help_text,p_feeling,p_icon,p_weekly_shell_target,\n p_reward_template_id,p_free_reward_title,p_reward_id);\n if coalesce(p_save_as_template,false) then\n   if p_reward_template_id is not null or p_reward_id is not null then raise exception 'Nur eigene Belohnungen als Vorlage speichern';end if;\n   v_title=btrim(p_free_reward_title);\n   if not exists(select 1 from public.reward_templates where teacher_id=auth.uid() and title=v_title and archived_at is null) then\n     insert into public.reward_templates(teacher_id,title,icon_key,shells_required) values(auth.uid(),v_title,'gift',1);\n   end if;\n end if;\nend $function$\n",
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}"
+    }
+  ],
+  "policies": [
+    {
+      "schemaname": "public",
+      "tablename": "profiles",
+      "policyname": "profile_read_self",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "(id = auth.uid())",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "classes",
+      "policyname": "class_insert_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "((teacher_id = auth.uid()) AND is_teacher_role())"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "classes",
+      "policyname": "class_update_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "UPDATE",
+      "qual": "(teacher_id = auth.uid())",
+      "with_check": "(teacher_id = auth.uid())"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "classes",
+      "policyname": "class_delete_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "DELETE",
+      "qual": "(teacher_id = auth.uid())",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "students",
+      "policyname": "students_read_authorized",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "can_access_student(id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "students",
+      "policyname": "students_insert_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "is_teacher_of_class(class_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "students",
+      "policyname": "students_update_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "UPDATE",
+      "qual": "is_teacher_of_student(id)",
+      "with_check": "is_teacher_of_class(class_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "students",
+      "policyname": "students_delete_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "DELETE",
+      "qual": "is_teacher_of_student(id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "parent_student_links",
+      "policyname": "links_read_parent_or_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "((parent_user_id = auth.uid()) OR is_teacher_of_student(student_id))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "parent_student_links",
+      "policyname": "links_insert_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "is_teacher_of_student(student_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "parent_student_links",
+      "policyname": "links_delete_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "DELETE",
+      "qual": "is_teacher_of_student(student_id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "goal_templates",
+      "policyname": "goal_templates_owner",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "ALL",
+      "qual": "(teacher_id = auth.uid())",
+      "with_check": "(teacher_id = auth.uid())"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "timetable_entries",
+      "policyname": "timetable_mutate_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "is_teacher_of_class(class_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "timetable_entries",
+      "policyname": "timetable_update_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "UPDATE",
+      "qual": "is_teacher_of_class(class_id)",
+      "with_check": "is_teacher_of_class(class_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "timetable_entries",
+      "policyname": "timetable_delete_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "DELETE",
+      "qual": "is_teacher_of_class(class_id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "weekly_plans",
+      "policyname": "weekly_read_authorized",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "(is_teacher_of_student(student_id) OR is_child_student(student_id) OR (checkout_published AND is_parent_of_student(student_id)))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "weekly_plans",
+      "policyname": "weekly_insert_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "is_teacher_of_student(student_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "weekly_plans",
+      "policyname": "weekly_update_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "UPDATE",
+      "qual": "is_teacher_of_student(student_id)",
+      "with_check": "is_teacher_of_student(student_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "weekly_plans",
+      "policyname": "weekly_delete_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "DELETE",
+      "qual": "is_teacher_of_student(student_id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "ratings",
+      "policyname": "ratings_read_teacher_or_child",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "(is_teacher_of_student(student_id) OR is_child_student(student_id))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "ratings",
+      "policyname": "ratings_insert_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "(is_teacher_of_student(student_id) AND (updated_by = auth.uid()))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "class_schedule_slots",
+      "policyname": "class_schedule_write",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "ALL",
+      "qual": "is_teacher_of_class(class_id)",
+      "with_check": "is_teacher_of_class(class_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "ratings",
+      "policyname": "ratings_update_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "UPDATE",
+      "qual": "is_teacher_of_student(student_id)",
+      "with_check": "(is_teacher_of_student(student_id) AND (updated_by = auth.uid()))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "ratings",
+      "policyname": "ratings_delete_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "DELETE",
+      "qual": "is_teacher_of_student(student_id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "rewards",
+      "policyname": "rewards_read_authorized",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "can_access_student(student_id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "rewards",
+      "policyname": "rewards_insert_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "is_teacher_of_student(student_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "rewards",
+      "policyname": "rewards_update_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "UPDATE",
+      "qual": "is_teacher_of_student(student_id)",
+      "with_check": "is_teacher_of_student(student_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "rewards",
+      "policyname": "rewards_delete_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "DELETE",
+      "qual": "is_teacher_of_student(student_id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_progress",
+      "policyname": "progress_read_authorized",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "can_access_student(student_id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_progress",
+      "policyname": "progress_insert_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "is_teacher_of_student(student_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_progress",
+      "policyname": "progress_update_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "UPDATE",
+      "qual": "is_teacher_of_student(student_id)",
+      "with_check": "is_teacher_of_student(student_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "parent_acknowledgements",
+      "policyname": "ack_read_parent_or_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "((parent_user_id = auth.uid()) OR (EXISTS ( SELECT 1\n   FROM weekly_plans wp\n  WHERE ((wp.id = parent_acknowledgements.weekly_plan_id) AND is_teacher_of_student(wp.student_id)))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reward_templates",
+      "policyname": "reward_templates_owner",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "ALL",
+      "qual": "(teacher_id = auth.uid())",
+      "with_check": "(teacher_id = auth.uid())"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reward_redemptions",
+      "policyname": "reward_redemptions_teacher_read",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "is_teacher_of_student(student_id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "parent_acknowledgements",
+      "policyname": "ack_insert_parent",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "((parent_user_id = auth.uid()) AND (EXISTS ( SELECT 1\n   FROM weekly_plans wp\n  WHERE ((wp.id = parent_acknowledgements.weekly_plan_id) AND wp.checkout_published AND is_parent_of_student(wp.student_id)))))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "parent_acknowledgements",
+      "policyname": "ack_update_parent",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "UPDATE",
+      "qual": "(parent_user_id = auth.uid())",
+      "with_check": "(parent_user_id = auth.uid())"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_device_links",
+      "policyname": "device_links_read_self",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "(user_id = auth.uid())",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "timetable_entries",
+      "policyname": "timetable_read_teacher_or_child",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "(is_teacher_of_class(class_id) OR (EXISTS ( SELECT 1\n   FROM students s\n  WHERE ((s.class_id = timetable_entries.class_id) AND is_child_student(s.id)))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "class_teacher_links",
+      "policyname": "class_teacher_links_read",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "((user_id = auth.uid()) OR (EXISTS ( SELECT 1\n   FROM classes c\n  WHERE ((c.id = class_teacher_links.class_id) AND (c.teacher_id = auth.uid())))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_absences",
+      "policyname": "Teachers remove permitted absences",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "DELETE",
+      "qual": "((COALESCE(((auth.jwt() ->> 'is_anonymous'::text))::boolean, false) = false) AND can_teacher_access_student(student_id))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "teacher_settings",
+      "policyname": "teacher_settings_self",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "ALL",
+      "qual": "(user_id = auth.uid())",
+      "with_check": "(user_id = auth.uid())"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "schools",
+      "policyname": "schools_member_read",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "is_school_member(id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "school_members",
+      "policyname": "school_members_member_read",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "is_school_member(school_id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "school_settings",
+      "policyname": "school_settings_member_read",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "(EXISTS ( SELECT 1\n   FROM school_members sm\n  WHERE ((sm.school_id = school_settings.school_id) AND (sm.user_id = auth.uid()))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "classes",
+      "policyname": "class_read_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "is_teacher_of_class(id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_schedule_slots",
+      "policyname": "student_schedule_read",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "(is_teacher_of_student(student_id) OR is_child_student(student_id))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_schedule_slots",
+      "policyname": "student_schedule_insert_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "is_teacher_of_student(student_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_schedule_slots",
+      "policyname": "student_schedule_update_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "UPDATE",
+      "qual": "is_teacher_of_student(student_id)",
+      "with_check": "is_teacher_of_student(student_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_schedule_slots",
+      "policyname": "student_schedule_delete_teacher",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "DELETE",
+      "qual": "is_teacher_of_student(student_id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "grade_teacher_links",
+      "policyname": "grade_teacher_links_read",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "((user_id = auth.uid()) OR is_school_admin(school_id))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_absences",
+      "policyname": "Teachers read permitted absences",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "((COALESCE(((auth.jwt() ->> 'is_anonymous'::text))::boolean, false) = false) AND can_teacher_access_student(student_id))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_absences",
+      "policyname": "Teachers record permitted absences",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "((COALESCE(((auth.jwt() ->> 'is_anonymous'::text))::boolean, false) = false) AND can_teacher_access_student(student_id) AND (created_by = auth.uid()))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_self_ratings",
+      "policyname": "Self assessment owner and teacher read",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "(is_child_student(student_id) OR can_teacher_access_student(student_id))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_self_ratings",
+      "policyname": "Child creates own self assessment",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "(is_child_student(student_id) AND (auth.uid() = created_by))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "student_self_ratings",
+      "policyname": "Child updates own self assessment",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "UPDATE",
+      "qual": "(is_child_student(student_id) AND (auth.uid() = created_by))",
+      "with_check": "(is_child_student(student_id) AND (auth.uid() = created_by))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "class_schedule_slots",
+      "policyname": "class_schedule_read",
+      "permissive": "PERMISSIVE",
+      "roles": [
+        "authenticated"
+      ],
+      "cmd": "SELECT",
+      "qual": "(is_teacher_of_class(class_id) OR (EXISTS ( SELECT 1\n   FROM students s\n  WHERE ((s.class_id = class_schedule_slots.class_id) AND (is_child_student(s.id) OR is_parent_of_student(s.id))))))",
+      "with_check": null
+    }
+  ]
+}

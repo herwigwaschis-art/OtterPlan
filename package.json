@@ -1,0 +1,6 @@
+{
+ "name":"milo-security-checks",
+ "private":true,
+ "scripts":{"test":"node --test tests/security.test.mjs tests/edge.test.mjs","test:browser":"node tests/browser.mjs","preview:test":"node tests/preview-server.mjs"},
+ "devDependencies":{"@electric-sql/pglite":"0.5.8","@playwright/test":"1.63.0"}
+}
