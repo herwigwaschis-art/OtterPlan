@@ -2,6 +2,8 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
+<script src="./security.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0EA5A0">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,6 +21,7 @@
 body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--ink);font-size:16px;background:radial-gradient(circle at 9% 8%,rgba(167,227,193,.30),transparent 29%),radial-gradient(circle at 91% 13%,rgba(96,165,250,.16),transparent 27%),radial-gradient(circle at 78% 82%,rgba(251,192,45,.10),transparent 24%),linear-gradient(180deg,#fcfefe,#f3f9f8);background-attachment:fixed;-webkit-font-smoothing:antialiased}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.13),transparent 65%);z-index:-1}
 button,input,textarea,select{font:inherit}button{cursor:pointer}
+.voice-btn,.child-goal-speak{display:none!important}
 header{position:sticky;top:0;z-index:30;height:68px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(247,248,251,.65);backdrop-filter:blur(28px) saturate(140%);-webkit-backdrop-filter:blur(28px) saturate(140%);border-bottom:1px solid rgba(255,255,255,.72)}
 .brand{display:flex;align-items:center;gap:10px}.brand-logo-img{display:block;width:148px;height:auto}.brand b{font-size:17px;letter-spacing:-.025em}.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .top-menu-wrap{position:relative;display:flex;align-items:center;gap:8px}.today-badge{display:inline-flex;align-items:center;padding:4px 2px;border:0;background:transparent;box-shadow:none;font-size:12px;font-weight:680;color:var(--muted);white-space:nowrap}.current-date-line{font-size:12px;color:var(--accent);font-weight:760;margin-top:7px}.date-soft{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;background:var(--soft);color:var(--accent);font-size:11px;font-weight:780}.menu-trigger{width:44px;height:44px;border:0;border-radius:15px;background:rgba(255,255,255,.78);box-shadow:var(--shadow);font-size:23px;line-height:1;color:var(--ink);display:grid;place-items:center}.menu-pop{display:none;position:absolute;right:0;top:52px;width:250px;padding:10px;border-radius:22px;background:rgba(255,255,255,.94);border:1px solid rgba(255,255,255,.98);box-shadow:0 24px 65px rgba(30,38,50,.18);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px)}.menu-pop.show{display:block}.menu-user{padding:10px 11px 11px;border-bottom:1px solid rgba(0,0,0,.06);margin-bottom:7px}.menu-user b{display:block;font-size:14px}.menu-user span{display:block;font-size:12px;color:var(--muted);margin-top:3px}.menu-item{width:100%;border:0;border-radius:14px;background:transparent;text-align:left;padding:11px 12px;color:var(--ink);font-weight:720}.menu-item:hover{background:rgba(242,245,248,.92)}.menu-status{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;font-size:12px;color:var(--muted)}
@@ -1011,7 +1014,7 @@ body:has(#childView.active) main{padding-top:20px}
 <div id="undoToast" class="undo-toast"><span>Bewertung gespeichert</span><button onclick="APP.undoLastRating()">Rückgängig</button></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
@@ -1019,7 +1022,8 @@ body:has(#childView.active) main{padding-top:20px}
 (function(){
 var SUPABASE_URL="https://vcjzkyzarmxkxdwrsqjq.supabase.co";
 var SUPABASE_KEY="sb_publishable_OrhnvzLF1BrDtZFdyW71RA_SxbLV935";
-var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{storage:window.sessionStorage},global:{fetch:window.MILO_SECURITY.fetch}});
+var initialBody=document.body.cloneNode(true);initialBody.querySelectorAll('script').forEach(function(n){n.remove()});var cleanBody=initialBody.innerHTML;initialBody=null;
 var DAYS=["Montag","Dienstag","Mittwoch","Donnerstag","Freitag"];
 function plantIcon(value){return '<span class="plant-icon plant-'+(value==="good"?"good":value==="partial"?"partial":"difficult")+'" aria-hidden="true"></span>'}
 var FACE={good:plantIcon("good"),partial:plantIcon("partial"),difficult:plantIcon("difficult")};
@@ -1051,6 +1055,9 @@ function rewardIconSvg(key){var shapes={
 
 var S={user:null,profile:null,role:null,classes:[],classRow:null,students:[],absences:[],selfRatings:[],timetable:[],scheduleSlots:[],classScheduleSlots:[],plans:[],ratings:[],rewards:[],progress:[],goalTemplates:[],rewardTemplates:[],schools:[],schoolRow:null,schoolStructure:[],schoolMembers:[],schoolMemberships:[],schoolSettings:[],gradeLinks:[],gradeRows:[],gradeLevel:null,gradeActivePlan:null,gradeStudentData:null,adminClasses:[],adminClassEdit:null,student:null,entry:null,channels:[],scanner:null,childRedeeming:false,checkinFeeling:"partial",checkoutSelf:"partial",checkoutDecision:"continue",teacherArea:"class",lastChildShells:null,weekOffset:0,gradeFilter:"all",gradeClassFilter:"all",gradeQuickMode:false,gradeQuickIndex:0,undoRating:null,undoTimer:null,adminTeacherEdit:null,studentTab:"plan",developmentData:null,developmentContext:"teacher",developmentStudentId:null,aiAnalysisText:"",initialStartResolved:false,pendingStartGrade:null,rewardLibraryReadyFor:null};
 var idleTimer=null,reload=null;
+var cleanState=JSON.stringify(S),loggingOut=false;
+// Pending edits stay in this tab only. Existing device queues are recovered after login.
+var memoryRatings=[],memoryNotes=[],ownNoteTemplates=[];
 
 function el(id){return document.getElementById(id)}
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]})}
@@ -1180,16 +1187,27 @@ function stats(sid){var a=S.ratings.filter(function(r){return r.student_id===sid
 function resetIdle(){clearTimeout(idleTimer);if(S.role==="teacher")idleTimer=setTimeout(function(){logout()},45*60*1000)}
 ["click","keydown","touchstart"].forEach(function(e){document.addEventListener(e,resetIdle,{passive:true})});
 
-async function login(){var email=el("email").value.trim(),password=el("password").value;if(!email||!password){toast("E-Mail und Passwort eingeben");return}var r=await sb.auth.signInWithPassword({email:email,password:password});if(r.error){toast("Anmeldung fehlgeschlagen");return}await bootstrap()}
+async function login(){var email=el("email").value.trim(),password=el("password").value;if(!email||!password){toast("E-Mail und Passwort eingeben");return}var r;try{r=await sb.auth.signInWithPassword({email:email,password:password})}finally{password="";el("password").value=""}if(r.error){toast("Anmeldung fehlgeschlagen");return}await bootstrap()}
 async function resumeSession(){var r=await sb.auth.getSession(),b=el("resumeSessionBtn");if(b)b.style.display="none";if(r.data&&r.data.session){await bootstrap()}else{toast("Bitte neu anmelden")}}
 function openChild(){childStatus("","");show("childLogin");setTimeout(scan,180)}
 function showLogin(){stopScan();show("login")}
-function childAccessUrl(token){var u=new URL(window.location.href);u.search="";u.hash="";u.searchParams.set("child",token);return u.href}
-function norm(v){v=String(v||"").trim();if(v.indexOf("otterplan:")===0)return v.slice(10);try{var u=new URL(v,window.location.href);if(u.origin===window.location.origin&&u.pathname===window.location.pathname&&u.searchParams.has("child"))return u.searchParams.get("child")||""}catch(e){}return v}
+function childAccessUrl(token){var u=new URL(window.location.href);u.search="";u.hash=new URLSearchParams({child:token}).toString();return u.href}
+function norm(v){v=String(v||"").trim();if(v.indexOf("otterplan:")===0)return v.slice(10);try{var u=new URL(v,window.location.href);if(u.origin===window.location.origin&&u.pathname===window.location.pathname){var h=new URLSearchParams(u.hash.slice(1));if(h.has("child"))return h.get("child")||"";if(u.searchParams.has("child"))return u.searchParams.get("child")||""}}catch(e){}return v}
 async function scan(){if(!window.Html5Qrcode){childStatus("Der QR-Scanner ist gerade nicht verfügbar. Öffne den QR-Link mit der Kamera-App oder gib den Code manuell ein.","error");return}await stopScan();try{S.scanner=new Html5Qrcode("qr-reader");await S.scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:220,height:220}},function(code){if(S.childRedeeming)return;el("childToken").value=norm(code);childStatus("QR-Code erkannt. Anmeldung läuft …","");stopScan().then(redeem)},function(){})}catch(e){childStatus("Kamera konnte nicht gestartet werden. Öffne den QR-Link mit der Kamera-App oder gib den Code manuell ein.","error")}}
 async function stopScan(){if(S.scanner){try{await S.scanner.stop()}catch(e){}try{S.scanner.clear()}catch(e){}S.scanner=null}}
 async function redeem(){if(S.childRedeeming)return;var token=norm(el("childToken").value);if(!token){childStatus("QR-Code fehlt. Bitte scanne den QR-Code erneut.","error");return}S.childRedeeming=true;var stage="QR-Code vorbereiten";childStatus("QR-Code erkannt. Anmeldung läuft …","");try{await stopScan();stage="Sitzung prüfen";var ses=await sb.auth.getSession();if(ses.data.session&&S.role==="teacher"){childStatus("Bitte öffne den QR-Code auf dem Kindergerät.","error");return}if(ses.data.session){stage="alte Sitzung beenden";await sb.auth.signOut()}stage="Kindergerät anmelden";var a=await sb.auth.signInAnonymously();if(a.error){childStatus("Kinderanmeldung fehlgeschlagen: "+String(a.error.message||"Bitte Internetverbindung prüfen."),"error");return}stage="QR-Code zuordnen";var r=await sb.rpc("redeem_child_qr",{p_qr_token:token});if(r.error){await sb.auth.signOut();childStatus("QR-Code konnte nicht zugeordnet werden: "+String(r.error.message||"Code ungültig oder zurückgesetzt.")+". Bitte lass dir einen aktuellen Code geben.","error");return}el("childToken").value="";if(new URL(location.href).searchParams.has("child"))window.history.replaceState({},"",location.pathname);childStatus("Anmeldung erfolgreich. Dein Plan wird geöffnet …","success");stage="Kinderprofil laden";await bootstrap()}catch(e){console.error("MILO child QR error at "+stage,e);var detail=e&&e.message?String(e.message):"";if(detail.length>100)detail=detail.slice(0,100);childStatus("Anmeldung bei „"+stage+"“ unterbrochen"+(detail?": "+detail:"")+". Bitte Seite neu laden und erneut versuchen.","error")}finally{S.childRedeeming=false}}
-async function logout(){closeTopMenu();Object.keys(sessionStorage).filter(function(k){return k.indexOf("otter_admin_")===0}).forEach(function(k){sessionStorage.removeItem(k)});stopRealtime();await stopScan();await sb.auth.signOut();S.user=null;S.profile=null;S.role=null;S.weekOffset=0;S.gradeQuickMode=false;S.undoRating=null;S.classRow=null;S.student=null;S.initialStartResolved=false;S.pendingStartGrade=null;el("session").style.display="none";el("globalSearchButton").style.display="none";show("login")}
+function clearPrivateSession(){
+ var redeeming=S.childRedeeming;window.MILO_SECURITY.invalidate();clearTimeout(idleTimer);clearTimeout(reload);clearTimeout(S.undoTimer);
+ stopRealtime();stopScan();if(window.speechSynthesis)window.speechSynthesis.cancel();
+ S=JSON.parse(cleanState);S.childRedeeming=redeeming;memoryRatings=[];memoryNotes=[];ownNoteTemplates=[];modalFocus.clear();
+ window.MILO_SECURITY.clearStoredSession();document.body.innerHTML=cleanBody;document.body.classList.remove('teacher-start-view');show(redeeming?'childLogin':'login');
+}
+async function logout(){
+ if(loggingOut)return;
+ if(memoryRatings.length||memoryNotes.length){toast('Noch nicht gespeicherte Einträge: Bitte zuerst mit dem Internet verbinden.');return}
+ loggingOut=true;try{stopRealtime();await stopScan();await sb.auth.signOut({scope:'local'})}finally{clearPrivateSession();loggingOut=false}
+}
+window.addEventListener('beforeunload',function(e){if(memoryRatings.length||memoryNotes.length){e.preventDefault();e.returnValue=''}});
 
 async function bootstrap(){
  var u=await sb.auth.getUser();if(!u.data.user){show("login");return}
@@ -1201,7 +1219,7 @@ async function bootstrap(){
  
  await load();
  startRealtime();
- if(S.role==="teacher"){syncOfflineRatings();syncOfflineObservations();if(S.profile&&S.profile.must_change_password)setTimeout(account,120)}
+ if(S.role==="teacher"){await recoverLocalDrafts();await loadNoteTemplates();syncOfflineRatings();syncOfflineObservations();if(S.profile&&S.profile.must_change_password)setTimeout(account,120)}
 }
 
 async function load(){
@@ -1214,7 +1232,7 @@ async function load(){
      sb.from("reward_templates").select("*").is("archived_at",null).order("sort_order").order("title"),
      sb.from("schools").select("*").order("name"),
      sb.from("school_members").select("school_id,user_id,role").eq("user_id",S.user.id),
-     sb.from("school_settings").select("*"),
+     sb.from("school_settings").select("school_id,default_school_year,default_retention_days,teachers_can_create_classes,updated_at,pilot_mode,ai_analysis_enabled"),
      sb.from("grade_teacher_links").select("*").eq("user_id",S.user.id)
    ]);
    S.classes=all[0].data||[];S.goalTemplates=all[1].data||[];S.rewardTemplates=all[2].data||[];S.schools=all[3].data||[];S.schoolMemberships=all[4].data||[];S.schoolSettings=all[5].data||[];S.gradeLinks=all[6].data||[];
@@ -1666,12 +1684,8 @@ function renderWeek(target,click){
 }
 function openRating(day,lesson){S.entry={weekday:Number(day),lesson_no:Number(lesson)};var p=plan(S.student.id);if(!p||!p.checkin_completed||!p.weekly_shell_target||!p.reward_title_snapshot){toast("Bitte zuerst den Check-in dieser Woche abschließen.");checkin();return}var isToday=isCurrentWeek()&&new Date().getDay()===S.entry.weekday;el("ratingTitle").textContent=DAYS[S.entry.weekday-1]+" · "+segmentLabel(S.entry.lesson_no)+(isToday?" · Heute":"");el("ratingGoal").textContent=p?p.goal:"Noch kein Wochenziel";modal("ratingModal",true)}
 function ratingQueueKey(){return "otterplan-rating-queue-"+(S.user?S.user.id:"signed-out")}
-function offlineQueue(){try{
- var scoped=JSON.parse(localStorage.getItem(ratingQueueKey())||"[]"),legacy=JSON.parse(localStorage.getItem("otterplan-rating-queue")||"[]");
- if(S.user&&legacy.length){var mine=legacy.filter(function(x){return x.updated_by===S.user.id});if(mine.length){scoped=scoped.concat(mine);saveQueue(scoped);localStorage.setItem("otterplan-rating-queue",JSON.stringify(legacy.filter(function(x){return x.updated_by!==S.user.id})))}}
- return scoped
- }catch(e){return[]}}
-function saveQueue(q){localStorage.setItem(ratingQueueKey(),JSON.stringify(q))}
+function offlineQueue(){return memoryRatings.slice()}
+function saveQueue(q){memoryRatings=q.slice()}
 function offerRatingUndo(previous,mode,source){
  clearTimeout(S.undoTimer);
  S.undoRating={student_id:S.student?S.student.id:null,week_start:week(),weekday:Number(S.entry&&S.entry.weekday),lesson_no:Number(S.entry&&S.entry.lesson_no),previous:previous?previous.rating:null,mode:mode||"class",source:source||"detail"};
@@ -1704,9 +1718,9 @@ async function saveRating(v){
    if(gr.error){toast("Bewertung konnte nicht gespeichert werden");return}
    modal("ratingModal",false);var gradeSid=S.student.id;await loadGradeStudent(gradeSid);offerRatingUndo(previous,"grade","detail");return
  }
- if(!navigator.onLine){queueRating(row);modal("ratingModal",false);applyLocalRating(row);toast("Offline gespeichert");return}
+ if(!navigator.onLine){toast("Nicht gespeichert. Bitte mit dem Internet verbinden.");return}
  var r=await sb.from("ratings").upsert(row,{onConflict:"student_id,week_start,weekday,lesson_no"});
- if(r.error){queueRating(row);modal("ratingModal",false);applyLocalRating(row);toast("Zwischengespeichert");return}
+ if(r.error){toast("Nicht gespeichert. Bitte erneut versuchen.");return}
  modal("ratingModal",false);var sid=S.student.id;await load();openStudent(sid);offerRatingUndo(previous,"class","detail")
 }
 function queueRating(row){var q=offlineQueue().filter(function(x){return !(x.student_id===row.student_id&&x.week_start===row.week_start&&Number(x.weekday)===Number(row.weekday)&&Number(x.lesson_no)===Number(row.lesson_no))});q.push(row);saveQueue(q)}
@@ -1817,35 +1831,48 @@ function openStudentTab(tab){
 }
 var NOTE_TEMPLATES=["hat selbstständig Stopp gesagt","hat Hilfe geholt","hat Konflikt friedlich gelöst","hat zügig mit der Arbeit begonnen"];
 function noteTemplateKey(){return "milo_note_templates_"+(S.user?S.user.id:"device")}
-function renderNoteTemplates(prefix){var own=[];try{own=JSON.parse(localStorage.getItem(noteTemplateKey())||"[]")}catch(e){};el(prefix+"ObsTemplate").innerHTML='<option value="">Formulierung auswählen</option>'+NOTE_TEMPLATES.concat(own).map(function(x,i){return '<option value="'+i+'">'+esc(x)+'</option>'}).join("")}
-function useNoteTemplate(prefix){var own=[];try{own=JSON.parse(localStorage.getItem(noteTemplateKey())||"[]")}catch(e){};var i=Number(el(prefix+"ObsTemplate").value);if(el(prefix+"ObsTemplate").value==="")return;el(prefix+"ObsText").value=NOTE_TEMPLATES.concat(own)[i]||""}
-function saveNoteTemplate(prefix){var note=el(prefix+"ObsText").value.trim();if(!note){toast("Schreibe zuerst eine Formulierung");return}var own=[];try{own=JSON.parse(localStorage.getItem(noteTemplateKey())||"[]")}catch(e){};if(!NOTE_TEMPLATES.includes(note)&&!own.includes(note))own.push(note);localStorage.setItem(noteTemplateKey(),JSON.stringify(own));renderNoteTemplates(prefix);toast("Vorlage gespeichert")}
-function initObservation(prefix){el(prefix+"ObsSegment").value=String(currentTeachingSlot()||"");renderNoteTemplates(prefix)}
-function dictateObservation(id){var SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
- if(!SpeechRecognition){toast("Spracheingabe wird hier nicht unterstützt. Du kannst die Notiz schreiben.");el(id).focus();return}
- var recognition=new SpeechRecognition();recognition.lang="de-DE";recognition.continuous=false;recognition.interimResults=false;
- recognition.onresult=function(e){var words=e.results[0][0].transcript.trim(),input=el(id);input.value=(input.value?input.value.trim()+" ":"")+words;input.focus();toast("Text übernommen")};
- recognition.onerror=function(){toast("Diktat nicht verfügbar. Du kannst die Notiz schreiben.")};recognition.start();toast("Ich höre zu …")
+async function recoverLocalDrafts(){
+ // Legacy records are never deleted before a confirmed server write. This path
+ // is only available to the authenticated owner and never creates new local data.
+ var uid=S.user.id,keys=[ratingQueueKey(),noteQueueKey(),noteTemplateKey()];
+ function read(key){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return[]}}
+ var ratings=read(keys[0]),notes=read(keys[1]),templates=read(keys[2]);
+ var legacy=read('otterplan-rating-queue'),mine=legacy.filter(function(x){return x.updated_by===uid});
+ if(!(ratings.length||notes.length||templates.length||mine.length))return;
+ if(!navigator.onLine||!confirm('Auf diesem Gerät liegen ältere, lokal gespeicherte Einträge deines Kontos. Jetzt online übernehmen? Frühere Bewertungen können dadurch aktualisiert werden.')){toast('Alte lokale Einträge bleiben erhalten. Bitte vor dem Schulbetrieb bereinigen.');return}
+ for(var pair of [[keys[0],ratings],['otterplan-rating-queue',mine]]){
+  if(!pair[1].length)continue;var r=await sb.from('ratings').upsert(pair[1],{onConflict:'student_id,week_start,weekday,lesson_no'});
+  if(!r.error){if(pair[0]==='otterplan-rating-queue'){var rest=legacy.filter(function(x){return x.updated_by!==uid});if(rest.length)localStorage.setItem(pair[0],JSON.stringify(rest));else localStorage.removeItem(pair[0])}else localStorage.removeItem(pair[0])}
+ }
+ while(notes.length){var r=await sb.rpc('save_student_observation_v3',notes[0]);if(r.error)break;notes.shift();if(notes.length)localStorage.setItem(keys[1],JSON.stringify(notes));else localStorage.removeItem(keys[1])}
+ if(templates.length){var r=await sb.from('teacher_note_templates').upsert(templates.map(function(body){return{teacher_id:uid,body:body}}),{onConflict:'teacher_id,body',ignoreDuplicates:true});if(!r.error)localStorage.removeItem(keys[2])}
+ if(keys.some(function(k){return read(k).length})||read('otterplan-rating-queue').some(function(x){return x.updated_by===uid}))toast('Einige alte Einträge konnten nicht übernommen werden. Sie wurden nicht gelöscht.');
 }
+async function loadNoteTemplates(){var r=await sb.from('teacher_note_templates').select('body').eq('teacher_id',S.user.id);if(!r.error)ownNoteTemplates=(r.data||[]).map(function(x){return x.body})}
+function renderNoteTemplates(prefix){el(prefix+"ObsTemplate").innerHTML='<option value="">Formulierung auswählen</option>'+NOTE_TEMPLATES.concat(ownNoteTemplates).map(function(x,i){return '<option value="'+i+'">'+esc(x)+'</option>'}).join("")}
+function useNoteTemplate(prefix){var i=Number(el(prefix+"ObsTemplate").value);if(el(prefix+"ObsTemplate").value==="")return;el(prefix+"ObsText").value=NOTE_TEMPLATES.concat(ownNoteTemplates)[i]||""}
+async function saveNoteTemplate(prefix){var note=el(prefix+"ObsText").value.trim();if(!note){toast("Schreibe zuerst eine Formulierung");return}if(!navigator.onLine){toast('Vorlagen bitte online speichern');return}if(!NOTE_TEMPLATES.includes(note)&&!ownNoteTemplates.includes(note)){var r=await sb.from('teacher_note_templates').insert({teacher_id:S.user.id,body:note});if(r.error){toast('Vorlage konnte nicht gespeichert werden');return}ownNoteTemplates.push(note)}renderNoteTemplates(prefix);toast("Vorlage gespeichert")}
+function initObservation(prefix){el(prefix+"ObsSegment").value=String(currentTeachingSlot()||"");renderNoteTemplates(prefix)}
+function dictateObservation(id){toast('Diktat ist vorerst deaktiviert. Bitte schreibe die Notiz.');el(id).focus()}
 async function saveObservation(source){
  if(!S.student){toast("Kein Kind ausgewählt");return}
  var prefix=source==="grade"?"grade":source==="notes"?"notes":"plan";
  var dateEl=el(prefix+"ObsDate"),catEl=el(prefix+"ObsCategory"),textEl=el(prefix+"ObsText");
  var note=(textEl&&textEl.value||"").trim();if(!note){toast("Bitte eine Beobachtung eintragen");return}
  var row={p_student_id:S.student.id,p_observed_on:dateEl.value||defaultObservationDate(),p_category:catEl.value||"observation",p_note:note,p_segment_no:Number(el(prefix+"ObsSegment").value)||null,p_client_ref:crypto.randomUUID()};
- if(!navigator.onLine){queueObservation(row);textEl.value="";toast("Notiz offline vorgemerkt");if(source==="grade")modal("gradeNoteModal",false);return}
+ if(!navigator.onLine){toast("Nicht gespeichert. Bitte mit dem Internet verbinden. Der Text bleibt geöffnet.");return}
  var r=await sb.rpc("save_student_observation_v3",row);
- if(r.error){if(r.error.code){toast("Notiz konnte nicht gespeichert werden · bitte Angaben prüfen");return}queueObservation(row);textEl.value="";toast("Notiz vorgemerkt · wird später synchronisiert");if(source==="grade")modal("gradeNoteModal",false);return}
+ if(r.error){toast("Notiz nicht gespeichert. Der Text bleibt geöffnet.");return}
  textEl.value="";toast("Beobachtung gespeichert");
  if(source==="grade")modal("gradeNoteModal",false);
  if(S.studentTab==="development")await refreshTeacherDevelopment();
  if(S.studentTab==="notes")await loadNotesTab()
 }
 function noteQueueKey(){return "milo_observation_queue_"+(S.user?S.user.id:"signed-out")}
-function pendingObservations(){try{return JSON.parse(localStorage.getItem(noteQueueKey())||"[]")}catch(e){return[]}}
-function queueObservation(row){var q=pendingObservations();q.push(row);localStorage.setItem(noteQueueKey(),JSON.stringify(q));updateNet()}
+function pendingObservations(){return memoryNotes.slice()}
+function queueObservation(row){memoryNotes.push(row);updateNet()}
 async function syncOfflineObservations(){if(!navigator.onLine||S.role!=="teacher"||S.syncingNotes)return;var q=pendingObservations();if(!q.length)return;S.syncingNotes=true;
- try{while(q.length&&navigator.onLine){var r=await sb.rpc("save_student_observation_v3",q[0]);if(r.error)break;q.shift();localStorage.setItem(noteQueueKey(),JSON.stringify(q))}}
+ try{while(q.length&&navigator.onLine){var r=await sb.rpc("save_student_observation_v3",q[0]);if(r.error)break;q.shift();memoryNotes=q.slice()}}
  finally{S.syncingNotes=false;var state=el("netState");if(state)state.textContent=q.length?"● "+q.length+" Notiz ausstehend":"● Synchronisiert"}
  if(!q.length){toast("Notizen synchronisiert");if(S.studentTab==="notes")await loadNotesTab()}
 }
@@ -2022,7 +2049,7 @@ async function quickRate(sid,value){
  if(!plan(sid)||!plan(sid).checkin_completed||!plan(sid).weekly_shell_target||!plan(sid).reward_title_snapshot){toast("Bitte zuerst den Check-in abschließen");return}
  var day=Number(el("quickDay").value),lesson=Number(el("quickLesson").value),old=rating(sid,day,lesson),previous=old?{rating:old.rating}:null;
  var row={student_id:sid,week_start:week(),weekday:day,lesson_no:lesson,rating:value,updated_by:S.user.id};
- if(!navigator.onLine){queueRating(row);if(old)old.rating=value;else S.ratings.push(row);renderQuickRating();renderHome();toast("Offline gespeichert");return}
+ if(!navigator.onLine){toast("Nicht gespeichert. Bitte mit dem Internet verbinden.");return}
  var r=await sb.from("ratings").upsert(row,{onConflict:"student_id,week_start,weekday,lesson_no"});
  if(r.error){toast("Bewertung konnte nicht gespeichert werden");return}
  if(old)old.rating=value;else S.ratings.push(row);
@@ -2235,8 +2262,8 @@ async function removeRewardTemplate(id){if(!confirm("Archivierte Vorlage endgül
 }
 function qr(){el("qrName").textContent=S.student.display_name;el("newQrBtn").style.display="block";el("qrResult").style.display="none";el("teacherQr").innerHTML="";modal("qrModal",true)}
 async function createQr(){var r=await sb.rpc("get_or_create_child_qr_code",{p_student_id:S.student.id});if(r.error){toast("QR-Code konnte nicht geladen werden");return}var row=Array.isArray(r.data)?r.data[0]:r.data;if(!row||!row.qr_token)return;el("newQrBtn").style.display="none";el("qrResult").style.display="block";el("teacherQr").innerHTML="";new QRCode(el("teacherQr"),{text:childAccessUrl(row.qr_token),width:220,height:220,correctLevel:QRCode.CorrectLevel.H});el("teacherQr").dataset.token=row.qr_token}
-async function resetQr(){if(!confirm("QR-Code zurücksetzen? Die alte Karte funktioniert danach nicht mehr."))return;var r=await sb.rpc("reset_child_qr_code",{p_student_id:S.student.id});if(r.error){toast("Zurücksetzen fehlgeschlagen");return}var row=Array.isArray(r.data)?r.data[0]:r.data;el("teacherQr").innerHTML="";new QRCode(el("teacherQr"),{text:childAccessUrl(row.qr_token),width:220,height:220,correctLevel:QRCode.CorrectLevel.H});el("teacherQr").dataset.token=row.qr_token;toast("Neuer QR-Code aktiv")}
-async function revoke(){if(!confirm("Alle gekoppelten Geräte trennen?"))return;var r=await sb.rpc("revoke_child_devices",{p_student_id:S.student.id});toast(r.error?"Trennen fehlgeschlagen":"Geräte getrennt")}
+async function resetQr(){if(!confirm("QR-Code erneuern und alle gekoppelten Geräte trennen? Die alte Karte funktioniert danach nicht mehr."))return;var r=await sb.rpc("reset_child_qr_code",{p_student_id:S.student.id});if(r.error){toast("Zurücksetzen fehlgeschlagen");return}var row=Array.isArray(r.data)?r.data[0]:r.data;el("teacherQr").innerHTML="";new QRCode(el("teacherQr"),{text:childAccessUrl(row.qr_token),width:220,height:220,correctLevel:QRCode.CorrectLevel.H});el("teacherQr").dataset.token=row.qr_token;toast("Neuer QR-Code aktiv")}
+async function revoke(){if(!confirm("Alle Geräte trennen und die bisherige QR-Karte sperren? Danach bitte einen neuen QR-Code erstellen."))return;var r=await sb.rpc("revoke_child_devices",{p_student_id:S.student.id});if(!r.error){el('teacherQr').innerHTML='';delete el('teacherQr').dataset.token}toast(r.error?"Trennen fehlgeschlagen":"Geräte und bisherige Karte gesperrt")}
 function qrImage(text){return new Promise(function(resolve,reject){var host=document.createElement("div");host.style.position="fixed";host.style.left="-9999px";document.body.appendChild(host);try{new QRCode(host,{text:text,width:320,height:320,correctLevel:QRCode.CorrectLevel.H});setTimeout(function(){var canvas=host.querySelector("canvas"),img=host.querySelector("img"),data=canvas?canvas.toDataURL("image/png"):(img?img.src:null);host.remove();data?resolve(data):reject(new Error("QR fehlt"))},70)}catch(e){host.remove();reject(e)}})}
 async function downloadSingleQr(){var token=el("teacherQr").dataset.token;if(!token){toast("QR-Code zuerst anzeigen");return}var data=await qrImage(childAccessUrl(token)),doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"});doc.setFont("helvetica","bold");doc.setFontSize(22);doc.text(S.student.display_name,105,35,{align:"center"});doc.addImage(data,"PNG",65,50,80,80);doc.setFont("helvetica","normal");doc.setFontSize(11);doc.text("MILO · QR-Code scannen",105,145,{align:"center"});doc.save("MILO_QR_"+safeName(S.student.display_name)+".pdf")}
 async function downloadCodes(){if(!S.students.length){toast("Noch keine Kinder");return}toast("QR-Karten werden erstellt …");var r=await sb.rpc("get_or_create_class_child_qr_codes",{p_class_id:S.classRow.id});if(r.error){toast("QR-Karten konnten nicht erstellt werden");return}var rows=r.data||[],doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"}),xs=[14,110],ys=[14,104,194];for(var i=0;i<rows.length;i++){if(i>0&&i%6===0)doc.addPage();var p=i%6,x=xs[p%2],y=ys[Math.floor(p/2)],data=await qrImage(childAccessUrl(rows[i].qr_token));doc.setDrawColor(225,228,233);doc.roundedRect(x,y,86,82,5,5,"S");doc.setFont("helvetica","bold");doc.setFontSize(14);doc.text(String(rows[i].display_name),57+x-14,y+10,{align:"center",maxWidth:76});doc.addImage(data,"PNG",x+19,y+16,48,48);doc.setFont("helvetica","normal");doc.setFontSize(8);doc.text("MILO · scannen",x+43,y+74,{align:"center"})}doc.save("MILO_QR_"+safeName(S.classRow.name)+".pdf");toast("PDF erstellt")}
@@ -2383,7 +2410,7 @@ function account(){
  var block=el("startPreferenceBlock");if(block)block.style.display=S.role==="teacher"?"block":"none";
  modal("passwordModal",true)
 }
-async function saveOwnPassword(){var a=el("newOwnPassword").value,b=el("newOwnPassword2").value;if(a.length<10){toast("Mindestens 10 Zeichen");return}if(a!==b){toast("Passwörter stimmen nicht überein");return}var r=await sb.auth.updateUser({password:a});if(r.error){toast("Passwort konnte nicht geändert werden");return}await sb.rpc("mark_password_changed");S.profile.must_change_password=false;modal("passwordModal",false);if(location.search.indexOf("invite=1")>=0)window.history.replaceState({},document.title,location.pathname);toast("Passwort gespeichert")}
+async function saveOwnPassword(){var a=el("newOwnPassword").value,b=el("newOwnPassword2").value;if(a.length<10){toast("Mindestens 10 Zeichen");return}if(a!==b){toast("Passwörter stimmen nicht überein");return}var r;try{r=await sb.auth.updateUser({password:a})}finally{a='';b='';el('newOwnPassword').value='';el('newOwnPassword2').value=''}if(r.error){toast("Passwort konnte nicht geändert werden");return}await sb.rpc("mark_password_changed");S.profile.must_change_password=false;modal("passwordModal",false);if(location.search.indexOf("invite=1")>=0)window.history.replaceState({},document.title,location.pathname);toast("Passwort gespeichert")}
 async function renderAdminArea(){
  var admins=adminSchools(),box=el("adminContent");
  if(!admins.length){
@@ -2520,7 +2547,7 @@ async function createSchoolClass(){var n=el("schoolClassName").value.trim(),g=Nu
 
 function previewChild(){if(S.role!=="teacher"||!S.student)return;S.previewStudent=S.student;renderChild();show("childView");el("previewBack").style.display="inline-flex"}
 function backFromChildPreview(){if(S.role!=="teacher")return;el("previewBack").style.display="none";show("teacher");if(S.previewStudent)openStudent(S.previewStudent.id);S.previewStudent=null}
-function speakGoal(){if(!("speechSynthesis" in window)){toast("Vorlesen wird auf diesem Gerät nicht unterstützt");return}var goal=el("childGoal").textContent;if(!goal)return;window.speechSynthesis.cancel();var utterance=new SpeechSynthesisUtterance(goal);utterance.lang="de-DE";utterance.rate=.85;window.speechSynthesis.speak(utterance)}
+function speakGoal(){toast('Vorlesen ist bis zur Prüfung der lokalen Sprachverarbeitung deaktiviert.')}
 function selfEligibleSlots(s){var now=new Date(),day=now.getDay(),minutes=now.getHours()*60+now.getMinutes(),starts={1:495,2:540,7:585,3:615,4:660,8:705,5:720,6:765};if(!isCurrentWeek()||day<1||day>5)return[];return SEGMENTS.filter(function(n){return minutes>=starts[n]&&slotEnabled(s.id,day,n)})}
 function setChildSelfSlot(value){S.childSelfSlot=Number(value);renderChild()}
 async function saveSelfRating(value){if(S.role!=="student"||!S.student)return;var day=new Date().getDay(),lesson=Number(el("childSelfSlot").value);if(day<1||day>5||!selfEligibleSlots(S.student).includes(lesson)||!plan(S.student.id)||!plan(S.student.id).checkin_completed)return;
@@ -2582,8 +2609,8 @@ window.APP={
 
 document.addEventListener("change",function(event){var target=event.target;if(target.classList.contains("scheduleCheck"))updateSchedulePauseButtons("scheduleCheck","schedulePause");else if(target.classList.contains("classScheduleCheck"))updateSchedulePauseButtons("classScheduleCheck","classSchedulePause")});
 
-sb.auth.onAuthStateChange(function(event,session){if(event==="SIGNED_OUT"&&!session){S.user=null;S.profile=null;S.role=null;el("session").style.display="none";el("globalSearchButton").style.display="none";if(S.childRedeeming||new URL(location.href).searchParams.has("child")){show("childLogin")}else{show("login")}}});
-sb.auth.getSession().then(function(r){var params=new URL(location.href).searchParams,token=params.get("child");if(token){el("childToken").value=norm(token);show("childLogin");redeem();return}if(params.get("menu")==="1"){show("login");return}if(r.data.session)bootstrap()});
+sb.auth.onAuthStateChange(function(event,session){if(event==="SIGNED_OUT"&&!session){clearPrivateSession()}});
+sb.auth.getSession().then(function(r){var params=new URL(location.href).searchParams,token=window.MILO_SECURITY.takeChildToken();if(token){el("childToken").value=norm(token);show("childLogin");redeem();return}if(params.get("menu")==="1"){show("login");return}if(r.data.session)bootstrap()});
 if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js").then(function(r){r.update()}).catch(function(){})});
 })();
 </script>

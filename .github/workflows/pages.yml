@@ -23,10 +23,15 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Stage browser resources only
+        run: |
+          mkdir dist
+          cp index.html security.js service-worker.js manifest.webmanifest .nojekyll dist/
+          cp ./*.svg ./*.png dist/
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:
-          path: "."
+          path: "dist"
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

@@ -1,7 +1,7 @@
-const CACHE="milo-v71";
+const CACHE="milo-v72-security";
 const STATIC=["./","./?menu=1","./index.html","./manifest.webmanifest","./milo-icon.svg","./milo-icon.svg?v=40","./milo-icon-180.png","./milo-icon-192.png","./milo-icon-512.png","./milo-wordmark.svg","./plant-seed.svg","./plant-sprout.svg","./plant-sunflower.svg"];
 const LIBRARIES=new Set([
-  "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
+  "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2",
   "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js",
   "https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js",
   "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"
@@ -9,7 +9,7 @@ const LIBRARIES=new Set([
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE).then(async cache=>{
-    await cache.addAll(STATIC);
+    await cache.addAll([...STATIC,"./security.js"]);
     await Promise.allSettled([...LIBRARIES].map(async url=>{
       const response=await fetch(url,{mode:"no-cors"});
       if(response.ok||response.type==="opaque")await cache.put(url,response);
