@@ -1,5 +1,15 @@
 # MILO Sicherheitskorrekturen: vorbereiteter Stand vom 30.09.2026
 
+## Nachprüfung am 01.10.2026
+
+- Separates Projekt `MILO Sicherheitstest` in Organisation `Otter`, Frankfurt, PostgreSQL 17.11.0.002. Die Supabase-Kostenabfrage nennt 0 monatlich; kein Tarifwechsel vorgenommen.
+- Datenbankstruktur und Sicherheitskorrekturen dort eingerichtet, Edge Function dort bereitgestellt. Nur synthetische Schüler-/Benutzerkonten; keine Datenkopie des laufenden Projekts.
+- 19 echte HTTP-Prüfungen bestanden: Auth-Passwortanmeldung, REST-RLS, Adminhash-Schutz, Edge-Berechtigungsprüfung ohne Mailversand, QR-Kopplung, Zugriffsentzug nach Rotation und Schulentfernung mit bereits ausgestellten JWTs.
+- Die anonymen Testkonten wurden serverseitig als künstliche Fixtures angelegt und erhielten echte Auth-JWTs. Die erstmalige anonyme Registrierung ist im neuen Projekt noch deaktiviert. Dieser Teil des QR-Onboardings bleibt ausdrücklich ungetestet. Reale Einladungsmails und Safari/iPad-Hardware ebenfalls offen.
+- Vertraulicher Export vom 30.09.: 28 Anwendungstabellen plus Auth-Benutzer/Identitäten, 284 Zeilen. Archivintegrität und 45 Fremdschlüsselbeziehungen geprüft. Keine Recovery-/Bestätigungstoken oder Sitzungen exportiert. Kein vollständiger Supabase-Projektdump und noch kein vollständiger Auth-Wiederherstellungstest. Der Export liegt ausdrücklich außerhalb dieses öffentlichen Repositories.
+
+Reproduzierbarer Test: `MILO_STAGING_CONFIG=/geschuetzter/pfad/config.json node tests/staging-http.mjs`. Die lokale Konfiguration enthält `url`, Publishable-`key` und das ausschließlich für synthetische Konten verwendete `password`. Niemals in Git einchecken. Der Runner verweigert das produktive Projekt und versendet keine E-Mails.
+
 **Nicht live veröffentlicht.** Ausgangspunkt: `3c0397396a78608894694073d09ee3f460185a17`.
 Produktionsdatenbank, Konten, QR-Karten und GitHub-Pages-Deployment sind unverändert.
 
